@@ -13,6 +13,7 @@ public class LoadResStep : MonoSingleton<LoadResStep>, ILoadingStep
     public override void Startup()
     {
         base.Startup();
+
     }
 
     protected override void Init()
@@ -30,18 +31,6 @@ public class LoadResStep : MonoSingleton<LoadResStep>, ILoadingStep
     private IEnumerator ExecuteStep()
     {
         bool isResInit = false;
-        ResourceManager.Instance.Init(() =>
-        {
-            Progress = 0.5f;
-            isResInit = true;
-        });
-        yield return null;
-        while (!isResInit)
-        {
-            yield return null;
-        }
-
-        isResInit = false;
         XLuaManager.Instance.LoadLuaScriptsRes(() =>
         {
             Progress = 0.7f;

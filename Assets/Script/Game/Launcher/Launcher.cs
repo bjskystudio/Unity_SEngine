@@ -1,5 +1,4 @@
-﻿using Game;
-using SEngine;
+﻿using SEngine;
 using UnityEngine;
 
 [XLua.LuaCallCSharp]
@@ -17,12 +16,10 @@ public class Launcher : MonoSingleton<Launcher>
     [Label("是否使用LuaAB")]
     public bool UsedLuaAssetBundle = false;
 
-
     protected override void Init()
     {
         base.Init();
         Log.Init(new UnityLogger());
-        InitResLoadCfg();
         string path = "test";
         Log.Debug("SDKUpdatePath>>>" + path + "\n\r"
             + "persistentDataPath>>>" + Application.persistentDataPath + "\n\r"
@@ -42,17 +39,6 @@ public class Launcher : MonoSingleton<Launcher>
     {
         EventManager.Instance.RemoveListener(EventDef.OnGameStartUp, OnGameStartUp);
         Log.Debug("Game Startup complete...");
-    }
-
-    private void InitResLoadCfg()
-    {
-        //ResourceLoadConfigRef configRef = gameObject.GetComponent<ResourceLoadConfigRef>();
-        //if (configRef == null || configRef.mConfig == null)
-        //{
-        //    Debug.LogError("资源加载配置缺失");
-        //    return;
-        //}
-        //configRef.mConfig.mResourceLoadMode = UsedAssetBundle ? ResourceLoadMode.eAssetbundle : ResourceLoadMode.eAssetDatabase;
     }
 
     /// <summary>

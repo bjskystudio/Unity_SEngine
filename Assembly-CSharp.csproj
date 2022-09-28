@@ -95,6 +95,23 @@
     <Compile Include="Assets\XLua\Src\InternalGlobals.cs" />
     <Compile Include="Assets\Script\SEngine\Log\UnityLogger.cs" />
     <Compile Include="Assets\Script\SEngine\Log\ILogger.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoadManager.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoadConfig.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoadConfigRef.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SRes.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResRef.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\AssetRequest.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\ABRequest.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResPath.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResText.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResAudioClip.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResAnimationClip.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResFont.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResPrefab.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResMaterial.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResAssetBundle.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResSprite.cs" />
+    <Compile Include="Assets\Script\SEngine\ResLoad\ResLoader\SResTexture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\XLua\Resources\xlua\util.lua.txt" />

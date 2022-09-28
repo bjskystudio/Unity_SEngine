@@ -1,0 +1,643 @@
+Using pre-set license
+Built from '2020.3/china_unity/release' branch; Version is '2020.3.39f1c1 (e8bb58ac2c1a) revision 15252312'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10  (10.0.19043) 64bit Professional' Language: 'zh' Physical Memory: 16297 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.3.39f1c1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+E:/work/Unity_SEngine
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+64826
+Successfully changed project path to: E:/work/Unity_SEngine
+E:/work/Unity_SEngine
+Using Asset Import Pipeline V2.
+AS: AutoStreaming module initializing.Refreshing native plugins compatible for Editor in 53.39 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.39f1c1 (e8bb58ac2c1a)
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.39f1c1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path E:/work/Unity_SEngine/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce GTX 1050 Ti (ID=0x1c82)
+    Vendor:   
+    VRAM:     4018 MB
+    Driver:   30.0.15.1215
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.39f1c1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.39f1c1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.39f1c1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56896
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.39f1c1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.005456 seconds.
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 45.46 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.617 seconds
+Domain Reload Profiling:
+	ReloadAssembly (617ms)
+		BeginReloadAssembly (97ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (0ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (1ms)
+		EndReloadAssembly (432ms)
+			LoadAssemblies (91ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (137ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (28ms)
+			SetupLoadedEditorAssemblies (161ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (4ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (46ms)
+				BeforeProcessingInitializeOnLoad (16ms)
+				ProcessInitializeOnLoadAttributes (70ms)
+				ProcessInitializeOnLoadMethodAttributes (25ms)
+				AfterProcessingInitializeOnLoad (0ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (0ms)
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.004143 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 44.77 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.172 seconds
+Domain Reload Profiling:
+	ReloadAssembly (1172ms)
+		BeginReloadAssembly (176ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (5ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (16ms)
+		EndReloadAssembly (920ms)
+			LoadAssemblies (130ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (285ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (48ms)
+			SetupLoadedEditorAssemblies (377ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (4ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (45ms)
+				BeforeProcessingInitializeOnLoad (98ms)
+				ProcessInitializeOnLoadAttributes (190ms)
+				ProcessInitializeOnLoadMethodAttributes (21ms)
+				AfterProcessingInitializeOnLoad (19ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (2ms)
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.06 seconds
+Refreshing native plugins compatible for Editor in 0.66 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2428 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 105.4 MB.
+System memory in use after: 105.5 MB.
+
+Unloading 48 unused Assets to reduce memory usage. Loaded Objects now: 2846.
+Total: 3.364400 ms (FindLiveObjects: 0.249200 ms CreateObjectMapping: 0.114100 ms MarkObjects: 2.835500 ms  DeleteObjects: 0.164300 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Import Request.
+  path: Assets/Script/SEngine/ResLoad
+  artifactKey: Guid(6d5a0de7e2b24b34885afba1e2e08295) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad using Guid(6d5a0de7e2b24b34885afba1e2e08295) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cd8347ea148083f79fb52d1d1dd0f035') in 0.006091 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 17.164022 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadManager.cs
+  artifactKey: Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadManager.cs using Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a84515e174ac79b081cd7fa6342f9377') in 0.020306 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 443.097054 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadManager.cs
+  artifactKey: Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadManager.cs using Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '167b37e0d87700b002f72cf83200e186') in 0.003166 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 11.264097 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadConfig.cs
+  artifactKey: Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadConfig.cs using Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '92c5afa82b003657cb5628a0507c6b56') in 0.003991 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 82.385040 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadConfig.cs
+  artifactKey: Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadConfig.cs using Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '08d8b93c89caefb6dbc2d05bc57acd4d') in 0.002828 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.652522 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadConfigRef.cs
+  artifactKey: Guid(e0691c930a085854cb16b6b280f1384d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadConfigRef.cs using Guid(e0691c930a085854cb16b6b280f1384d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd41c0b1fcb1fe90b56297a3a93f54d75') in 0.003830 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 556.894166 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadConfigRef.cs
+  artifactKey: Guid(e0691c930a085854cb16b6b280f1384d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadConfigRef.cs using Guid(e0691c930a085854cb16b6b280f1384d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1e858d7402c11f86ae37164d918de745') in 0.002965 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 920.500740 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader
+  artifactKey: Guid(1e2f10b436ae8214dbef73820a18c354) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader using Guid(1e2f10b436ae8214dbef73820a18c354) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '188ba401f7dfa02230db5209ccfb1af8') in 0.003574 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 31.056861 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HRes.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HRes.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2626906ab8b3c8bdf13c7b45ccfaae70') in 0.003295 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 10.057337 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/BaseResLoader.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/BaseResLoader.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '15450185334351f1a6216e73de4fdfa5') in 0.003715 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 625.407820 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '57891df67abc64498143fde1b86c9a8e') in 0.003453 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 48.469965 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c1d26fdf39feeaf4c1f0eb4d51e960e3') in 0.003622 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 172.613380 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResRef.cs
+  artifactKey: Guid(85d795b9ce7d2f64b8ff49d9d2b62596) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResRef.cs using Guid(85d795b9ce7d2f64b8ff49d9d2b62596) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '922e12996fb47a5f669d021b90144e7a') in 0.004647 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2161.596965 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResRef.cs
+  artifactKey: Guid(85d795b9ce7d2f64b8ff49d9d2b62596) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResRef.cs using Guid(85d795b9ce7d2f64b8ff49d9d2b62596) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1af927c0902c21984e0894948d108fcf') in 0.004618 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 6.402806 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HPrefab.cs
+  artifactKey: Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HPrefab.cs using Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '05e0a0f8726322e867210f52f31c317a') in 0.003462 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 6.529537 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs
+  artifactKey: Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs using Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bdf73196b2453cb5eea36808cd66440d') in 0.003945 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 97.861147 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs
+  artifactKey: Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs using Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4e028579a3f8a8e127741e3ef5307a4a') in 0.003121 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2369.529570 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs
+  artifactKey: Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SPrefab.cs using Guid(cc55360eca5fd1046854590b817e132d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e9db0a1110d8ca257f96ab28e271c35d') in 0.004047 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 6.616677 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs
+  artifactKey: Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs using Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a98fa1de085c5c2ab577d6bf81502032') in 0.003209 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 371.440840 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResPath.cs
+  artifactKey: Guid(9e5840d77b063be44aeb611ef610b1b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResPath.cs using Guid(9e5840d77b063be44aeb611ef610b1b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8a9177994de17586d9177c8af02eb540') in 0.004469 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1481.041818 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResPath.cs
+  artifactKey: Guid(9e5840d77b063be44aeb611ef610b1b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResPath.cs using Guid(9e5840d77b063be44aeb611ef610b1b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '11ff26bcb8c313f4851912f41330e467') in 0.003413 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 3.133836 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HAssetBundle.cs
+  artifactKey: Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HAssetBundle.cs using Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '484920a346440d7387f06f184a01c7ba') in 0.003438 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.483078 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs
+  artifactKey: Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs using Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5f7c3bae6ddd2f3c143d81542097c1fa') in 0.003727 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 64.333850 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs
+  artifactKey: Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs using Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '53ff07ea79723fc3459427df2f7c39c4') in 0.003707 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 375.213855 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs
+  artifactKey: Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs using Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3780d83f6efa3ef00274f73c99ccfcba') in 0.003169 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.176558 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs
+  artifactKey: Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs using Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a3d061ed02d60392671d765f673858c1') in 0.003080 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 297.728153 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs
+  artifactKey: Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs using Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd2bd9990de6bb5a324d5124e3f39360b') in 0.004306 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 449.468626 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs
+  artifactKey: Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs using Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '54b83898fb573effdea88fa8edac7f98') in 0.003091 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 5.985949 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HAnimationClip.cs
+  artifactKey: Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HAnimationClip.cs using Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7bcfecbc3094a4e516bf0fba1fcbc9d3') in 0.003852 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.722099 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAnimationClip.cs
+  artifactKey: Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAnimationClip.cs using Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9e6c71a665f9a4b911afb93fff170b33') in 0.004458 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.362668 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HAudioClip.cs
+  artifactKey: Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HAudioClip.cs using Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '26b4fc7972726783cbd01aa2737ac41c') in 0.003681 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.819370 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAudioClip.cs
+  artifactKey: Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAudioClip.cs using Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e6c112a1a3a2837d0ebe63c7400e4b0e') in 0.004015 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.067918 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HFont.cs
+  artifactKey: Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HFont.cs using Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1c0791fef62a7f86787642a029d5f96c') in 0.004036 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.555294 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SFont.cs
+  artifactKey: Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SFont.cs using Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '431cfda2f0f0b021e91c023b4691e500') in 0.004699 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.071665 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HMaterial.cs
+  artifactKey: Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HMaterial.cs using Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '295b3bba9990d670539749376446980e') in 0.004393 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 3.791473 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SMaterial.cs
+  artifactKey: Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SMaterial.cs using Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd3dcddcad0e9edc614bf160af3177fda') in 0.003494 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.081234 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HSprite.cs
+  artifactKey: Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HSprite.cs using Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4a063026d427ac4fe93f2edc429f1956') in 0.003682 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.519490 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SSprite.cs
+  artifactKey: Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SSprite.cs using Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '24089c43846445b43439ce77eeddfbdc') in 0.004418 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.302978 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HText.cs
+  artifactKey: Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HText.cs using Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1a382aa0f150b685ff9bc9f5bd1e9c89') in 0.004368 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.873925 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SText.cs
+  artifactKey: Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SText.cs using Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4b48f6db3d4d1ea46f23ed9943e87b4a') in 0.004389 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.316068 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/HTexture.cs
+  artifactKey: Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/HTexture.cs using Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3a41480409c5a8532445a6e74bc5a118') in 0.005468 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.006603 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/STexture.cs
+  artifactKey: Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/STexture.cs using Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1e7bb70d4e129b0075eb716c52167ce6') in 0.004271 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 59.354456 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAnimationClip.cs
+  artifactKey: Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAnimationClip.cs using Guid(66f3a72e4b7bd6d4897e39ed788d1225) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '44d31bfdca69c64151f23504514d0a95') in 0.003004 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.709342 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs
+  artifactKey: Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAssetBundle.cs using Guid(ad5b97e1395913c4d857fee3ecba8ff8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fbc3a9739043f2701018fd8622c561f5') in 0.002982 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 32.660305 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SAudioClip.cs
+  artifactKey: Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SAudioClip.cs using Guid(c66d030b261f3e64baf32f0cd564e131) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd8273ba209d3edea781bfc026c128ecf') in 0.003085 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 56.911153 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SFont.cs
+  artifactKey: Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SFont.cs using Guid(1add6a48857da3c499f199e68be724c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '44b163fcfb9260646434a3bdd5ce87a5') in 0.003694 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 66.130370 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SMaterial.cs
+  artifactKey: Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SMaterial.cs using Guid(366ee5ecae8c29444abba4b4a06bf098) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a8b4c7d543b74aa65374afc5322151c9') in 0.002851 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.695537 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '797479d3805534f00c3ea90369fe79da') in 0.002908 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 142.090260 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SSprite.cs
+  artifactKey: Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SSprite.cs using Guid(8c2d7285511e56b41ae2b2f33afc221c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f1f75d9ab1425a62787dfd26562cf054') in 0.003166 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 49.817618 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SText.cs
+  artifactKey: Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SText.cs using Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '86217daaed73b42208fa370f0b1672b5') in 0.003989 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 18.963867 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/STexture.cs
+  artifactKey: Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/STexture.cs using Guid(6125a86fafc5ce24785714a9dcae6752) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f9a5b8c27adb9b7c583f2ce311ec5098') in 0.002869 seconds 
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.004014 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.79 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.179 seconds
+Domain Reload Profiling:
+	ReloadAssembly (1181ms)
+		BeginReloadAssembly (216ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (13ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (69ms)
+		EndReloadAssembly (887ms)
+			LoadAssemblies (143ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (285ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (42ms)
+			SetupLoadedEditorAssemblies (367ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (6ms)
+				SetLoadedEditorAssemblies (1ms)
+				RefreshPlugins (1ms)
+				BeforeProcessingInitializeOnLoad (101ms)
+				ProcessInitializeOnLoadAttributes (224ms)
+				ProcessInitializeOnLoadMethodAttributes (16ms)
+				AfterProcessingInitializeOnLoad (20ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (4ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.63 ms, found 4 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2438 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 105.8 MB.
+System memory in use after: 105.9 MB.
+
+Unloading 37 unused Assets to reduce memory usage. Loaded Objects now: 2866.
+Total: 3.284500 ms (FindLiveObjects: 0.209100 ms CreateObjectMapping: 0.119400 ms MarkObjects: 2.797000 ms  DeleteObjects: 0.157900 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Import Request.
+  Time since last request: 323.177315 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAnimationClip.cs
+  artifactKey: Guid(ae141b258ff117945b3137389606f2a2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAnimationClip.cs using Guid(ae141b258ff117945b3137389606f2a2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b3857b2f45527abb822cd9ba03ec0709') in 0.010872 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 19.812091 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAnimationClip.cs
+  artifactKey: Guid(ae141b258ff117945b3137389606f2a2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAnimationClip.cs using Guid(ae141b258ff117945b3137389606f2a2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '678a67e2134395f8e64631fe78b5ac47') in 0.003270 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.957883 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAssetBundle.cs
+  artifactKey: Guid(5956fcc4b4b218e469d76043eeaab433) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAssetBundle.cs using Guid(5956fcc4b4b218e469d76043eeaab433) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '551208096bacbfea3b8847648a014412') in 0.003475 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 35.799864 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAssetBundle.cs
+  artifactKey: Guid(5956fcc4b4b218e469d76043eeaab433) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAssetBundle.cs using Guid(5956fcc4b4b218e469d76043eeaab433) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '96041a2dd39301f557a845d4f9d5a353') in 0.002931 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.210695 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAudioClip.cs
+  artifactKey: Guid(a95a034982bd66f4aa024523bc44469c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAudioClip.cs using Guid(a95a034982bd66f4aa024523bc44469c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e42da3729cc795d7185fe3bd9a68ce94') in 0.003685 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 10.461846 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResAudioClip.cs
+  artifactKey: Guid(a95a034982bd66f4aa024523bc44469c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResAudioClip.cs using Guid(a95a034982bd66f4aa024523bc44469c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '03990e1ad36daa1be5b8cf88b9a419a7') in 0.003674 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.742747 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResFont.cs
+  artifactKey: Guid(1268ff10389e69146a772ec04151723b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResFont.cs using Guid(1268ff10389e69146a772ec04151723b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e799c386f2d61f77353ed9b5bb9ef6c0') in 0.003400 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 8.567324 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResFont.cs
+  artifactKey: Guid(1268ff10389e69146a772ec04151723b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResFont.cs using Guid(1268ff10389e69146a772ec04151723b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '228d15ff6e3b3a79b672bad8971efbe3') in 0.002865 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.755451 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResMaterial.cs
+  artifactKey: Guid(97dab4384cd154944a7c7afa26d55588) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResMaterial.cs using Guid(97dab4384cd154944a7c7afa26d55588) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ed4faaefa2a42dbc6a388e017118496e') in 0.003339 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 11.119048 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResMaterial.cs
+  artifactKey: Guid(97dab4384cd154944a7c7afa26d55588) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResMaterial.cs using Guid(97dab4384cd154944a7c7afa26d55588) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6fc0122dbc0d22b68a9eb816962199ba') in 0.002937 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.509629 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResPrefab.cs
+  artifactKey: Guid(5f933efa22484bb4b818afd3329846d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResPrefab.cs using Guid(5f933efa22484bb4b818afd3329846d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8e68596aa47882cbbb703b4eef74a816') in 0.003348 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 9.388706 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResPrefab.cs
+  artifactKey: Guid(5f933efa22484bb4b818afd3329846d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResPrefab.cs using Guid(5f933efa22484bb4b818afd3329846d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c4f47fc703be64f9e618534c71ab0216') in 0.003214 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.085378 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResSprite.cs
+  artifactKey: Guid(a23751f5326e9d54b9851d943c4a7d0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResSprite.cs using Guid(a23751f5326e9d54b9851d943c4a7d0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '593e0ce3b4669b2c79cf1f84c0234947') in 0.003214 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 8.924078 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResSprite.cs
+  artifactKey: Guid(a23751f5326e9d54b9851d943c4a7d0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResSprite.cs using Guid(a23751f5326e9d54b9851d943c4a7d0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '825c7471335a923fa4500039c7e9419f') in 0.003278 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.583915 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResText.cs
+  artifactKey: Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResText.cs using Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5a2b1715ec1bfe78a70ca4849b6974ba') in 0.003753 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 8.200701 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResText.cs
+  artifactKey: Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResText.cs using Guid(6def99924b2360f44b02739098cac86d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a318d228b9a2e329d8f8441b19f666c9') in 0.003238 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 1.893984 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResTexture.cs
+  artifactKey: Guid(6886d4942f4c6f24ea59a61f5fe3df6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResTexture.cs using Guid(6886d4942f4c6f24ea59a61f5fe3df6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cf7edb8cdeb3eaa70483485f27042630') in 0.003346 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 8.644382 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SResTexture.cs
+  artifactKey: Guid(6886d4942f4c6f24ea59a61f5fe3df6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SResTexture.cs using Guid(6886d4942f4c6f24ea59a61f5fe3df6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd2ecbb1ea6c485eb792ab7928b46314e') in 0.003264 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 29.798241 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs
+  artifactKey: Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/SRes.cs using Guid(3dd4f05c500c48046911dc4987d6bc65) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '713cefc522819f0d5b52050e6ef60819') in 0.002739 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 2.861881 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs
+  artifactKey: Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs using Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '11342723b099a69f0cd1679a9f41acda') in 0.003252 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 30.271373 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs
+  artifactKey: Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/ABRequest.cs using Guid(4e686d79cdade71449489856a9dbe12b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b6feee75370e93c45bd82dc3e80d1d31') in 0.003014 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 8.904154 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs
+  artifactKey: Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoader/AssetRequest.cs using Guid(393ca2ce5a3e1d84b9c7dbee2662fca7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'edbc8ed02e77d70866414f285ae310e2') in 0.002930 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 5.569477 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadConfig.cs
+  artifactKey: Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadConfig.cs using Guid(36f6e41546d09d64b8891e13e311e67d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ba7e52d63da2a6ddd9e7b36d531d1425') in 0.003159 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 4.232729 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadManager.cs
+  artifactKey: Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadManager.cs using Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a1f83f97c003a5ab7f264d4396125061') in 0.002974 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 47.604264 seconds.
+  path: Assets/Script/SEngine/ResLoad/ResLoadManager.cs
+  artifactKey: Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Script/SEngine/ResLoad/ResLoadManager.cs using Guid(27937e94844a2594a98f1bc419773000) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1dcc0f1e5ee61ca2a6b4e7068d5a09d9') in 0.003499 seconds 
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file
