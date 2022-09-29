@@ -65,6 +65,6 @@ function reimport(name)
     end
     return realRequire(name)
 end
-_G.CS.XLuaManager.LuaReimport = function(filePath)
+_G.CS.XLuaManager.LuaReimport .LuaReimport = function(filePath)
     _G.reimport(filePath)
 end

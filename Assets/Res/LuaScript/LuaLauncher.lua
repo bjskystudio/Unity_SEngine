@@ -3,8 +3,12 @@
 --- Created by Simon.L.
 --- DateTime: 2022/9/29 13:41
 ---
+require("Init")
+-- EmmyLua调试（自己设备替换）
+package.cpath = package.cpath .. ';C:/Users/asd/AppData/Roaming/JetBrains/IdeaIC2022.2/plugins/EmmyLua/debugger/emmy/windows/x64/?.dll'
+local dbg = require('emmy_core')
+dbg.tcpConnect('localhost', 9966)
 
---require("Init")
 
 ---@class LuaLauncher 游戏的主入口，一般由C#端调用
 local LuaLauncher = {}
@@ -14,4 +18,5 @@ _G.LuaLauncher = LuaLauncher
 function LuaLauncher:Start()
      print("<color=red><size=18>Lua LuaLauncher: Start</size></color>")
     --self:StartLuaLogic()
+     local cs = _G.CS;
 end
