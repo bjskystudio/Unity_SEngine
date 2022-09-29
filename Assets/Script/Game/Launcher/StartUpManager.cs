@@ -58,7 +58,8 @@ public class StartUpManager : MonoSingleton<StartUpManager>
         {
             DestroyImmediate(UIModel.Inst.gameObject);
         }
-        ResUtils.LoadPrefabInstance("Launcher/UIModel").name = "UIModel";
+        ResLoadManager.Instance.LoadResourceRes<GameObject>("Launcher/UIModel", AssetType.ePrefab).name = "UIModel";
+
         UIModel.Inst.Init();
 
         while (!UIModel.Inst.IsInitFinish)
@@ -69,7 +70,7 @@ public class StartUpManager : MonoSingleton<StartUpManager>
         //摄像机管理模块
         if (CameraManager.Get() != null)
             DestroyImmediate(CameraManager.Get().gameObject);
-        ResUtils.LoadPrefabInstance("Launcher/CameraManager").name = "CameraManager";
+        ResLoadManager.Instance.LoadResourceRes<GameObject>("Launcher/CameraManager", AssetType.ePrefab).name = "CameraManager";
 
         //IsSplashFinish = false;
         ////闪屏

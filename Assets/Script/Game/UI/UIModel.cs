@@ -109,6 +109,8 @@ public class UIModel : MonoBehaviour
         ResetData();
         EventManager.Instance.AddListener(EventDef.SDKGetNotchScreenInfo, InitSDKData);
         //AndroidSDKManager.Instance.SDK.openNotchScreen();
+
+        StartCoroutine(RefreshUIRealSize());
     }
 
     private void InitSDKData(object notchScreenMsg)

@@ -16,6 +16,13 @@ public class Launcher : MonoSingleton<Launcher>
     [Label("是否使用LuaAB")]
     public bool UsedLuaAssetBundle = false;
 
+    [HeaderAttribute("======内网用，出包别选======")]
+    /// <summary>
+    /// 打印级别
+    /// </summary>
+    [Label("打印级别")]
+    public LogLevel LogLevel;
+
     protected override void Init()
     {
         base.Init();

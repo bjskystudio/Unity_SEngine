@@ -102,7 +102,7 @@ namespace SEngine
             }
         }
 
-        #region load资源类型
+        #region Load Res资源
 
         /// <summary>
         /// 根据类型参数加载资源
@@ -112,7 +112,7 @@ namespace SEngine
         /// <param name="type">资源类型</param>
         /// <param name="isSync">是否同步加载</param>
         /// <param name="callback">加载回调</param>
-        public void LoadObj(string path, AssetType type, Action<UnityEngine.Object, SResRef> callback = null, bool isSync = false)
+        public void LoadRes(string path, AssetType type, Action<UnityEngine.Object, SResRef> callback = null, bool isSync = false)
         {
             string assetName = Path.GetFileName(path);
             switch (type)
@@ -202,7 +202,28 @@ namespace SEngine
         }
         #endregion
 
-        internal void AddRecycleBin(SRes res)
+        #region Load Resource资源
+        /// <summary>
+        /// 根据类型参数加载资源
+        /// </summary>
+        /// <param name="path">资源相对路径</param>
+        /// <param name="type">资源类型</param>
+        public T LoadResourceRes<T>(string path, AssetType type) where T : UnityEngine.Object
+        {
+            UnityEngine.Object res = null;
+            switch (type)
+            {
+                case AssetType.ePrefab:
+                    GameObject resGO = Resources.Load<GameObject>(path);
+                    res = GameObject.Instantiate(resGO);
+                    (res as GameObject).ResetPRS();
+                    break;
+            }
+            return res as T;
+        }
+        #endregion
+
+            internal void AddRecycleBin(SRes res)
         {
             if (!mRecycleBinMap.ContainsKey(res))
             {
