@@ -462,6 +462,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UsedAssetBundle: 0
   UsedLuaAssetBundle: 0
+  mLogLevel: 16777215
 --- !u!4 &1778624905
 Transform:
   m_ObjectHideFlags: 0

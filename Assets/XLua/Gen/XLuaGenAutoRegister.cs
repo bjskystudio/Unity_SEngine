@@ -595,6 +595,12 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(UIModel), UIModelWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(SEngine.Log), SEngineLogWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(LuaResLoadHelp), LuaResLoadHelpWrap.__Register);
+        
+        
             translator.DelayWrapLoader(typeof(SEngine.UnityObjectExtends), SEngineUnityObjectExtendsWrap.__Register);
         
         

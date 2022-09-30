@@ -4,14 +4,13 @@
 --- DateTime: 2022/9/29 13:41
 ---
 require("Init")
--- EmmyLua调试（自己设备替换）
-package.cpath = package.cpath .. ';C:/Users/asd/AppData/Roaming/JetBrains/IdeaIC2022.2/plugins/EmmyLua/debugger/emmy/windows/x64/?.dll'
-local dbg = require('emmy_core')
-dbg.tcpConnect('localhost', 9966)
-
+local EventInst = require("EventManager"):GetInstance()
+local GameEvent = require("GameEvent")
+local Log = require("Log")
 
 ---@class LuaLauncher 游戏的主入口，一般由C#端调用
 local LuaLauncher = {}
+
 _G.LuaLauncher = LuaLauncher
 
 -- 主入口函数。
@@ -19,4 +18,10 @@ function LuaLauncher:Start()
      print("<color=red><size=18>Lua LuaLauncher: Start</size></color>")
     --self:StartLuaLogic()
      local cs = _G.CS;
+     EventInst:AddListener(GameEvent.TestEvent1,self.OnTestEvent,self)
+     EventInst:Broadcast(GameEvent.TestEvent1,"xxx")
+end
+
+function LuaLauncher:OnTestEvent(arg)
+     Log.Debug(arg)
 end

@@ -5,9 +5,11 @@
 ---
 local AppSetting = AppSetting
 local table_remove = table.remove
+local CSLog = CS.SEngine.Log
 
 ---@class Log 打印
 local Log = {}
+
 
 ---@class eLogLevel 日志的开放等级(参考YoukiaCore中的Log，与或枚举)
 ---@field Off number 关闭
@@ -29,10 +31,10 @@ Log.eLogLevel = eLogLevel
 
 ---打印方法列表
 local LogList = {
-    [eLogLevel.Debug] = CS.Log.Log,
-    [eLogLevel.Info] = CS.Log.Info,
-    [eLogLevel.Warning] = CS.Log.Warning,
-    [eLogLevel.Error] = CS.Log.Error
+    [eLogLevel.Debug] = CSLog.Debug,
+    [eLogLevel.Info] = CSLog.Info,
+    [eLogLevel.Warning] = CSLog.Warning,
+    [eLogLevel.Error] = CSLog.Error
 }
 
 ---创建log消息
@@ -179,6 +181,7 @@ end
 ---@param log_level eLogLevel 日志等级
 ---@param ... any 内容（string类型支持传入format格式， 后跟多参数... 参数支持table;  table类型直接打印table）
 local function OnLog(log_level, ...)
+    local cs = CS
     if Log.IsLogLevelOpen(log_level) and LogList[log_level] ~= nil then
         LogList[log_level](debug.traceback(CreatLogInfo(...)))
     end

@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(XLuaManager);
-			Utils.BeginObjectRegister(type, L, translator, 0, 11, 3, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 12, 3, 0);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "LoadLuaScriptsRes", _m_LoadLuaScriptsRes);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "LoadLuaPBRes", _m_LoadLuaPBRes);
@@ -33,6 +33,7 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Dispose", _m_Dispose);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "DeleteDelegate", _m_DeleteDelegate);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SafeDoString", _m_SafeDoString);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "ExecuteScript", _m_ExecuteScript);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "CreateNewTable", _m_CreateNewTable);
 			
 			
@@ -385,6 +386,80 @@ namespace XLua.CSObjectWrap
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_ExecuteScript(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                XLuaManager gen_to_be_invoked = (XLuaManager)translator.FastGetCSObj(L, 1);
+            
+            
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 3&& (LuaAPI.lua_isnil(L, 2) || LuaAPI.lua_type(L, 2) == LuaTypes.LUA_TSTRING)&& (LuaAPI.lua_isnil(L, 3) || LuaAPI.lua_type(L, 3) == LuaTypes.LUA_TSTRING)) 
+                {
+                    byte[] _scriptCode = LuaAPI.lua_tobytes(L, 2);
+                    string _file = LuaAPI.lua_tostring(L, 3);
+                    
+                        var gen_ret = gen_to_be_invoked.ExecuteScript( _scriptCode, _file );
+                        translator.PushAny(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                if(gen_param_count == 2&& (LuaAPI.lua_isnil(L, 2) || LuaAPI.lua_type(L, 2) == LuaTypes.LUA_TSTRING)) 
+                {
+                    byte[] _scriptCode = LuaAPI.lua_tobytes(L, 2);
+                    
+                        var gen_ret = gen_to_be_invoked.ExecuteScript( _scriptCode );
+                        translator.PushAny(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                if(gen_param_count == 3&& (LuaAPI.lua_isnil(L, 2) || LuaAPI.lua_type(L, 2) == LuaTypes.LUA_TSTRING)&& (LuaAPI.lua_isnil(L, 3) || LuaAPI.lua_type(L, 3) == LuaTypes.LUA_TSTRING)) 
+                {
+                    byte[] _scriptCode = LuaAPI.lua_tobytes(L, 2);
+                    object _ret;
+                    string _file = LuaAPI.lua_tostring(L, 3);
+                    
+                        var gen_ret = gen_to_be_invoked.ExecuteScript( _scriptCode, out _ret, _file );
+                        LuaAPI.lua_pushboolean(L, gen_ret);
+                    translator.PushAny(L, _ret);
+                        
+                    
+                    
+                    
+                    return 2;
+                }
+                if(gen_param_count == 2&& (LuaAPI.lua_isnil(L, 2) || LuaAPI.lua_type(L, 2) == LuaTypes.LUA_TSTRING)) 
+                {
+                    byte[] _scriptCode = LuaAPI.lua_tobytes(L, 2);
+                    object _ret;
+                    
+                        var gen_ret = gen_to_be_invoked.ExecuteScript( _scriptCode, out _ret );
+                        LuaAPI.lua_pushboolean(L, gen_ret);
+                    translator.PushAny(L, _ret);
+                        
+                    
+                    
+                    
+                    return 2;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to XLuaManager.ExecuteScript!");
             
         }
         

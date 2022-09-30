@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -187,6 +188,7 @@ public class XLuaManager : MonoSingleton<XLuaManager>
 
         //加载LuaLauncher.lua
         LoadScript(luaLauncherScriptName);
+        StartEmmyLuaDebugger();
         StartGame();
     }
 
@@ -197,6 +199,13 @@ public class XLuaManager : MonoSingleton<XLuaManager>
     public LuaEnv GetLuaEnv()
     {
         return luaEnv;
+    }
+    private void StartEmmyLuaDebugger()
+    {
+        Debug.Log("Start EmmyLua");
+        string debugDll = UnityEngine.Application.dataPath + "/../EmmyLuaDebugger/windows/x64/?.dll";
+        byte[] byteArray = System.Text.Encoding.Default.GetBytes($"package.cpath = package.cpath .. ';{debugDll}'\nlocal dbg = require('emmy_core')\ndbg.tcpConnect('localhost', 9966)");
+        ExecuteScript(byteArray);
     }
 
     /// <summary>
@@ -348,7 +357,50 @@ public class XLuaManager : MonoSingleton<XLuaManager>
             }
         }
     }
+    
+    
+    /// <summary>
+    /// Execute lua script directly!
+    /// </summary>
+    /// <param name="scriptCode"></param>
+    /// <returns></returns>
+    public object ExecuteScript(byte[] scriptCode, string file = "chunk")
+    {
+        object ret;
+        ExecuteScript(scriptCode, out ret, file);
+        return ret;
+    }
+    
+    /// <summary>
+    /// Execute lua script directly!
+    /// </summary>
+    /// <param name="scriptCode"></param>
+    /// <param name="ret">return result</param>
+    /// <returns></returns>
+    public bool ExecuteScript(byte[] scriptCode, out object ret, string file = "chunk")
+    {
+        if (luaEnv!= null)
+        {
+            var results = luaEnv.DoString(Encoding.UTF8.GetString(scriptCode), file);
 
+            if (results != null && results.Length == 1)
+            {
+                ret = results[0];
+            }
+            else
+            {
+                ret = results;
+            }
+
+            return true;
+        }
+        else
+        {
+            ret = null;
+            return false;
+        }
+    }
+    
     public LuaTable CreateNewTable()
     {
         return luaEnv != null ? luaEnv.NewTable() : null;

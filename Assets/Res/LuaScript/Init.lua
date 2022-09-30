@@ -25,28 +25,33 @@ require "Singleton"
 
 --region -------------UnityEngine-------------
 require "InitUnityEngine"
---require "CSCallLua"
---endregion
-
---region -------------Config-------------
---require "ConfigManager"
+require "CSCallLua"
 --endregion
 
 --region -------------Updater-------------
---require "Timer"
---require "TimerManager"
---require "TimeUtil"
+require "Timer"
+require "TimerManager"
+require "TimeUtil"
 --endregion
 
 
 --region -------------Event-------------
---require "EventManager"
---require "EventID"
+require "Event"
+require "EventManager"
+require "EventID"
 --endregion
 
+--region -------------Resource-------------
+require "ResTypeEnum"
+require "ResLoadManager"
+--require "ConfigManager"
+--endregion
 
 --region --------------UI-----------------
---require "UIManager"
+require "UILayerEnum"
+require "UIBase"
+require "UIComBase"
+require "UIManager"
 --endregion
 
 --region --------------Module-----------------
@@ -65,6 +70,6 @@ function reimport(name)
     end
     return realRequire(name)
 end
-_G.CS.XLuaManager.LuaReimport .LuaReimport = function(filePath)
+_G.CS.XLuaManager.LuaReimport = function(filePath)
     _G.reimport(filePath)
 end

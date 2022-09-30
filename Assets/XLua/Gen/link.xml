@@ -8,6 +8,8 @@
 		<type fullname="StartUpManager" preserve="all"/>
 		<type fullname="XLuaManager" preserve="all"/>
 		<type fullname="UIModel" preserve="all"/>
+		<type fullname="SEngine.Log" preserve="all"/>
+		<type fullname="LuaResLoadHelp" preserve="all"/>
 		<type fullname="SEngine.UnityObjectExtends" preserve="all"/>
 		
 	</assembly>

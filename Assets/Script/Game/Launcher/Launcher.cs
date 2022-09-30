@@ -21,12 +21,12 @@ public class Launcher : MonoSingleton<Launcher>
     /// 打印级别
     /// </summary>
     [Label("打印级别")]
-    public LogLevel LogLevel;
+    public LogLevel mLogLevel = LogLevel.All;
 
     protected override void Init()
     {
         base.Init();
-        Log.Init(new UnityLogger());
+        Log.Init(new UnityLogger(), mLogLevel);
         string path = "test";
         Log.Debug("SDKUpdatePath>>>" + path + "\n\r"
             + "persistentDataPath>>>" + Application.persistentDataPath + "\n\r"

@@ -30,11 +30,11 @@ namespace XLua.CSObjectWrap
 			
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedAssetBundle", _g_get_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedLuaAssetBundle", _g_get_UsedLuaAssetBundle);
-            Utils.RegisterFunc(L, Utils.GETTER_IDX, "LogLevel", _g_get_LogLevel);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "mLogLevel", _g_get_mLogLevel);
             
 			Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedAssetBundle", _s_set_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedLuaAssetBundle", _s_set_UsedLuaAssetBundle);
-            Utils.RegisterFunc(L, Utils.SETTER_IDX, "LogLevel", _s_set_LogLevel);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "mLogLevel", _s_set_mLogLevel);
             
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
@@ -194,13 +194,13 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_LogLevel(RealStatePtr L)
+        static int _g_get_mLogLevel(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
                 Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
-                translator.Push(L, gen_to_be_invoked.LogLevel);
+                translator.Push(L, gen_to_be_invoked.mLogLevel);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -240,14 +240,14 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _s_set_LogLevel(RealStatePtr L)
+        static int _s_set_mLogLevel(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
                 Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
                 SEngine.LogLevel gen_value;translator.Get(L, 2, out gen_value);
-				gen_to_be_invoked.LogLevel = gen_value;
+				gen_to_be_invoked.mLogLevel = gen_value;
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

@@ -9,7 +9,7 @@
 ---@field UsedLuaAssetBundle boolean 是否使用UsedLuaAssetBundle
 local AppSetting = {}
 
-AppSetting.LogLevel = CS.System.Convert.ToInt32(CS.Launcher.Instance.LogLevel)
+AppSetting.LogLevel = CS.System.Convert.ToInt32(CS.Launcher.Instance.mLogLevel)
 
 AppSetting.UsedAssetBundle = CS.Launcher.Instance.UsedAssetBundle
 

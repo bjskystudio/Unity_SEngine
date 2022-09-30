@@ -238,6 +238,7 @@ public static class GenConfig
         typeof(Launcher),
         typeof(XLuaManager),
         typeof(UIModel),
+        typeof(Log),
         //typeof(CSTimerManager),
 	    #endregion
     };
@@ -246,6 +247,42 @@ public static class GenConfig
     [CSharpCallLua]
     public static List<Type> CSharpCallLua = new List<Type>()
     {
+        typeof(Action),
+        typeof(Action<int>),
+        typeof(Action<int, int>),
+        typeof(Action<int, GameObject>),
+        typeof(Action<int, string>),
+        typeof(Action<int, float>),
+        typeof(Action<int, long>),
+        typeof(Action<int, int, bool>),
+        typeof(Action<int, string, GameObject>),
+        typeof(Action<int, bool, GameObject>),
+        typeof(Action<int, UnityEngine.Object, SResRef>),
+        typeof(Action<int, Transform, int>),
+        typeof(Action<float>),
+        typeof(Action<float, float>),
+        typeof(Action<float ,float, float, float>),
+        typeof(Action<long>),
+        typeof(Action<long, long>),
+        typeof(Action<int, string>),
+        typeof(Action<int, Transform, int>),
+        typeof(Action<bool, GameObject>),
+        typeof(Action<long, UnityEngine.AI.OffMeshLink>),
+        typeof(Action<string>),
+        typeof(Action<string, string>),
+        typeof(Action<string, GameObject>),
+        typeof(Action<bool>),
+        typeof(Action<bool, float, float, float>),
+        typeof(Action<Transform, int>),
+        typeof(Action<GameObject, int>),
+        typeof(Action<Transform, int, bool>),
+        typeof(Action<LuaTable, GameObject>),
+        typeof(Action<LuaTable>),
+        typeof(Action<LuaTable, int>),
+        typeof(Action<LuaTable, LuaTable>),
+        typeof(Action<GameObject>),
+        typeof(Action<GameObject, int>),
+        typeof(Action<GameObject, GameObject, int, int>),
     };
 
         //ºÚÃûµ¥

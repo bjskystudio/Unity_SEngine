@@ -32,6 +32,16 @@ function XLuaManager:DeleteDelegate() end
 ---@param scriptContent string
 function XLuaManager:SafeDoString(scriptContent) end
 
+---@param scriptCode System.Byte[]
+---@param file string
+---@return System.Object
+function XLuaManager:ExecuteScript(scriptCode,file) end
+
+---@param scriptCode System.Byte[]
+---@param file string
+---@return System.Boolean
+function XLuaManager:ExecuteScript(scriptCode,file) end
+
 ---@return XLua.LuaTable
 function XLuaManager:CreateNewTable() end
 

@@ -3,7 +3,7 @@
 ---@class Launcher : SEngine.MonoSingleton
 ---@field public UsedAssetBundle System.Boolean
 ---@field public UsedLuaAssetBundle System.Boolean
----@field public LogLevel SEngine.LogLevel
+---@field public mLogLevel SEngine.LogLevel
 local Launcher = {}
 
 function Launcher:StartUp() end
