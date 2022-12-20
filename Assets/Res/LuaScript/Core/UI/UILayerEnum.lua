@@ -4,15 +4,15 @@
 --- DateTime: 2022/9/30 15:37
 ---
 ---@class UILayerEnum @UI层级枚举
----@field SceneLayer number @场景层Layer(e.g. 场景HUD等所在层)
----@field MainLayer number @主窗口层(主窗口所在层)
----@field PopLayer number @窗口层(所有普通窗口都在这一层)
----@field InfoLayer number @提示层(e.g. 跑马灯,飘字提示等所在层)
+---@field SceneLayer number @场景层Layer(e.g. 场景等所在层)
+---@field WindowLayer number @窗口层(所有普通窗口都在这一层)
+---@field InfoLayer number @提示层()
+---@field TopLayer number @顶层(e.g. 引导等所在层)
 local UILayerEnum = {
     SceneLayer = 0,
-    MainLayer = 1,
-    PopLayer = 2,
-    InfoLayer = 999,
+    WindowLayer = 1,
+    InfoLayer = 2,
+    TopLayer = 9,
 }
 ---@type UILayerEnum @UI层级枚举(枚举值有用到，必须为int且从0开始，请勿轻易修改)
 _G.UILayerEnum = UILayerEnum

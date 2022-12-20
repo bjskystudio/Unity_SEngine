@@ -1,0 +1,25 @@
+string	string	number	number[]	int[][]	string
+字段	描述	数值配置	数值配置数组	数值配置数组多组	文字配置
+Key	Desc	paramNum	paramNumArr	paramNumArrs	paramStr
+					
+//资源相关					
+Res_GoldAutoRaise	挂机金币收益每秒	10			
+Res_GoldStart	开始金币	100			
+Res_DiamondStart	开始钻石	10000			
+Res_PopularStart	开始人气	0			
+Res_GhostStart	开始幽灵	0			
+Max_energy	体力最大值	50			
+Energy_Recover_Time	体力恢复需要的时间（秒）	600			
+Energy_Recover_Amount	体力恢复量	5			
+Click_Number	常规情况下扭蛋机的点击次数	3			
+Diamond_Upgreade_Time	钻石升级，1钻石等于多少加速（s）	30			
+Diamond_Upgreade_Gold	钻石升级，1钻石等于多少金币	60			
+gashapon_machine_sp_interval	扭蛋机特殊状态出现时间间隔（秒）	300			
+Gems_Energy_Recover	观看广告和花费钻石恢复的体力量	50			
+AD_Count	每日可观看广告的次数	5			
+AD_Gems_Cost	钻石恢复体力的花费		10#15#20#25#30		
+Initial_Acceleration_Time	初始加速时间（s）	900			
+waitqueue_room1001	休息室室外排列			-10#-17|-13#-18|-16#-19|-18#-22|-20#-24	
+client_wayout	顾客室外消失点			10#-51#1#1	
+lounge_door	休息室入口			-24#-31	
+takingbubble_weight	聊天气泡触发	50			

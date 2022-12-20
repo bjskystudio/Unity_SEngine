@@ -14,9 +14,9 @@ namespace SEngine
         {
             get
             {
-                if (ResLoadManager.Instance.Config != null)
+                if (ResLoadManager.Config != null)
                 {
-                    return ResLoadManager.Instance.Config.RES_LOCAL_ASSETDATABASE_RELATIVE_PATH;
+                    return ResLoadManager.Config.RES_LOCAL_ASSETDATABASE_RELATIVE_PATH;
                 }
 
                 return "";
@@ -30,9 +30,9 @@ namespace SEngine
         {
             get
             {
-                if (ResLoadManager.Instance.Config != null)
+                if (ResLoadManager.Config != null)
                 {
-                    return Application.dataPath + "/" + ResLoadManager.Instance.Config.RES_LOCAL_AB_RELATIVE_PATH;
+                    return Application.dataPath + "/" + ResLoadManager.Config.RES_LOCAL_AB_RELATIVE_PATH;
                 }
 
                 return "";
@@ -46,9 +46,9 @@ namespace SEngine
         {
             get
             {
-                if (ResLoadManager.Instance.Config != null)
+                if (ResLoadManager.Config != null)
                 {
-                    return Application.streamingAssetsPath + "/" + ResLoadManager.Instance.Config.RES_STREAM_AB_RELATIVE_PATH;
+                    return Application.streamingAssetsPath + "/" + ResLoadManager.Config.RES_STREAM_AB_RELATIVE_PATH;
                 }
 
                 return "";
@@ -62,15 +62,15 @@ namespace SEngine
         {
             get
             {
-                if (ResLoadManager.Instance.Config != null)
+                if (ResLoadManager.Config != null)
                 {
-                    if (string.IsNullOrEmpty(ResLoadManager.Instance.Config.RES_PERSISTENT_RELATIVE_PATH))
+                    if (string.IsNullOrEmpty(ResLoadManager.Config.RES_PERSISTENT_RELATIVE_PATH))
                     {
                         return Application.persistentDataPath;
                     }
                     else
                     {
-                        return Application.persistentDataPath + "/" + ResLoadManager.Instance.Config.RES_PERSISTENT_RELATIVE_PATH;
+                        return Application.persistentDataPath + "/" + ResLoadManager.Config.RES_PERSISTENT_RELATIVE_PATH;
                     }
                 }
 
@@ -155,10 +155,10 @@ namespace SEngine
                     case RuntimePlatform.Android:
                         {
                             result.Append(RES_SDK_UPDATE_ROOT_PATH);
-                            if (!string.IsNullOrEmpty(ResLoadManager.Instance.Config.RES_PERSISTENT_AB_RELATIVE_PATH))
+                            if (!string.IsNullOrEmpty(ResLoadManager.Config.RES_PERSISTENT_AB_RELATIVE_PATH))
                             {
                                 result.Append("/");
-                                result.Append(ResLoadManager.Instance.Config.RES_PERSISTENT_AB_RELATIVE_PATH);
+                                result.Append(ResLoadManager.Config.RES_PERSISTENT_AB_RELATIVE_PATH);
                             }
                         }
                         break;
@@ -168,10 +168,10 @@ namespace SEngine
                     case RuntimePlatform.OSXPlayer:
                         {
                             result.Append(RES_PERSISTENT_ROOT_PATH);
-                            if (!string.IsNullOrEmpty(ResLoadManager.Instance.Config.RES_PERSISTENT_AB_RELATIVE_PATH))
+                            if (!string.IsNullOrEmpty(ResLoadManager.Config.RES_PERSISTENT_AB_RELATIVE_PATH))
                             {
                                 result.Append("/");
-                                result.Append(ResLoadManager.Instance.Config.RES_PERSISTENT_AB_RELATIVE_PATH);
+                                result.Append(ResLoadManager.Config.RES_PERSISTENT_AB_RELATIVE_PATH);
                             }
                         }
                         break;

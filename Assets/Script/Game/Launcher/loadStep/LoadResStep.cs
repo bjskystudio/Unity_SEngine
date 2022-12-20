@@ -31,6 +31,18 @@ public class LoadResStep : MonoSingleton<LoadResStep>, ILoadingStep
     private IEnumerator ExecuteStep()
     {
         bool isResInit = false;
+        ResLoadManager.Instance.Init(() =>
+        {
+            Progress = 0.5f;
+            isResInit = true;
+        });
+        yield return null;
+        while (!isResInit)
+        {
+            yield return null;
+        }
+
+        isResInit = false;
         XLuaManager.Instance.LoadLuaScriptsRes(() =>
         {
             Progress = 0.7f;

@@ -385,4 +385,280 @@ function Transform:GetEnumerator() end
 ---@return UnityEngine.Transform
 function Transform:GetChild(index) end
 
+function Transform:ResetPRS() end
+
+---@param s number
+function Transform:SetLocalScaleXYZ(s) end
+
+---@param index int32
+function Transform:ClearChildren(index) end
+
+---@param cam UnityEngine.Camera
+---@param pRect UnityEngine.RectTransform
+---@return UnityEngine.Vector3
+function Transform:ConvertLocalPositionToParent(cam,pRect) end
+
+---@param startPos UnityEngine.Vector3
+---@param controlPos UnityEngine.Vector3
+---@param endPos UnityEngine.Vector3
+---@param during number
+---@return DG.Tweening.Tweener
+function Transform:DoBezier2(startPos,controlPos,endPos,during) end
+
+---@param endValue UnityEngine.Vector3
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOMove(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOMoveX(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOMoveY(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOMoveZ(endValue,duration,snapping) end
+
+---@param endValue UnityEngine.Vector3
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOLocalMove(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOLocalMoveX(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOLocalMoveY(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOLocalMoveZ(endValue,duration,snapping) end
+
+---@param endValue UnityEngine.Vector3
+---@param duration number
+---@param mode DG.Tweening.RotateMode
+---@return DG.Tweening.Tweener
+function Transform:DORotate(endValue,duration,mode) end
+
+---@param endValue UnityEngine.Quaternion
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DORotateQuaternion(endValue,duration) end
+
+---@param endValue UnityEngine.Vector3
+---@param duration number
+---@param mode DG.Tweening.RotateMode
+---@return DG.Tweening.Tweener
+function Transform:DOLocalRotate(endValue,duration,mode) end
+
+---@param endValue UnityEngine.Quaternion
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOLocalRotateQuaternion(endValue,duration) end
+
+---@param endValue UnityEngine.Vector3
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOScale(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOScale(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOScaleX(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOScaleY(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOScaleZ(endValue,duration) end
+
+---@param towards UnityEngine.Vector3
+---@param duration number
+---@param axisConstraint DG.Tweening.AxisConstraint
+---@param up UnityEngine.Vector3
+---@return DG.Tweening.Tweener
+function Transform:DOLookAt(towards,duration,axisConstraint,up) end
+
+---@param punch UnityEngine.Vector3
+---@param duration number
+---@param vibrato int32
+---@param elasticity number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOPunchPosition(punch,duration,vibrato,elasticity,snapping) end
+
+---@param punch UnityEngine.Vector3
+---@param duration number
+---@param vibrato int32
+---@param elasticity number
+---@return DG.Tweening.Tweener
+function Transform:DOPunchScale(punch,duration,vibrato,elasticity) end
+
+---@param punch UnityEngine.Vector3
+---@param duration number
+---@param vibrato int32
+---@param elasticity number
+---@return DG.Tweening.Tweener
+function Transform:DOPunchRotation(punch,duration,vibrato,elasticity) end
+
+---@param duration number
+---@param strength number
+---@param vibrato int32
+---@param randomness number
+---@param snapping System.Boolean
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakePosition(duration,strength,vibrato,randomness,snapping,fadeOut) end
+
+---@param duration number
+---@param strength UnityEngine.Vector3
+---@param vibrato int32
+---@param randomness number
+---@param snapping System.Boolean
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakePosition(duration,strength,vibrato,randomness,snapping,fadeOut) end
+
+---@param duration number
+---@param strength number
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakeRotation(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength UnityEngine.Vector3
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakeRotation(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength number
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakeScale(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength UnityEngine.Vector3
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOShakeScale(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param endValue UnityEngine.Vector3
+---@param jumpPower number
+---@param numJumps int32
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Sequence
+function Transform:DOJump(endValue,jumpPower,numJumps,duration,snapping) end
+
+---@param endValue UnityEngine.Vector3
+---@param jumpPower number
+---@param numJumps int32
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Sequence
+function Transform:DOLocalJump(endValue,jumpPower,numJumps,duration,snapping) end
+
+---@param path UnityEngine.Vector3[]
+---@param duration number
+---@param pathType DG.Tweening.PathType
+---@param pathMode DG.Tweening.PathMode
+---@param resolution int32
+---@param gizmoColor UnityEngine.Color
+---@return DG.Tweening.Core.TweenerCore
+function Transform:DOPath(path,duration,pathType,pathMode,resolution,gizmoColor) end
+
+---@param path UnityEngine.Vector3[]
+---@param duration number
+---@param pathType DG.Tweening.PathType
+---@param pathMode DG.Tweening.PathMode
+---@param resolution int32
+---@param gizmoColor UnityEngine.Color
+---@return DG.Tweening.Core.TweenerCore
+function Transform:DOLocalPath(path,duration,pathType,pathMode,resolution,gizmoColor) end
+
+---@param path DG.Tweening.Plugins.Core.PathCore.Path
+---@param duration number
+---@param pathMode DG.Tweening.PathMode
+---@return DG.Tweening.Core.TweenerCore
+function Transform:DOPath(path,duration,pathMode) end
+
+---@param path DG.Tweening.Plugins.Core.PathCore.Path
+---@param duration number
+---@param pathMode DG.Tweening.PathMode
+---@return DG.Tweening.Core.TweenerCore
+function Transform:DOLocalPath(path,duration,pathMode) end
+
+---@param byValue UnityEngine.Vector3
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOBlendableMoveBy(byValue,duration,snapping) end
+
+---@param byValue UnityEngine.Vector3
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function Transform:DOBlendableLocalMoveBy(byValue,duration,snapping) end
+
+---@param byValue UnityEngine.Vector3
+---@param duration number
+---@param mode DG.Tweening.RotateMode
+---@return DG.Tweening.Tweener
+function Transform:DOBlendableRotateBy(byValue,duration,mode) end
+
+---@param byValue UnityEngine.Vector3
+---@param duration number
+---@param mode DG.Tweening.RotateMode
+---@return DG.Tweening.Tweener
+function Transform:DOBlendableLocalRotateBy(byValue,duration,mode) end
+
+---@param punch UnityEngine.Vector3
+---@param duration number
+---@param vibrato int32
+---@param elasticity number
+---@return DG.Tweening.Tweener
+function Transform:DOBlendablePunchRotation(punch,duration,vibrato,elasticity) end
+
+---@param byValue UnityEngine.Vector3
+---@param duration number
+---@return DG.Tweening.Tweener
+function Transform:DOBlendableScaleBy(byValue,duration) end
+
 return Transform

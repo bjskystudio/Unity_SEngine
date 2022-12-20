@@ -4,9 +4,16 @@
 --- DateTime: 2022/9/29 13:41
 ---
 require("Init")
-local EventInst = require("EventManager"):GetInstance()
-local GameEvent = require("GameEvent")
 local Log = require("Log")
+local EventManager = require("EventManager")
+local GameEvent = require("GameEvent")
+local UIManager = require("UIManager")
+local UIDefine = require("UIDefine")
+
+local GameData = require("GameData")
+local HotelData = require("HotelData")
+local DeviceData = require("DeviceData")
+
 
 ---@class LuaLauncher 游戏的主入口，一般由C#端调用
 local LuaLauncher = {}
@@ -16,12 +23,19 @@ _G.LuaLauncher = LuaLauncher
 -- 主入口函数。
 function LuaLauncher:Start()
      print("<color=red><size=18>Lua LuaLauncher: Start</size></color>")
-    --self:StartLuaLogic()
+     --初始化一些必要的管理器
+     self:StartupLuaLogic()
      local cs = _G.CS;
-     EventInst:AddListener(GameEvent.TestEvent1,self.OnTestEvent,self)
-     EventInst:Broadcast(GameEvent.TestEvent1,"xxx")
+     EventManager:GetInstance():AddListener(GameEvent.TestEvent1,self.OnTestEvent,self)
+     EventManager:GetInstance():Broadcast(GameEvent.TestEvent1,"xxx")
+end
+
+function LuaLauncher:StartupLuaLogic()
 end
 
 function LuaLauncher:OnTestEvent(arg)
      Log.Debug(arg)
+     UIManager:GetInstance():OpenUIDefine(UIDefine.LoginView)
 end
+
+return LuaLauncher

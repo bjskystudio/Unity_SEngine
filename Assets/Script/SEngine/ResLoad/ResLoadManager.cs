@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 namespace SEngine
 {
@@ -27,11 +28,28 @@ namespace SEngine
         eAssetDatabase,
         eAssetbundle,
     }
-    public class ResLoadManager : MonoSingleton<ResLoadManager>
+    public class ResLoadManager
     {
 
+        private static ResLoadManager mInstance;
+        public static ResLoadManager Instance
+        {
+            get
+            {
+                if (mInstance == null)
+                {
+                    mInstance = new ResLoadManager();
+                }
 
-        private ResLoadConfig mConfig;
+                mInstance.CheckUpdate();
+                return mInstance;
+            }
+        }
+
+        private static ResLoadUpdater mUpdater;
+        private static ResLoadConfig mConfig;
+        private SResRef mShaderResRef;
+        private Dictionary<string, Shader> mShaderMap = new Dictionary<string, Shader>(); //所有shader列表
         public Dictionary<string, SRes> mResMap = new Dictionary<string, SRes>(); //所有资源列表
         public Dictionary<SRes, string> mRecycleBinMap = new Dictionary<SRes, string>(); //回收站列表
 
@@ -42,9 +60,9 @@ namespace SEngine
         {
             get
             {
-                if (mConfig != null)
+                if (Config != null)
                 {
-                    return mConfig.mResourceLoadMode;
+                    return Config.mResourceLoadMode;
                 }
                 else
                 {
@@ -52,57 +70,152 @@ namespace SEngine
                 }
             }
         }
-        public ResLoadConfig Config
+        public static ResLoadConfig Config
         {
             get
             {
-                if (mConfig != null)
+                if (mConfig == null)
                 {
-                    return mConfig;
+                    ResLoadConfigRef configRef = GameObject.FindObjectOfType<ResLoadConfigRef>();
+                    if (configRef != null)
+                    {
+                        mConfig = configRef.mConfig;
+                    }
                 }
-                else
-                {
-                    return null;
-                }
-               }
-        }
-        public override void Startup()
-        {
-            base.Startup();
-        }
-        protected override void Init()
-        {
-            base.Init();
-            if (mConfig == null)
-            {
-                ResLoadConfigRef configRef = GameObject.FindObjectOfType<ResLoadConfigRef>();
-                if (configRef != null)
-                {
-                    mConfig = configRef.mConfig;
-                }
-            }
 
-            if (mConfig == null)
-            {
-                Log.Error("!!!!!!!!!!!!!没再场景中找到ResourceLoadConfig脚本!!!!!!!!!!!!!!!!");
-                return;
+                if (mConfig == null)
+                {
+                    Debug.LogError("!!!!!!!!!!!!!没再场景中找到ResourceLoadConfig脚本!!!!!!!!!!!!!!!!");
+                }
+
+                return mConfig;
             }
-            {
-                StartCoroutine(CoInit());
-            }
+        }
+        public void Init(Action completeAction)
+        {
+            StartCoroutine(CoInit(completeAction));
         }
 
-        IEnumerator CoInit()
+        internal void StartCoroutine(IEnumerator routine)
+        {
+            if (mUpdater != null)
+            {
+                mUpdater.StartCoroutine(routine);
+            }
+        }
+        IEnumerator CoInit(Action completeAction)
         {
             if (LoadMode == ResLoadMode.eAssetbundle)
             {
                 SResAssetBundle.InitManifest();
-                yield return null;
+                yield return null;// CoInitShader();
 
+            }
+            completeAction?.Invoke();
+        }
+        IEnumerator CoInitShader()
+        {
+            AsyncRequest request = LoadShaderAllCoRequest(Config.SHADER_AB_RELATIVE_PATH);
+            yield return request;
+            mShaderResRef = request.ResRef;
+            if (request.Assets != null)
+            {
+                for (int i = 0; i < request.Assets.Count; i++)
+                {
+                    if (request.Assets[i] != null)
+                    {
+                        if (!mShaderMap.ContainsKey(request.Assets[i].name))
+                        {
+                            mShaderMap[request.Assets[i].name] = request.Assets[i] as Shader;
+                        }
+                        else
+                        {
+                            Debug.LogError(string.Format("{0}中有同多个同名{1}", Config.SHADER_AB_RELATIVE_PATH, request.Assets[i].name));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void CheckUpdate()
+        {
+            if (!mUpdater)
+            {
+                mUpdater = GameObject.FindObjectOfType<ResLoadUpdater>();
+                if (!mUpdater)
+                {
+                    mUpdater = new GameObject("ResLoadUpdater").AddComponent<ResLoadUpdater>();
+                    mUpdater.gameObject.hideFlags = HideFlags.DontSave;
+                }
             }
         }
 
         #region Load Res资源
+
+        /// <summary>
+        /// 回调方式，加载AB中的所有Text(AssetDatabase模式无法使用)
+        /// 释放方式：调用回调第二个返回对象Release()去释放
+        /// </summary>
+        /// <param name="path">路径名</param>
+        /// <param name="callback">回调</param>
+        /// <param name="isSync">是否同步</param>
+        public void LoadABTextAll(string path, Action<List<TextAsset>, SResRef> callback, bool isSync = false)
+        {
+            LoadAll<TextAsset, SResText>(path, AssetType.eText, callback, isSync);
+        }
+        /// 释放方式：调用AsyncRequest中的HRes对象的Release()去释放
+        private AsyncRequest LoadShaderAllCoRequest(string path)
+        {
+            return LoadAllCoRequest<Shader, SResShader>(path, AssetType.eShader);
+        }
+        private AsyncRequest LoadAllCoRequest<T1, T2>(string path, AssetType assetType, bool isPreload = false) where T1 : UnityEngine.Object where T2 : SRes, new()
+        {
+            AsyncRequest request = new AsyncRequest();
+            LoadAll<T1, T2>(path, assetType, (obj, resRef) =>
+            {
+                request.isDone = true;
+                request.progress = 1;
+                if (obj != null)
+                {
+                    request.Assets = obj.ConvertAll((item) => { return item as UnityEngine.Object; });
+                    request.ResRef = resRef;
+                }
+            }, false, isPreload);
+
+            return request;
+        }
+        /// <summary>
+        /// 获取shader,外部统一走这里
+        /// </summary>
+        /// <param name="shaderName">shader名字</param>
+        /// <returns></returns>
+        public Shader GetShader(string shaderName)
+        {
+            if (LoadMode != ResLoadMode.eAssetbundle || Application.isEditor)
+            {
+                Shader shader = Shader.Find(shaderName);
+                if (shader == null)
+                {
+                    Debug.LogError(string.Format("不存在 {0}", shaderName));
+                }
+
+                return shader;
+            }
+            else
+            {
+                if (mShaderMap.ContainsKey(shaderName))
+                {
+                    return mShaderMap[shaderName];
+                }
+                else
+                {
+                    Debug.LogError(string.Format("{0} 中不存在 {1} ", mConfig.SHADER_AB_RELATIVE_PATH, shaderName));
+                    return null;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 根据类型参数加载资源
@@ -200,6 +313,41 @@ namespace SEngine
             T2 res = GetSRes<T2>(assetPath, assetName, assetType, isAll);
             res.StartLoad(isSync, isAll, isPreload, tCallBack);
         }
+
+        private void LoadAll<T1, T2>(string assetPath, AssetType assetType, Action<List<T1>, SResRef> callback, bool isSync = false, bool isPreload = false) where T1 : UnityEngine.Object where T2 : SRes, new()
+        {
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                Debug.LogError("assetPath is null!!!");
+                if (callback != null)
+                {
+                    callback(null, null);
+                }
+                return;
+            }
+
+            Action<System.Object, SResRef> tCallBack = null;
+            if (callback != null)
+            {
+                tCallBack = (asset, resRef) =>
+                {
+                    if (asset != null)
+                    {
+                        List<System.Object> objectList = (asset as IEnumerable<System.Object>).Cast<System.Object>().ToList();
+                        List<T1> assetList = objectList.ConvertAll((item) => { return item as T1; });
+                        assetList.RemoveAll((item) => { return item == null; });
+                        callback(assetList, resRef);
+                    }
+                    else
+                    {
+                        callback(null, null);
+                    }
+                };
+            }
+
+            T2 res = GetSRes<T2>(assetPath, "*", assetType, true);
+            res.StartLoad(isSync, true, isPreload, tCallBack);
+        }
         #endregion
 
         #region Load Resource资源
@@ -284,10 +432,6 @@ namespace SEngine
             {
                 mReleaseRequestList.Add(sRes);
             }
-        }
-        public override void Dispose()
-        {
-
         }
     }
 }

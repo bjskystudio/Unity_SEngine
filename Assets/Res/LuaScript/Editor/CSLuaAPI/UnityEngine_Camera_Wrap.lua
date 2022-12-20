@@ -265,6 +265,78 @@ function Camera:TryGetCullingParameters() end
 ---@return System.Boolean
 function Camera:TryGetCullingParameters(stereoAware) end
 
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOAspect(endValue,duration) end
+
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOColor(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOFarClipPlane(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOFieldOfView(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DONearClipPlane(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOOrthoSize(endValue,duration) end
+
+---@param endValue UnityEngine.Rect
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DOPixelRect(endValue,duration) end
+
+---@param endValue UnityEngine.Rect
+---@param duration number
+---@return DG.Tweening.Tweener
+function Camera:DORect(endValue,duration) end
+
+---@param duration number
+---@param strength number
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Camera:DOShakePosition(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength UnityEngine.Vector3
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Camera:DOShakePosition(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength number
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Camera:DOShakeRotation(duration,strength,vibrato,randomness,fadeOut) end
+
+---@param duration number
+---@param strength UnityEngine.Vector3
+---@param vibrato int32
+---@param randomness number
+---@param fadeOut System.Boolean
+---@return DG.Tweening.Tweener
+function Camera:DOShakeRotation(duration,strength,vibrato,randomness,fadeOut) end
+
 ---@param focalLength number
 ---@param sensorSize UnityEngine.Vector2
 ---@param lensShift UnityEngine.Vector2

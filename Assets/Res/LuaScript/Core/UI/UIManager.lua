@@ -7,8 +7,12 @@ local UILayerEnum = require("UILayerEnum")
 local EventManager = require("EventManager")
 local Log = require("Log")
 local EventID = require("EventID")
+local PopEvent = require("PopEvent")
+local UIDefine = require("UIDefine")
 local tableInsert = table.insert
 local tableRemovebyvalue = table.removebyvalue
+local tableCount = table.count
+local IsNil = IsNil
 
 ---@class UIManager : Singleton @UI管理单例类
 ---@field public UICamera UnityEngine.Camera @UI摄像机
@@ -16,19 +20,28 @@ local tableRemovebyvalue = table.removebyvalue
 ---@field public SceneUIRoot UnityEngine.Transform @SceneUIRoot根节点
 ---@field public NormalUIRoot UnityEngine.Transform @NormalUI根节点
 ---@field public BlurUIRoot UnityEngine.Transform @BlurUI根节点
----@field private LayerAllOpenedViewMap table<UILayerEnum, table<string, UIBase>> @UI Layer对应所有已打开的窗口集合(Key为UI Layer值,Value为该Layer已打开窗口映射Map--为了获取Layer最高Order时避免不必要的窗口遍历)
----@field private AllOpenedViewList UIBase[] @当前所有已打开的窗口列表(用列表的原因是为了确保和打开顺序一致)
+---@field private LayerUIMap table<UILayerEnum, table<string, UIBase>> @UI Layer对应所有已打开的窗口集合(Key为UI Layer值,Value为该Layer已打开窗口映射Map--为了获取Layer最高Order时避免不必要的窗口遍历)
+---@field private AllOpenedUIList UIBase[] @当前所有已打开的窗口列表(用列表的原因是为了确保和打开顺序一致)
+---@field private MaskView MaskView 背景设置层
 local UIManager = Class("UIManager", Singleton)
+
+---单层起始1000
+--UIManager.LayerOrderStart = 1000
+---单ui order差值50
+UIManager.LayerOrderGap = 50
 
 ---@private
 function UIManager:__init()
-    self.LayerAllOpenedViewMap = {}
-
-    for _, uilayer in pairs(UILayerEnum) do
-        self.LayerAllOpenedViewMap[uilayer] = {}
+    self.UISettingMap = {}
+    self.LayerUIMap = {}
+    --该窗口script的实例map
+    self.NamedUIMap = {}
+    --窗口层的实例map
+    for _, uiLayer in pairs(UILayerEnum) do
+        self.LayerUIMap[uiLayer] = {}
     end
 
-    self.AllOpenedViewList = {}
+    self.AllOpenedUIList = {}
     self:InitUIRoot()
 end
 
@@ -37,66 +50,233 @@ end
 function UIManager:InitUIRoot()
     self.UICamera = CSUIModel.UICamera
     self.BlurCamera = CSUIModel.BlurCamera
-    self.SceneUIRoot = CSUIModel.SceneUIRoot
-    self.NormalUIRoot = CSUIModel.NormalUIRoot
-    self.BlurUIRoot = CSUIModel.BlurUIRoot
 end
 
 --- 获取指定UILayer的挂载节点
 ---@private
----@param uilayer UILayerEnum @UI层级
+---@param uiLayer UILayerEnum @UI层级
 ---@return UnityEngine.Transform @指定UILayer对应的挂载节点
-function UIManager:GetLayerTransform(uilayer)
-    if uilayer == UILayerEnum.SceneLayer then
-        return self.SceneUIRoot
+function UIManager:GetLayerTransform(uiLayer)
+    if uiLayer == UILayerEnum.SceneLayer then
+        return CSUIModel.SceneUIRoot
+    elseif uiLayer == UILayerEnum.WindowLayer then
+        return CSUIModel.NormalUIRoot
+    elseif uiLayer == UILayerEnum.InfoLayer then
+        return CSUIModel.InfoLayer
+    elseif uiLayer == UILayerEnum.TopLayer then
+        return CSUIModel.TopLayer
     else
-        return self.NormalUIRoot
+        return CSUIModel.NormalUIRoot
     end
+end
+---获取指定UI层级已打开窗口Order最高的值(没有有效窗口则返回0)
+---@private
+---@param uiLayer number @UI层级
+---@return number @获取指定UI层级Order最高的值(没有有效窗口则返回0)
+function UIManager:GetUILayerHighestOrder(uiLayer)
+    local highestOrder = 0
+    ---@param uiInstance UIBase
+    for _, uiInstance in pairs(self.LayerUIMap[uiLayer]) do
+        if uiInstance.SortOrder > highestOrder then
+            highestOrder = uiInstance.SortOrder
+
+        end
+    end
+    return highestOrder
+end
+
+
+---打开指定define窗口
+---@param uiDefine {Name:string,Path:string} @窗口define
+---@param uiSetting UISetting @窗口setting
+---@param ... any @窗口传参
+---@return UIBase @窗口对象
+function UIManager:OpenUIDefine(uiDefine,uiSetting,...)
+    return self:OpenUI(uiDefine.Name,uiDefine.Path,uiSetting,...)
 end
 
 
 ---打开指定窗口
----@param scriptName string @窗口脚本名
+---@param uiName string @窗口脚本名
 ---@param uiPath string @窗口asset路径
 ---@param uiSetting UISetting @窗口setting
 ---@param ... any @窗口传参
 ---@return UIBase @窗口对象
-function UIManager:OpenWindow(scriptName,uiPath,uiSetting, ...)
-    if not self:IsWindowOpened(scriptName) then
+function UIManager:OpenUI(uiName,uiPath,uiSetting, ...)
+    local layer = (uiSetting and uiSetting.Layer) or UILayerEnum.WindowLayer
+    local uiviewparentnode = self:GetLayerTransform(layer)
+    if not IsNil(uiviewparentnode) then
+        local sortOrder = self:GetLayerSortOrder(layer,uiSetting)
 
-        local layer = (uiSetting and uiSetting.Layer) or UILayerEnum.MainLayer
-        local uiviewparentnode = self:GetLayerTransform(layer)
-        local viewclass = require(scriptName)
-
-        -- 进入模糊
-        --local isBlur =  (uiSetting and uiSetting.IsBlur) or false
-        --if isBlur then
-        --    self:SetCurViewBlur(true)
-        --end
-
+        local viewclass = require(uiName)
         -- 每一次都New一个对象来支持异步加载等概念
         ---@type UIBase
-        local viewinstance = viewclass.New()
-        tableInsert(self.AllOpenedViewList, viewinstance)
-        self.LayerAllOpenedViewMap[layer][scriptName] = viewinstance
-        viewinstance:_Init(scriptName,uiPath,uiSetting, uiviewparentnode, handler(self, self.OnWindowOpenCompleted), ...)
-        EventManager:GetInstance():Broadcast(EventID.OnViewOpened, scriptName)
-        return viewinstance
+        local uiInstance = viewclass.New()
+        tableInsert(self.AllOpenedUIList, uiInstance)
+        self.LayerUIMap[layer][uiInstance.InstID] = uiInstance
+        uiInstance:_Init(uiName,uiPath,uiSetting, uiviewparentnode,layer, sortOrder, handler(self, self.OnUIOpenCompleted), ...)
+        EventManager:GetInstance():Broadcast(EventID.OnViewOpened, uiName)
+
+        --显示背景遮罩(window层默认显示,其他不显示)
+        local showBgMask = (uiSetting and uiSetting.ShowBgMask) or (layer == UILayerEnum.WindowLayer and true or false)
+        if showBgMask and uiName ~= UIDefine.MaskView.Name then
+            self:ShowBgMask(uiInstance)
+        end
+        --添加到名字字典
+        self:AddToNamedUIMap(uiInstance)
+        return uiInstance
     else
-        Log.Error("窗口名:%s已打开,无法重复打开!", scriptName)
+        Log.Error("窗口名:%s指定层错误,无法打开!", uiName)
         return nil
+    end
+end
+
+---@param layer number 层
+---@param uiSetting UISetting @窗口setting
+function UIManager:GetLayerSortOrder(layer,uiSetting)
+    if uiSetting and uiSetting.ConstOrder and uiSetting.ConstOrder > 0 then
+        return uiSetting.ConstOrder
+    end
+    local layerHighestOrder = self:GetUILayerHighestOrder(layer)
+    if layerHighestOrder ~= 0 then
+        return layerHighestOrder + UIManager.LayerOrderGap
+    else
+        return layer * 10000--UIManager.LayerOrderStart
     end
 end
 
 ---窗口完全打开回调(OnShow之后)
 ---@private
----@param viewinstance UIBase @打开的窗口
-function UIManager:OnWindowOpenCompleted(viewinstance)
-    EventManager:GetInstance():Broadcast(EventID.OnViewCompletedOpened, viewinstance)
+---@param uiInstance UIBase @打开的窗口
+function UIManager:OnUIOpenCompleted(uiInstance)
+    EventManager:GetInstance():Broadcast(EventID.OnViewCompletedOpened, uiInstance)
+    if uiInstance.IsPop then
+        ---@type PopBase
+        local pop = uiInstance
+        pop:ShowOpenTween(function()
+            EventManager:GetInstance():Broadcast(PopEvent.OnOpenTweenFinish)
+        end)
+    end
 end
 
+---显示背景遮罩
+---@private
+---@param uiInstance UIBase @打开的窗口
+function UIManager:ShowBgMask(uiInstance)
+    if not IsNil(self.MaskView) then
+        self.MaskView:AddMaskUI(uiInstance)
+    else
+        ---@type UISetting
+        local setting = {
+            Layer = UILayerEnum.WindowLayer,
+            ShowBgMask = false
+        }
+        self:OpenUI(UIDefine.MaskView.Name,UIDefine.MaskView.Path,setting,uiInstance)
+    end
+end
+
+---隐藏背景遮罩
+---@private
+---@param uiInstance UIBase @打开的窗口
+function UIManager:HideBgMask(uiInstance)
+    if not IsNil(self.MaskView) then
+        self.MaskView:RemoveMaskUI(uiInstance)
+    end
+end
+
+
+---添加到ui的名字字典
+---@private
+---@param uiInstance UIBase
+function UIManager:AddToNamedUIMap(uiInstance)
+    if IsNil(self.NamedUIMap[uiInstance.UIName]) then
+        self.NamedUIMap[uiInstance.UIName] = {}
+    end
+    tableInsert(self.NamedUIMap[uiInstance.UIName], uiInstance)
+end
+---从ui的名字字典移除ui
+---@private
+---@param uiInstance UIBase
+---@return boolean 成功移除
+function UIManager:RemoveFromNamedUIMap(uiInstance)
+    if not IsNil(self.NamedUIMap[uiInstance.UIName]) then
+        tableRemovebyvalue(self.NamedUIMap[uiInstance.UIName], uiInstance)
+        return true
+    end
+    return false
+end
+
+
+---关闭指定名称窗口
+---@param uiName string ui的脚本名称
+function UIManager:CloseUIByName(uiName)
+    if not IsNil(self.NamedUIMap[uiName]) then
+        for i = 1,#self.NamedUIMap[uiName] do
+            self:CloseUI(self.NamedUIMap[uiName][i])
+        end
+    end
+end
+
+---关闭指定窗口
+---@param uiInstance UIBase ui的实例
+function UIManager:CloseUI(uiInstance)
+    if uiInstance.IsPop then
+        ---@type PopBase
+        local pop = uiInstance
+        pop:ShowCloseTween(function()
+            self:DoCloseUI(uiInstance)
+        end)
+    else
+        self:DoCloseUI(uiInstance)
+    end
+end
+
+---@private
+---@param uiInstance UIBase ui的实例
+function UIManager:DoCloseUI(uiInstance)
+    if self:RemoveFromNamedUIMap(uiInstance) then
+        tableRemovebyvalue(self.AllOpenedUIList, uiInstance)
+        local layer = uiInstance.UILayer
+        local uiName = uiInstance.UIName
+        self.LayerUIMap[layer][uiInstance.InstID] = nil
+        Log.Info("关闭窗口:%s", uiName)
+        Log.Info("UILayer:%s当前已打开窗口数量:%s", layer, tableCount(self.LayerUIMap[layer]))
+        Log.Info("当前已打开窗口数量:%s", tableCount(self.AllOpenedUIList))
+
+        self:HideBgMask(uiInstance)
+        uiInstance:Destroy()
+        EventManager:GetInstance():Broadcast(EventID.OnViewClosed, uiName)
+    end
+end
+
+---获取打开的窗口数量
+---@param uiName string @窗口名
+---@return UIBase @已打开的对应窗口
+function UIManager:GetOpenedUICount(uiName)
+    if not IsNil(self.NamedUIMap[uiName]) then
+        return #self.NamedUIMap[uiName]
+    end
+    return 0
+end
+---获取打开的唯一窗口
+function UIManager:GetOpenedUISingle(uiName)
+    if not IsNil(self.NamedUIMap[uiName]) and #self.NamedUIMap[uiName] > 0 then
+        return self.NamedUIMap[uiName][1]
+    end
+    return nil
+end
+
+---指定窗口是否打开
+---@param uiName string @窗口名
+---@return boolean @指定窗口是否打开
+function UIManager:IsUIOpened(uiName)
+    return self:GetOpenedUICount(uiName) > 0
+end
 
 
 ---@class UISetting  @UI窗口配置
 ---@field public Layer string @UI窗口层
----@field public IsBlur string @UI 是否模糊背景
+---@field public ShowBgMask boolean @显示背景遮罩
+---@field public ConstOrder number @固定SortOrder
+---@return UIManager @UI管理单例类
+return UIManager

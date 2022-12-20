@@ -6,11 +6,26 @@
 	    <type fullname="EventDef" preserve="all"/>
 		<type fullname="Launcher" preserve="all"/>
 		<type fullname="StartUpManager" preserve="all"/>
+		<type fullname="LuaResLoadHelp" preserve="all"/>
 		<type fullname="XLuaManager" preserve="all"/>
+		<type fullname="SEngine.TransformExtend" preserve="all"/>
+		<type fullname="SEngine.UnityObjectExtends" preserve="all"/>
 		<type fullname="UIModel" preserve="all"/>
 		<type fullname="SEngine.Log" preserve="all"/>
-		<type fullname="LuaResLoadHelp" preserve="all"/>
-		<type fullname="SEngine.UnityObjectExtends" preserve="all"/>
+		<type fullname="SEngine.UI.SText" preserve="all"/>
+		<type fullname="SEngine.UI.STMP" preserve="all"/>
+		<type fullname="SEngine.UI.SButton" preserve="all"/>
+		<type fullname="SEngine.UI.SImage" preserve="all"/>
+		<type fullname="SEngine.UI.SToggle" preserve="all"/>
+		<type fullname="SEngine.UI.SScrollRect" preserve="all"/>
+		<type fullname="SEngine.UI.UIParticleSystem" preserve="all"/>
+		<type fullname="SEngine.UI.UISpine" preserve="all"/>
+		<type fullname="SuperScrollView.LoopListView2" preserve="all"/>
+		<type fullname="SuperScrollView.LoopGridView" preserve="all"/>
+		<type fullname="SceneDragHandler" preserve="all"/>
+		<type fullname="SEngine.TransformUtils" preserve="all"/>
+		<type fullname="SEngine.Map.MapService" preserve="all"/>
+		<type fullname="SEngine.Map.InitMap" preserve="all"/>
 		
 	</assembly>
 
@@ -80,6 +95,7 @@
 		<type fullname="UnityEngine.SceneManagement.SceneManager" preserve="all"/>
 		<type fullname="UnityEngine.SceneManagement.Scene" preserve="all"/>
 		<type fullname="UnityEngine.PlayerPrefs" preserve="all"/>
+		<type fullname="UnityEngine.BoundsInt" preserve="all"/>
 		<type fullname="UnityEngine.Random+State" preserve="all"/>
 		<type fullname="UnityEngine.Texture2D" preserve="all"/>
 		<type fullname="UnityEngine.Texture2D+EXRFlags" preserve="all"/>
@@ -200,6 +216,7 @@
 		<type fullname="UnityEngine.UI.Image+OriginHorizontal" preserve="all"/>
 		<type fullname="UnityEngine.UI.Image+FillMethod" preserve="all"/>
 		<type fullname="UnityEngine.UI.Image+Type" preserve="all"/>
+		<type fullname="UnityEngine.EventSystems.PointerEventData" preserve="all"/>
 		<type fullname="UnityEngine.EventSystems.PointerEventData+FramePressState" preserve="all"/>
 		<type fullname="UnityEngine.EventSystems.PointerEventData+InputButton" preserve="all"/>
 		<type fullname="UnityEngine.EventSystems.AbstractEventData" preserve="all"/>
@@ -257,6 +274,36 @@
 
 	<assembly fullname="UnityEngine.DirectorModule">
 	    <type fullname="UnityEngine.Playables.PlayableDirector" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween">
+	    <type fullname="DG.Tweening.ShortcutExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.Tween" preserve="all"/>
+		<type fullname="DG.Tweening.Tweener" preserve="all"/>
+		<type fullname="DG.Tweening.TweenSettingsExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.Ease" preserve="all"/>
+		<type fullname="DG.Tweening.DOVirtual" preserve="all"/>
+		<type fullname="DG.Tweening.Sequence" preserve="all"/>
+		<type fullname="DG.Tweening.TweenExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.DOTween" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp-firstpass">
+	    <type fullname="DG.Tweening.DOTweenModuleUI" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="spine-unity">
+	    <type fullname="Spine.AnimationState" preserve="all"/>
+		<type fullname="Spine.TrackEntry" preserve="all"/>
+		<type fullname="Spine.Unity.SkeletonAnimation" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Coffee.UIParticle">
+	    <type fullname="Coffee.UIExtensions.UIParticle" preserve="all"/>
 		
 	</assembly>
 

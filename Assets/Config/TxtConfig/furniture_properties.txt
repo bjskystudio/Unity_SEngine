@@ -1,0 +1,15 @@
+int	int	string	string	string	string
+ID	排序	说明	属性文本	对应ICON	锁定状态
+id	sort	desc	text	icon	icon_lock
+1	1	休息室收入+	Common_furnitureparam_xxs	ui_icon_jinbi_60.60	
+2	1	每分钟收入+	Common_furnitureparam_idle	ui_icon_jinbi_60.60	
+3	1	使用后收入+	Common_furnitureparam_used	ui_icon_jinbi_60.60	
+4	1	30秒额外收入+	Common_furnitureparam_exter	ui_icon_jinbi_60.60	
+5	1	人气值+	Common_furnitureparam_grade	ui_icon_renqi_60.60	ui_icon_renqi_lock_60.60
+6	1	库存数量	Common_furnitureparam_DuraMax	ui_icon_renqi_60.60	ui_icon_renqi_lock_60.60
+7	1	在休息室中睡觉时间减少	Common_furnitureparam_Ltime	ui_icon_xiuxi_60.60	
+8	1	需求人气解锁	Common_furnitureparam_term	ui_icon_renqi_60.60	ui_icon_renqi_lock_60.60
+9	1	需求前置房间	Common_field_unlock	ui_icon_suo	ui_icon_suo
+10	1	需求前置家具	Common_field_unlock	ui_icon_suo	ui_icon_suo
+11	1	剩余运输时间	Commom_timeremaining	ui_icon_yunshu_60.60	ui_icon_yunshu_lock_60.60
+12	1	需要运输	Commom_transittime	ui_icon_yunshu_60.60	ui_icon_yunshu_lock_60.60

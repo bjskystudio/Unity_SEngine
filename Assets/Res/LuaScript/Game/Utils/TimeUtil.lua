@@ -28,7 +28,6 @@ local function LocalTimeMsec()
     return LocalTimeSec() * 1000 + (Now.Ticks / 10000) % 1000
 end
 
-
 ---获取当前时间戳(秒)
 function TimeUtil.GetSecTime()
     -- return _currServerTime
@@ -86,6 +85,33 @@ function TimeUtil.TimeToString(time, flag, useTimeZone)
     else
         return string.format("%02d:%02d:%02d", hour, min, sec)
     end
+end
+
+---将秒数转换为：有小时 返回小时 有分钟返回分钟  有秒返回秒
+---@param time number 时间戳秒数
+---@param flag number nil为 时:分:秒 2为 时:分
+---@param useTimeZone boolean 是否使用时区 默认不使用
+---@return string
+function TimeUtil.TimeToString2(time, useTimeZone)
+    -- function TimeUtil.TimeToString(time, flag)
+    local sec = time % SECOND_OF_MINUTE
+    local min = math.floor(time / 60) % 60
+    local hour = math.floor(time / SECOND_OF_HOUR)
+    if (useTimeZone) then
+        hour = hour + TimeUtil.GetTimeZone()
+    end
+
+    local str = ""
+    if (hour > 0) then
+        str = str .. hour .. "h"
+    end
+    if (min > 0) then
+        str = str .. min .. "m"
+    end
+    if (sec > 0) then
+        str = str .. sec .. "s"
+    end
+    return str
 end
 
 ---将时间戳的秒数转换为今日的：00:00:00

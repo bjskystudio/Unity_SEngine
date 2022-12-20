@@ -39,6 +39,29 @@ function Text:CalculateLayoutInputVertical() end
 
 function Text:OnRebuildRequested() end
 
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Text:DOColor(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Text:DOFade(endValue,duration) end
+
+---@param endValue string
+---@param duration number
+---@param richTextEnabled System.Boolean
+---@param scrambleMode DG.Tweening.ScrambleMode
+---@param scrambleChars string
+---@return DG.Tweening.Tweener
+function Text:DOText(endValue,duration,richTextEnabled,scrambleMode,scrambleChars) end
+
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Text:DOBlendableColor(endValue,duration) end
+
 ---@param anchor UnityEngine.TextAnchor
 ---@return UnityEngine.Vector2
 function Text.GetTextAnchorPivot(anchor) end

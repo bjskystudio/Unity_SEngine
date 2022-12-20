@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(Launcher);
-			Utils.BeginObjectRegister(type, L, translator, 0, 3, 3, 3);
+			Utils.BeginObjectRegister(type, L, translator, 0, 3, 5, 5);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "StartUp", _m_StartUp);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "IsEditor", _m_IsEditor);
@@ -31,10 +31,14 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedAssetBundle", _g_get_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedLuaAssetBundle", _g_get_UsedLuaAssetBundle);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "mLogLevel", _g_get_mLogLevel);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "LuaDebugEnable", _g_get_LuaDebugEnable);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "TileMapEnable", _g_get_TileMapEnable);
             
 			Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedAssetBundle", _s_set_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedLuaAssetBundle", _s_set_UsedLuaAssetBundle);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "mLogLevel", _s_set_mLogLevel);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "LuaDebugEnable", _s_set_LuaDebugEnable);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "TileMapEnable", _s_set_TileMapEnable);
             
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
@@ -207,6 +211,34 @@ namespace XLua.CSObjectWrap
             return 1;
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_LuaDebugEnable(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
+                LuaAPI.lua_pushboolean(L, gen_to_be_invoked.LuaDebugEnable);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_TileMapEnable(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
+                LuaAPI.lua_pushboolean(L, gen_to_be_invoked.TileMapEnable);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -248,6 +280,36 @@ namespace XLua.CSObjectWrap
                 Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
                 SEngine.LogLevel gen_value;translator.Get(L, 2, out gen_value);
 				gen_to_be_invoked.mLogLevel = gen_value;
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_LuaDebugEnable(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.LuaDebugEnable = LuaAPI.lua_toboolean(L, 2);
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_TileMapEnable(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.TileMapEnable = LuaAPI.lua_toboolean(L, 2);
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

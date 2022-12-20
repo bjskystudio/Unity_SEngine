@@ -10,7 +10,7 @@ using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 
 using XLua;
 using System.Collections.Generic;
-
+using DG.Tweening;
 
 namespace XLua.CSObjectWrap
 {
@@ -21,9 +21,10 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(UnityEngine.CanvasGroup);
-			Utils.BeginObjectRegister(type, L, translator, 0, 1, 4, 4);
+			Utils.BeginObjectRegister(type, L, translator, 0, 2, 4, 4);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "IsRaycastLocationValid", _m_IsRaycastLocationValid);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "DOFade", _m_DOFade);
 			
 			
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "alpha", _g_get_alpha);
@@ -98,6 +99,36 @@ namespace XLua.CSObjectWrap
                     
                         var gen_ret = gen_to_be_invoked.IsRaycastLocationValid( _sp, _eventCamera );
                         LuaAPI.lua_pushboolean(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_DOFade(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                UnityEngine.CanvasGroup gen_to_be_invoked = (UnityEngine.CanvasGroup)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    float _endValue = (float)LuaAPI.lua_tonumber(L, 2);
+                    float _duration = (float)LuaAPI.lua_tonumber(L, 3);
+                    
+                        var gen_ret = gen_to_be_invoked.DOFade( _endValue, _duration );
+                        translator.Push(L, gen_ret);
                     
                     
                     

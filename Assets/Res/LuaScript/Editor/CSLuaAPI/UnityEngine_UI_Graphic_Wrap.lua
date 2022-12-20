@@ -15,6 +15,21 @@
 ---@field static defaultGraphicMaterial UnityEngine.Material
 local Graphic = {}
 
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Graphic:DOColor(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Graphic:DOFade(endValue,duration) end
+
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Graphic:DOBlendableColor(endValue,duration) end
+
 function Graphic:SetAllDirty() end
 
 function Graphic:SetLayoutDirty() end

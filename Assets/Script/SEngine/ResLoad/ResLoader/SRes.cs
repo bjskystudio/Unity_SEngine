@@ -144,7 +144,7 @@ namespace SEngine
 
         protected virtual IEnumerator CoLoadByAB(bool isSync, bool isAll, bool isPreLoad, Action<System.Object, SResRef> callback)
         {
-            ABDep = ResLoadManager.Instance.GetSRes<SResAssetBundle>(AssetPath + ResLoadManager.Instance.Config.ASSETBUNDLE_SUFFIX_NAME, "", AssetType.eAB);
+            ABDep = ResLoadManager.Instance.GetSRes<SResAssetBundle>(AssetPath + ResLoadManager.Config.ASSETBUNDLE_SUFFIX_NAME, "", AssetType.eAB);
 #if UNITY_EDITOR
             SResAssetBundle.AddWhoRefMe(ABDep.AssetPath, ResName);
 #endif

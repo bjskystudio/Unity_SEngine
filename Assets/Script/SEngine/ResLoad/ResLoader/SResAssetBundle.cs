@@ -77,7 +77,7 @@ namespace SEngine
         {
             if (mAssetBundleManifest == null)
             {
-                mAssetBundle = AssetBundle.LoadFromFile(ResPath.URL(ResLoadManager.Instance.Config.MANIFEST_NAME));
+                mAssetBundle = AssetBundle.LoadFromFile(ResPath.URL(ResLoadManager.Config.MANIFEST_NAME));
                 mAssetBundleManifest = mAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
 
                 string[] variantList = mAssetBundleManifest.GetAllAssetBundlesWithVariant();
@@ -213,9 +213,11 @@ namespace SEngine
                 ResLoadManager.Instance.mResMap.Remove(ResName);
             }
             //释放这个AB的所有资源,从这个AB中加载的资源Asset都将变为"null"
+            // 暂时不释放ab的资源simon.L 12.19
             if (AB != null)
             {
                 AB.Unload(true);
+                //AB.Unload(false);
                 AB = null;
             }
 

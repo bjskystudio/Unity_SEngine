@@ -36,6 +36,11 @@ public class XLuaManager : MonoSingleton<XLuaManager>
     private LuaEnv luaEnv = null;
 
     /// <summary>
+    /// Lua更新脚本
+    /// </summary>
+    private LuaUpdater luaUpdater = null;
+
+    /// <summary>
     /// Lua脚本二进制缓存
     /// </summary>
     public Dictionary<string, byte[]> LuaScriptsBytesCaching
@@ -85,15 +90,15 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         LuaScriptsBytesCaching.Clear();
         if (Launcher.Instance.UsedAssetBundle && Launcher.Instance.UsedLuaAssetBundle)
         {
-            //ResLoadManager.Instance.LoadABTextAll("luascriptsbyte/luascriptsbyte_bundle", (list, res) =>
-            //{
-            //    for (int i = 0; i < list.Count; i++)
-            //    {
-            //        LuaScriptsBytesCaching.Add(list[i].name, list[i].bytes);
-            //    }
-            //    res.Release();
-            //    loadcompletedcb?.Invoke();
-            //}, false);
+            ResLoadManager.Instance.LoadABTextAll("luascriptsbyte/luascriptsbyte_bundle", (list, res) =>
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    LuaScriptsBytesCaching.Add(list[i].name, list[i].bytes);
+                }
+                res.Release();
+                loadcompletedcb?.Invoke();
+            }, false);
         }
         else
         {
@@ -125,6 +130,8 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         LuaPBBytesCaching.Clear();
         if (Launcher.Instance.UsedAssetBundle && Launcher.Instance.UsedLuaAssetBundle)
         {
+
+            loadcompletedcb?.Invoke();
             //ResLoadManager.Instance.LoadABTextAll("pbdata/pbdata_bundle", (list, res) =>
             //{
             //    for (int i = 0; i < list.Count; i++)
@@ -190,6 +197,13 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         LoadScript(luaLauncherScriptName);
         StartEmmyLuaDebugger();
         StartGame();
+
+        luaUpdater = gameObject.GetComponent<LuaUpdater>();
+        if (luaUpdater == null)
+        {
+            luaUpdater = gameObject.AddComponent<LuaUpdater>();
+        }
+        luaUpdater.OnInit(luaEnv);
     }
 
     /// <summary>
@@ -202,10 +216,13 @@ public class XLuaManager : MonoSingleton<XLuaManager>
     }
     private void StartEmmyLuaDebugger()
     {
-        Debug.Log("Start EmmyLua");
-        string debugDll = UnityEngine.Application.dataPath + "/../EmmyLuaDebugger/windows/x64/?.dll";
-        byte[] byteArray = System.Text.Encoding.Default.GetBytes($"package.cpath = package.cpath .. ';{debugDll}'\nlocal dbg = require('emmy_core')\ndbg.tcpConnect('localhost', 9966)");
-        ExecuteScript(byteArray);
+        if (Launcher.Instance.LuaDebugEnable)
+        {
+            Debug.Log("Start EmmyLua");
+            string debugDll = UnityEngine.Application.dataPath + "/../EmmyLuaDebugger/windows/x64/?.dll";
+            byte[] byteArray = System.Text.Encoding.Default.GetBytes($"package.cpath = package.cpath .. ';{debugDll}'\nlocal dbg = require('emmy_core')\ndbg.tcpConnect('localhost', 9966)");
+            ExecuteScript(byteArray);
+        }
     }
 
     /// <summary>

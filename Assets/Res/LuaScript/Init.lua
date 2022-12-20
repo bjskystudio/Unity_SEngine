@@ -15,11 +15,14 @@ local AppSetting = require "AppSetting"
 require "TableUtil"
 require "LuaUtil"
 require "StringUtil"
+require "UITool"
 require "Log"
 require "Class"
 require "DataClass"
 require "ConstClass"
 require "Singleton"
+require "list"
+require "event"
 
 --endregion
 
@@ -41,11 +44,20 @@ require "EventManager"
 require "EventID"
 --endregion
 
+
 --region -------------Resource-------------
 require "ResTypeEnum"
 require "ResLoadManager"
---require "ConfigManager"
 --endregion
+
+--region -------------Config-------------
+require "serpent"
+require "ConfigDataDefine"
+require "ConfigManager"
+require "LanguageUtil"
+require "PlayerPrefsUtil"
+--endregion
+
 
 --region --------------UI-----------------
 require "UILayerEnum"
@@ -58,6 +70,9 @@ require "UIManager"
 require "GameDefine"
 --endregion
 
+--region --------------Utils-----------------
+require "LoopListViewHelper"
+--endregion
 ---懒加载
 _G.require = lazyRequire
 

@@ -1,0 +1,30 @@
+---@class game_config_Item
+---@field public Key string @字段
+---@field public Desc string @描述
+---@field public paramNum number @数值配置
+---@field public paramNumArr number[] @数值配置数组
+---@field public paramNumArrs number[][] @数值配置数组多组
+---@field public paramStr string @文字配置
+
+
+---@class game_config
+---@field public Res_GoldAutoRaise  game_config_Item
+---@field public Res_GoldStart  game_config_Item
+---@field public Res_DiamondStart  game_config_Item
+---@field public Res_PopularStart  game_config_Item
+---@field public Res_GhostStart  game_config_Item
+---@field public Max_energy  game_config_Item
+---@field public Energy_Recover_Time  game_config_Item
+---@field public Energy_Recover_Amount  game_config_Item
+---@field public Click_Number  game_config_Item
+---@field public Diamond_Upgreade_Time  game_config_Item
+---@field public Diamond_Upgreade_Gold  game_config_Item
+---@field public gashapon_machine_sp_interval  game_config_Item
+---@field public Gems_Energy_Recover  game_config_Item
+---@field public AD_Count  game_config_Item
+---@field public AD_Gems_Cost  game_config_Item
+---@field public Initial_Acceleration_Time  game_config_Item
+---@field public waitqueue_room1001  game_config_Item
+---@field public client_wayout  game_config_Item
+---@field public lounge_door  game_config_Item
+---@field public takingbubble_weight  game_config_Item

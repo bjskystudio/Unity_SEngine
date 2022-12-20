@@ -25,10 +25,32 @@ GameDefine.eConnectType = {
 
 ---@class GlobalDefine.eResPath 资源路径
 GameDefine.eResPath = {
+    ---效果资源
+    EffectPath = "Effect/",
     ---公共图集
     AtlasCommon = "AtlasSprites/Common/",
     ---main 图集
     AtlasMain = "AtlasSprites/Main/",
+
+    AtlasFurniture = "AtlasSprites/Item/furniture/",
+
+    AtlasDevice = "AtlasSprites/Device/",
+    ---房间美术资源
+    AtlasRoomFurniture = "AtlasSprites/Room/",
+
+    ---旅店美术资源
+    AtlasHotel = "AtlasSprites/Hotel/View/",
+}
+---@class GameDefine.ePlayerProp 玩家数据类型
+GameDefine.ePlayerProp = {
+    Gold = 1,
+    Diamond = 2,
+    Popularity = 3,
+    Ghost = 4,
+    --加速时间
+    SpeedTime = 5,
+    --体力
+    Energy = 6
 }
 --endregion
 return GameDefine

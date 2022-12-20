@@ -4,6 +4,8 @@
 ---@field public UsedAssetBundle System.Boolean
 ---@field public UsedLuaAssetBundle System.Boolean
 ---@field public mLogLevel SEngine.LogLevel
+---@field public LuaDebugEnable System.Boolean
+---@field public TileMapEnable System.Boolean
 local Launcher = {}
 
 function Launcher:StartUp() end

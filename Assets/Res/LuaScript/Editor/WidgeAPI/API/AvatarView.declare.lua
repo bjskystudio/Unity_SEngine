@@ -1,0 +1,14 @@
+---@class AvatarView_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
+---@field public obj_avatar UnityEngine.GameObject
+---@field public obj_avatarSkel UnityEngine.GameObject
+---@field public obj_avatarSkel2 UnityEngine.GameObject
+---@field public obj_content UnityEngine.GameObject
+---@field public obj_dialog UnityEngine.GameObject
+---@field public obj_Image UnityEngine.GameObject
+---@field public sbtn_need SEngine.UI.SButton
+---@field public simg_angry SEngine.UI.SImage
+---@field public simg_need SEngine.UI.SImage
+---@field public stmp_text SEngine.UI.STMP
+

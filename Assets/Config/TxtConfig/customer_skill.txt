@@ -1,0 +1,4 @@
+int	string	int	int	int	string
+ID	技能描述	技能等级	技能参数1	技能参数2	备注
+id	image_key	skill_level	skill_coef_1	skill_coef_2	remark
+1	1	1	1	1	1

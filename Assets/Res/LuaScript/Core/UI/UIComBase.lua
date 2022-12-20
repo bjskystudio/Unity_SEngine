@@ -3,3 +3,281 @@
 --- Created by Simon.L.
 --- DateTime: 2022/9/30 15:37
 ---
+local EventManager = require("EventManager")
+local Log = require("Log")
+
+---@class UIComBase @Lua组件类(类似原来的Component但脱离Mono且和View强绑定)
+---@field public IsValide boolean @是否是有效组件
+---@field public Owner UIComBase @所属组件(支持组件套组件，窗口的第一个组件(哪怕是继承)的Owner是UIComBase,第二个组件开始就是上一个组件)
+---@field public OwnerUI UIBase @所属窗口
+---@field public transform UnityEngine.Transform 物体对应的transform
+---@field public gameObject UnityEngine.GameObject 物体对应的gameObject
+---@field public go_table any @组件绑定
+---@field private Components table<UnityEngine.GameObject, table<string, UIComBase>> @子组件缓存映射Map(Key为GameObject，Value为类名和绑定的组件实例对象)
+---@field protected EventIDList EventID[] @窗口注册的监听事件ID集合
+local UIComBase = Class("UIComBase")
+
+---UIComBase构造函数
+---@private
+---@param owner UIComBase @所属组件
+---@param ownerui UIBase @所属窗口
+---@param go UnityEngine.GameObject @绑定的GameObject
+---@param ... any @参数
+function UIComBase:__init(owner, ownerui, go, ...)
+    self.IsValide = true
+    self.Owner = owner
+    self.OwnerUI = ownerui
+    self.transform = go.transform
+    self.gameObject = go
+    self.Components = {}
+    --self.GlobalEventListenerMap = {}
+    self.go_table = GetAutoGoTableOrNil(self.gameObject, handler(self, self.OnClickBtn), handler(self, self.OnClickToggle),handler(self, self.OnClickTmp))
+    --self:UpdateOrder()
+    self:OnBaseAwake()
+    EventManager:GetInstance():Register(self)
+    self:OnCreate(...)
+    self:OnEnable()
+end
+
+function UIComBase:OnBaseAwake()
+    -- 其他base的扩展
+    self:Awake()
+end
+
+---是否可用(动态加载在未加载完成前被使用可能需要判定)
+---@return boolean @是否可用
+function UIComBase:IsAvalible()
+    return self.IsValide
+end
+
+---是否可见
+---@return boolean @是否可见
+function UIComBase:IsActive()
+    return self.IsShow == true
+end
+
+---设置可见
+---@param active boolean @设置可见
+function UIComBase:SetActive(active)
+    if self:IsAvalible() then
+        self.gameObject:SetActive(Bool2Num(active))
+        self.IsShow = active
+        if active then
+            self:OnEnable()
+            --EventManager:GetInstance():Register(self)
+        else
+            self:OnDisable()
+            --EventManager:GetInstance():Unregister(self)
+        end
+    else
+        Log.Error("组件:%s对象已无效，不应该进入这里!", self.__cname)
+    end
+end
+
+---模拟Unity Component的 Awake
+---@protected
+function UIComBase:Awake()
+end
+
+---初始化
+---@protected
+---@param ... any @参数
+function UIComBase:OnCreate(...)
+end
+
+---可用
+---@protected
+function UIComBase:OnEnable()
+end
+
+---不可用
+---@protected
+function UIComBase:OnDisable()
+end
+
+---点击Button回调
+---@protected
+---@param btn UnityEngine.UI.Button 按钮
+function UIComBase:OnClickBtn(btn)
+end
+
+---点击Toggle回调
+---@protected
+---@param toggle UnityEngine.UI.Toggle Toggle
+---@param isOn boolean 是否选中
+function UIComBase:OnClickToggle(toggle, isOn)
+end
+
+---点击tmp Link回调
+---@protected
+---@param tmp SEngine.UI.STMP
+---@param linkId string
+function UIComBase:OnClickTmp(tmp, linkId)
+end
+
+---获取所属窗口
+---@return UIBase @所属窗口
+function UIComBase:GetOwnerUI()
+    return self.OwnerUI
+end
+
+----加载UI粒子效果，同步粒子效果的层级
+---@param path string 粒子效果的预制体路径
+---@param parent UnityEngine.GameObject 父级GameObject
+---@param complete fun(obj:SEngine.UI.UIParticleSystem) 完成回调
+function UIComBase:LoadParticle(path,parent,complete)
+    if self.OwnerUI then
+        self.OwnerUI:LoadParticle(path,parent,complete)
+    else
+        Log.Error("particle "..path.." load Error:no OwnerUI")
+    end
+end
+
+--region -----------------组件添加获取移除接口开始--------------------
+
+---为GameObject获得或添加lua组件(嵌套子组件统一添加入口，不允许直接New)
+---@param bindtarget UnityEngine.GameObject 绑定的GameObject
+---@param class UIComBase  lua组件类
+---@param ... any @参数
+---@return UIComBase @组件实例化类
+function UIComBase:GetOrAddComponent(bindtarget, class, ...)
+    Guard.AssertException(IsClass(class, UIComBase), string.format("%s未继承UIComBase", class.__cname))
+    -- behaviour 记录数据是否存在
+    local cl = self:GetComponent(bindtarget, class)
+    -- 检测组件是否已经添加过
+    if cl == nil then
+        cl = class.New(self, self.OwnerUI, bindtarget, ...)
+        -- 添加缓存到本地集合中
+        self.Components[bindtarget] = self.Components[bindtarget] or {}
+        self.Components[bindtarget][class.__cname] = cl
+    end
+    return cl
+end
+
+---GetComponent 获取GameObject中挂载的lua组件
+---@param bindtarget UnityEngine.GameObject 绑定的GameObject
+---@param class UIComBase  lua组件类
+---@return  UIComBase 实例化类 或nil
+function UIComBase:GetComponent(bindtarget, class)
+    local tager = self.Components[bindtarget]
+    if tager ~= nil and tager[class.__cname] then
+        return tager[class.__cname]
+    end
+    return nil
+end
+
+---销毁GameObject,并移除其中挂载的所有lua组件
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+function UIComBase:DestoryComponentGameObj(bindtarget)
+    ---@type table<string, UIComBase>
+    local tager = self.Components[bindtarget]
+    if tager ~= nil then
+        Log.Info("移除之前:", self.Components)
+        for i, v in pairs(tager) do
+            Log.Info("组件类:%s移除实体对象名:%s绑定的组件脚本:%s!", self.__cname, bindtarget.name, v.__cname)
+            v:Destroy()
+        end
+        self.Components[bindtarget] = nil
+        bindtarget:DestroyGameObj()
+        Log.Info("移除之后:", self.Components)
+        return true
+    else
+        Log.Error("当前组件类:%s实例对象:%s未绑定组件类，清除失败!", self.__cname, bindtarget.name)
+        return false
+    end
+end
+
+---移除GameObject中挂载的指定lua组件
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+---@param class UIComBase @lua组件类
+---@return boolean @移除是否成功
+function UIComBase:RemoveComponent(bindtarget, class)
+    Guard.AssertException(IsClass(class, UIComBase), "未继承UIComBase")
+    local tager = self.Components[bindtarget]
+    if tager ~= nil and tager[class.__cname] then
+        Log.Info("组件类:%s移除实体对象名:%s绑定的组件脚本:%s!", self.__cname, bindtarget.name, class.__cname)
+        tager[class.__cname]:Destroy()
+        tager[class.__cname] = nil
+        return true
+    else
+        Log.Error("当前组件类:%s实例对象:%s未绑定组件类:%s，清除失败!", self.__cname, bindtarget.name, class.__cname)
+        return false
+    end
+end
+
+---清除所有子组件绑定
+---@private
+function UIComBase:ClearAllComponents()
+    ---@param classinstancemap table<string, UIComBase>
+    for bindtarget, classinstancemap in pairs(self.Components) do
+        ---@param component UIComBase
+        for classname, component in pairs(classinstancemap) do
+            Log.Info("清理窗口组件:%s实例对象:%s绑定窗口组件:%s!", self.__cname, bindtarget.name, classname)
+            component:Destroy()
+        end
+    end
+    self.Components = {}
+end
+
+--region    -----------------事件监听部分开始--------------------------
+
+---添加事件（在Awake中添加才生效）
+---protected
+---@param id EventID
+function UIComBase:AddEvent(id)
+    if self.EventIDList == nil then
+        self.EventIDList = {}
+    end
+    table.insert(self.EventIDList, id)
+end
+
+---获取注册监听的事件ID列表
+---@return EventID[]
+function UIComBase:GetEventIDList()
+    return self.EventIDList
+end
+
+---事件处理
+---@protected
+---@param id EventID EventID
+function UIComBase:EventHandle(id, ...)
+    --Log.Warning("[%s:EventHandle]__此函数需要再子类覆盖使用！", self:GetClassName())
+end
+
+---移除所有监听
+---@private
+function UIComBase:RemoveAllListener()
+    EventManager:GetInstance():Unregister(self)
+    self.EventIDList = nil
+end
+
+--endregion -----------------事件监听部分结束------------------------
+
+
+---逻辑销毁(窗口关闭时和RemoveComponent时调用)
+---@private
+function UIComBase:Destroy()
+    if self.IsValide then
+        self:OnDisable()
+        self:OnDestroy()
+        self:RemoveAllListener()
+        self:ClearAllComponents()
+        self.Owner = nil
+        self.OwnerUI = nil
+        self.transform = nil
+        self.gameObject = nil
+        self.Components = nil
+        self.go_table = nil
+        self.IsValide = false
+    else
+        Log.Error("组件类:%s对象已经被销毁,不应该再次进入,请检查代码!", self.__cname)
+    end
+end
+
+---子类重写实现自定义清理[virtual]
+---@protected
+function UIComBase:OnDestroy()
+end
+
+---@return UIComBase @Lua组件类(类似原来的Component但脱离Mono且和View强绑定)
+return UIComBase

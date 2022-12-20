@@ -79,6 +79,7 @@ namespace XLua
 				translator.RegisterPushAndGetAndUpdate<UnityEngine.UI.ScrollRect.MovementType>(translator.PushUnityEngineUIScrollRectMovementType, translator.Get, translator.UpdateUnityEngineUIScrollRectMovementType);
 				translator.RegisterPushAndGetAndUpdate<UnityEngine.UI.Scrollbar.Direction>(translator.PushUnityEngineUIScrollbarDirection, translator.Get, translator.UpdateUnityEngineUIScrollbarDirection);
 				translator.RegisterPushAndGetAndUpdate<TMPro.TextAlignmentOptions>(translator.PushTMProTextAlignmentOptions, translator.Get, translator.UpdateTMProTextAlignmentOptions);
+				translator.RegisterPushAndGetAndUpdate<DG.Tweening.Ease>(translator.PushDGTweeningEase, translator.Get, translator.UpdateDGTweeningEase);
 			
 			}
         }
@@ -4395,6 +4396,90 @@ namespace XLua
             }
         }
         
+        int DGTweeningEase_TypeID = -1;
+		int DGTweeningEase_EnumRef = -1;
+        
+        public void PushDGTweeningEase(RealStatePtr L, DG.Tweening.Ease val)
+        {
+            if (DGTweeningEase_TypeID == -1)
+            {
+			    bool is_first;
+                DGTweeningEase_TypeID = getTypeId(L, typeof(DG.Tweening.Ease), out is_first);
+				
+				if (DGTweeningEase_EnumRef == -1)
+				{
+				    Utils.LoadCSTable(L, typeof(DG.Tweening.Ease));
+				    DGTweeningEase_EnumRef = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+				}
+				
+            }
+			
+			if (LuaAPI.xlua_tryget_cachedud(L, (int)val, DGTweeningEase_EnumRef) == 1)
+            {
+			    return;
+			}
+			
+            IntPtr buff = LuaAPI.xlua_pushstruct(L, 4, DGTweeningEase_TypeID);
+            if (!CopyByValue.Pack(buff, 0, (int)val))
+            {
+                throw new Exception("pack fail fail for DG.Tweening.Ease ,value="+val);
+            }
+			
+			LuaAPI.lua_getref(L, DGTweeningEase_EnumRef);
+			LuaAPI.lua_pushvalue(L, -2);
+			LuaAPI.xlua_rawseti(L, -2, (int)val);
+			LuaAPI.lua_pop(L, 1);
+			
+        }
+		
+        public void Get(RealStatePtr L, int index, out DG.Tweening.Ease val)
+        {
+		    LuaTypes type = LuaAPI.lua_type(L, index);
+            if (type == LuaTypes.LUA_TUSERDATA )
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != DGTweeningEase_TypeID)
+				{
+				    throw new Exception("invalid userdata for DG.Tweening.Ease");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+				int e;
+                if (!CopyByValue.UnPack(buff, 0, out e))
+                {
+                    throw new Exception("unpack fail for DG.Tweening.Ease");
+                }
+				val = (DG.Tweening.Ease)e;
+                
+            }
+            else
+            {
+                val = (DG.Tweening.Ease)objectCasters.GetCaster(typeof(DG.Tweening.Ease))(L, index, null);
+            }
+        }
+		
+        public void UpdateDGTweeningEase(RealStatePtr L, int index, DG.Tweening.Ease val)
+        {
+		    
+            if (LuaAPI.lua_type(L, index) == LuaTypes.LUA_TUSERDATA)
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != DGTweeningEase_TypeID)
+				{
+				    throw new Exception("invalid userdata for DG.Tweening.Ease");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+                if (!CopyByValue.Pack(buff, 0,  (int)val))
+                {
+                    throw new Exception("pack fail for DG.Tweening.Ease ,value="+val);
+                }
+            }
+			
+            else
+            {
+                throw new Exception("try to update a data with lua type:" + LuaAPI.lua_type(L, index));
+            }
+        }
+        
         
 		// table cast optimze
 		
@@ -4724,6 +4809,12 @@ namespace XLua
 				translator.PushTMProTextAlignmentOptions(L, array[index]);
 				return true;
 			}
+			else if (type == typeof(DG.Tweening.Ease[]))
+			{
+			    DG.Tweening.Ease[] array = obj as DG.Tweening.Ease[];
+				translator.PushDGTweeningEase(L, array[index]);
+				return true;
+			}
             return false;
 		}
 		
@@ -5045,6 +5136,12 @@ namespace XLua
 			else if (type == typeof(TMPro.TextAlignmentOptions[]))
 			{
 			    TMPro.TextAlignmentOptions[] array = obj as TMPro.TextAlignmentOptions[];
+				translator.Get(L, obj_idx, out array[array_idx]);
+				return true;
+			}
+			else if (type == typeof(DG.Tweening.Ease[]))
+			{
+			    DG.Tweening.Ease[] array = obj as DG.Tweening.Ease[];
 				translator.Get(L, obj_idx, out array[array_idx]);
 				return true;
 			}

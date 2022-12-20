@@ -5,39 +5,55 @@
 ---
 
 local EventManager = require("EventManager")
+local UIComBase = require("UIComBase")
 local EventID = require("EventID")
 local UIManager = require("UIManager")
 local ResLoadManager = require("ResLoadManager")
 local ResTypeEnum = require("ResTypeEnum")
+local Log = require("Log")
+local TexCoord1 = CS.UnityEngine.AdditionalCanvasShaderChannels.TexCoord1
+
+local table_pack = table.pack
+local table_unpack = table.unpack
+local string_format = string.format
 
 ---@class UIBase @窗口基类
 ---@field public UIName string @窗口名
+---@field public InstID number @窗口的唯一id
 ---@field public AssetPath string @窗口asset路径
 ---@field public UISetting string @窗口设置
+---@field private ParentNode UnityEngine.Transform @挂载父节点
+---@field public SortOrder number @窗口Order
+---@field public UILayer UILayerEnum @窗口所属layer
+---@field private OnOpencompletedCB fun(view:UIBase) @窗口完全打开后回调(OnCreate之后--用于支持异步资源加载确保窗口真正打开)
 ---@field public UIParam string @窗口传递参数
----@field public ParentNode string @窗口父对象
 ---@field public IsLoaded boolean @是否加载完成
 ---@field public IsOpened boolean @窗口是否打开
+---@field public gameObject UnityEngine.GameObject @窗口实体资源对象
+---@field public transform UnityEngine.Transform @窗口实体资源对象节点
+---@field private UIRootCom UIComBase @窗口根组件(用于支持嵌套子组件增删)
+---@field protected EventIDList table<EventID> @窗口注册的监听事件ID集合
+---@field public go_table any @窗口组件绑定对象
 ---@field private IsBlur boolean @是否被模糊
 local UIBase = Class("UIBase")
 
----@class ViewActiveState @窗口显隐标志位
----@field None number @无显隐标志位
----@field LogicalState number @逻辑显隐标志位(有值标识隐藏)
----@field FullScreenStrategyState number @全屏策略显隐标志位(有值标识隐藏)
-local ViewActiveState =
-{
-    None = 0,
-    LogicalState = 1 << 0,
-    FullScreenStrategyState = 1 << 1,
-}
+
+local ID_UIInstID_Start = 2000000000
+
+function UIBase:CreateUIInstID()
+    ID_UIInstID_Start = ID_UIInstID_Start + 1
+    return ID_UIInstID_Start
+end
+
+
 ---窗口构造函数
 ---@private
 function UIBase:__init()
     self.IsLoaded = false
     self.IsOpened = false
     self.IsBlur = false
-    self.HideFlag = ViewActiveState.None
+    self.nowActive = true
+    self.InstID = self:CreateUIInstID()
 end
 
 ---是否可用(动态加载在未加载完成前被使用可能需要判定)
@@ -49,40 +65,26 @@ end
 ---是否可见(必须通过此接口判定窗口显隐)
 ---@return boolean @是否可见
 function UIBase:IsActive()
-    return self.HideFlag == ViewActiveState.None
+    return self.nowActive
 end
 
 ---设置可见
 ---@param active boolean @设置是否可见
----@param flag ViewActiveState @设置显隐原因标志位
-function UIBase:SetActive(active, flag)
+function UIBase:SetActive(active)
     active = active or false
-    flag = flag or ViewActiveState.LogicalState
-    local preactive = self:IsActive()
-    if active == false then
-        self.HideFlag = self.HideFlag | flag
-    else
-        local hasflag = (self.HideFlag & flag > 0)
-        if hasflag then
-            local reverseflag = ~flag
-            self.HideFlag = self.HideFlag & reverseflag
-        end
-    end
 
-    local isactive = self:IsActive()
-    --if self:IsAvalible() and self.ViewInstance.activeSelf ~= isactive then
-    --    self.ViewInstance:SetActive(Bool2Num(isactive))
-    --end
-    if preactive ~= isactive then
+    local preActive = self:IsActive()
+    if active ~= preActive then
         if self:IsAvalible() then
-            self.ViewInstance:SetActive(Bool2Num(isactive))
+            self.nowActive = active
+            self.gameObject:SetActive(Bool2Num(active))
         end
-        if isactive then
+        if active then
             self:OnEnable()
-            EventManager:GetInstance():Broadcast(EventID.OnViewShow, self, flag)
+            EventManager:GetInstance():Broadcast(EventID.OnViewShow, self)
         else
             self:OnDisable()
-            EventManager:GetInstance():Broadcast(EventID.OnViewHide, self, flag)
+            EventManager:GetInstance():Broadcast(EventID.OnViewHide, self)
         end
     end
 end
@@ -92,9 +94,9 @@ end
 function UIBase:SetBlur(value)
     self.IsBlur = value
     if value then
-        self.ViewInstance:SetParent(UIManager:GetInstance().BlurUIRoot)
+        self.gameObject:SetParent(UIManager:GetInstance().BlurUIRoot)
     else
-        self.ViewInstance:SetParent(UIManager:GetInstance().NormalUIRoot)
+        self.gameObject:SetParent(UIManager:GetInstance().NormalUIRoot)
     end
 end
 
@@ -110,14 +112,18 @@ end
 ---@param name string @窗口脚本名
 ---@param uiPath string @窗口asset路径
 ---@param uiSetting UISetting @窗口信息
+---@param layer UILayerEnum @窗口layer
+---@param sortOrder number @窗口Order
 ---@param parentnode UnityEngine.Transform @窗口挂载节点
 ---@param onopencompletedcb fun(UIBase) @窗口完全打开回调(OnCreate之后)
 ---@param ... any @窗口自定义参数
-function UIBase:_Init(name,uiPath,uiSetting, parentnode, onopencompletedcb, ...)
+function UIBase:_Init(name,uiPath,uiSetting,parentnode, layer,sortOrder, onopencompletedcb, ...)
     self.UIName = name
     self.AssetPath = uiPath
     self.UISetting = uiSetting
     self.ParentNode = parentnode
+    self.UILayer = layer
+    self.SortOrder = sortOrder
     self.OnOpencompletedCB = onopencompletedcb
     self.UIParam = table_pack(...)
     self.IsLoaded = false
@@ -131,38 +137,274 @@ function UIBase:LoadRes()
     ResLoadManager:GetInstance():LoadObj(self.AssetPath, ResTypeEnum.ePrefab, true, handler(self, self.OnLoadResCompleted))
 end
 
+----加载UI粒子效果，同步粒子效果的层级
+---@param path string 粒子效果的预制体路径
+---@param parent UnityEngine.GameObject 父级GameObject
+---@param complete fun(uiParticle:Coffee.UIExtensions.UIParticle) 完成回调
+function UIBase:LoadParticle(path,parent,complete)
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        go.transform:SetParent(parent.transform)
+        go:ResetPRS()
+        -----uiParticle组件
+        local uiParticle = go:GetComponentInChildren(typeof(CS.Coffee.UIExtensions.UIParticle))
+        if uiParticle ~= nil then
+            if complete ~= nil then
+                complete(uiParticle)
+            end
+        end
+    end)
+end
+
+
 ---资源加载完成回调
 ---@private
 ---@param go UnityEngine.GameObject @资源实体对象
 function UIBase:OnLoadResCompleted(go)
-    --if not self.IsOpened then
-    --    Logger.Warning("窗口已关闭，直接销毁加载完成资源对象:%s!", go.name)
-    --    -- 资源加载回来后子组件已经无效了，直接删除实体对象
-    --    go:DestroyGameObj()
-    --    return
-    --end
-    --
-    --self.IsLoaded = true
-    --self.ViewInstance = go
-    --self.ViewTransform = self.ViewInstance.transform
-    --self.ViewTransform:SetParent(self.ParentNode, false)
-    --self.ViewInstance:SetActive(self:IsActive())
-    --self:CreateViewRootComponent()
-    --self.go_table = GetAutoGoTable(self.ViewInstance, handler(self, self.OnBaseClickBtn), handler(self, self.OnClickToggle))
-    --self:UpdateOrder()
-    --self:InitCommonComponent()
-    --self:Awake()
-    ----self.ViewInstance:SetAnimatorTrigger("Open")
-    ----GameUtil.PlayOneShotAuido(GlobalDefine.eAudioSid.JieMianDakai)
-    --EventManager:GetInstance():Register(self)
-    --self:OnCreate(table_unpack(self.Datas))
-    --self:OnEnable()
-    --if self.OnOpencompletedCB ~= nil then
-    --    self.OnOpencompletedCB(self)
-    --    self.OnOpencompletedCB = nil
-    --end
+    if not self.IsOpened then
+        Log.Warning("窗口已关闭，直接销毁加载完成资源对象:%s!", go.name)
+        -- 资源加载回来后子组件已经无效了，直接删除实体对象
+        go:DestroyGameObj()
+        return
+    end
+
+    self.IsLoaded = true
+    self.gameObject = go
+    self.transform = self.gameObject.transform
+    self.transform:SetParent(self.ParentNode, false)
+    self.gameObject:SetActive(self:IsActive())
+    self:CreateUIRootComponent()
+    self.go_table = GetAutoGoTable(self.gameObject, handler(self, self.OnBaseClickBtn), handler(self, self.OnClickToggle),handler(self, self.OnClickTmp))
+    self:UpdateOrder()
+    self:OnBaseAwake()
+    EventManager:GetInstance():Register(self)
+    self:OnCreate(table_unpack(self.UIParam))
+    self:OnEnable()
+    if self.OnOpencompletedCB ~= nil then
+        self.OnOpencompletedCB(self)
+        self.OnOpencompletedCB = nil
+    end
 end
 
+---更新Order
+---@private
+function UIBase:UpdateOrder()
+    local canvas = self.gameObject:GetComponent(typeof(Canvas))
+    if IsNil(canvas) then
+        Log.LogFatal("%s 自行添加Canvas组件", self.UIName)
+    end
+
+    -- 设置它的canvas深度
+    canvas.overrideSorting = true
+    --canvas.additionalShaderChannels = TexCoord1
+    canvas.sortingOrder = self.SortOrder
+    --UpdateUIGameObjectOrder(self.gameObject, UIData.PerWindowOrder, true)
+end
+
+function UIBase:OnBaseAwake()
+    -- 其他base的扩展
+    self:Awake()
+end
+
+---模拟Unity Component的 Awake
+---@protected
+function UIBase:Awake()
+end
+
+---窗口显示(子类重写自定义每个参数)
+---@protected
+---@param ... any @窗口传参
+function UIBase:OnCreate(...)
+end
+
+---可用
+---@protected
+function UIBase:OnEnable()
+end
+
+---不可用
+---@protected
+function UIBase:OnDisable()
+end
+
+---点击Button回调
+---@private
+function UIBase:OnBaseClickBtn(btn)
+    -- 其他base的扩展
+    self:OnClickBtn(btn)
+end
+
+---点击Button回调,子类扩展使用
+---@protected
+---@param btn UnityEngine.UI.Button 按钮
+function UIBase:OnClickBtn(btn)
+end
+
+
+---点击Toggle回调
+---@protected
+---@param toggle UnityEngine.UI.Toggle Toggle
+---@param isOn boolean 是否选中
+function UIBase:OnClickToggle(toggle, isOn)
+end
+
+---点击tmp Link回调
+---@protected
+---@param tmp SEngine.UI.STMP
+---@param linkId string
+function UIBase:OnClickTmp(tmp, linkId)
+end
+
+
+---关闭自身(子类重写实现自定义关闭流程)
+---@protected
+function UIBase:Close()
+    UIManager:GetInstance():CloseUI(self)
+end
+
+--region ------------- 窗口组件相关部分开始 -------------
+
+---创建窗口根组件
+---@private
+function UIBase:CreateUIRootComponent()
+    if self.UIRootCom == nil then
+        ---TODO:采用对象池
+        ---@type UnityEngine.GameObject
+        local viewrootcomponentinstance = GameObject(string_format("%s_UIRootCom", self.UIName))
+        viewrootcomponentinstance.transform:SetParent(self.transform, false)
+        self.UIRootCom = UIComBase.New(nil, self, viewrootcomponentinstance)
+    else
+        Log.Error("窗口名:%s根组件已经创建,请勿重复创建!", self.UIName)
+    end
+end
+
+---为GameObject获得或添加lua组件(窗口子组件统一添加入口，除了UIRootCom不允许直接New)
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+---@param class UIComBase @lua组件类
+---@param ... any @参数
+---@return UIComBase @组件实例化类
+function UIBase:GetOrAddComponent(bindtarget, class, ...)
+    if self.UIRootCom ~= nil then
+        return self.UIRootCom:GetOrAddComponent(bindtarget, class, ...)
+    else
+        Log.Error("窗口名:%s根组件已经被清理,无法进行组件绑定!", self.UIName)
+        return nil
+    end
+end
+
+---获取GameObject中挂载的lua组件
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+---@param class UIComBase  @lua组件类
+---@return  UIComBase @实例化类 或nil
+function UIBase:GetComponent(bindtarget, class)
+    if self.UIRootCom ~= nil then
+        return self.UIRootCom:GetComponent(bindtarget, class)
+    else
+        Log.Error("窗口名:%s根组件已经被清理,无法进行组件获取!", self.UIName)
+        return nil
+    end
+end
+
+---移除GameObject中挂载的指定lua组件
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+---@param class UIComBase  @lua组件类
+---@return boolean @移除是否成功
+function UIBase:RemoveComponent(bindtarget, class)
+    if self.UIRootCom ~= nil then
+        return self.UIRootCom:RemoveComponent(bindtarget, class)
+    else
+        Log.Error("窗口名:%s根组件已经被清理,无法进行组件清理!", self.UIName)
+        return false
+    end
+end
+
+---销毁GameObject,并移除其中挂载的所有lua组件
+---@param bindtarget UnityEngine.GameObject @绑定的GameObject
+function UIBase:DestoryComponentGameObj(bindtarget)
+    if self.UIRootCom ~= nil then
+        return self.UIRootCom:DestoryComponentGameObj(bindtarget)
+    else
+        Log.Error("窗口名:%s根组件已经被清理,无法进行组件清理!", self.UIName)
+        return false
+    end
+
+end
+--endregion
+
+
+--region ------------- 全局事件监听部分 -------------
+
+---添加事件（在Awake中添加才生效）
+---protected
+---@param id EventID
+function UIBase:AddEvent(id)
+    if self.EventIDList == nil then
+        self.EventIDList = {}
+    end
+    table.insert(self.EventIDList, id)
+end
+
+---获取注册监听的事件ID列表
+---@return table<EventID>
+function UIBase:GetEventIDList()
+    return self.EventIDList
+end
+
+---事件处理
+---@protected
+---@param id EventID EventID
+function UIBase:EventHandle(id, ...)
+    --Logger.Warning("[%s:EventHandle]__此函数需要再子类覆盖使用！", self:GetClassName())
+end
+
+---移除所有监听
+---@private
+function UIBase:RemoveAllListener()
+    EventManager:GetInstance():Unregister(self)
+    self.EventIDList = nil
+end
+
+--endregion
+
+
+---清除根组件(递归清除嵌套组件绑定)
+function UIBase:ClearRootUIComponent()
+    if self.UIRootCom ~= nil then
+        self.UIRootCom:Destroy()
+        self.UIRootCom = nil
+    end
+end
+
+---窗口清理销毁
+function UIBase:Destroy()
+    self.IsOpened = false
+    self:ClearRootUIComponent()
+    --资源加载未完成的情况下不走清理流程(资源异步加载才有可能发生)
+    if self.IsLoaded == true then
+        self:OnDisable()
+        self:OnDestroy()
+        self:RemoveAllListener()
+        self.gameObject:DestroyGameObj()
+    else
+        Log.Error("出现未加载完成又被关闭的情况!", self.UIName)
+    end
+
+    self.UIName = nil
+    self.UISetting = nil
+    self.ParentNode = nil
+    self.UILayer = nil
+    self.SortOrder = nil
+    self.OnOpencompletedCB = nil
+    self.UIParam = nil
+    self.IsLoaded = nil
+    self.IsOpened = nil
+    self.gameObject = nil
+    self.transform = nil
+    self.go_table = nil
+end
+---窗口清理(子类重写实现自定义清理流程)
+---@protected
+function UIBase:OnDestroy()
+end
 
 ---@return UIBase @窗口基类
 return UIBase

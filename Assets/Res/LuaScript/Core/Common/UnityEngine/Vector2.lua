@@ -262,7 +262,7 @@ function Vector2:Sub(b)
     self.x = self.x - b.x
     self.y = self.y - b.y
 
-    return
+    return self
 end
 
 Vector2.__tostring = function(self)

@@ -65,4 +65,22 @@ function ScrollRect:SetLayoutHorizontal() end
 
 function ScrollRect:SetLayoutVertical() end
 
+---@param endValue UnityEngine.Vector2
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function ScrollRect:DONormalizedPos(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function ScrollRect:DOHorizontalNormalizedPos(endValue,duration,snapping) end
+
+---@param endValue number
+---@param duration number
+---@param snapping System.Boolean
+---@return DG.Tweening.Tweener
+function ScrollRect:DOVerticalNormalizedPos(endValue,duration,snapping) end
+
 return ScrollRect

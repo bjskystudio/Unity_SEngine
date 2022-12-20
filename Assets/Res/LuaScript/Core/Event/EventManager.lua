@@ -88,63 +88,63 @@ end
 
 --region -------------UIEvent-------------
 --
------注册事件载体
------@param observer BaseUIView|BaseViewComponent|BaseHud 载体
---function EventManager:Register(observer)
---    if observer ~= nil and observer.GetEventIDList ~= nil then
---        self:RegisterByList(observer, observer:GetEventIDList())
---    end
---end
---
------注册事件载体中的事件列表
------@private
------@param evendIDList EventID[] 事件ID列表
---function EventManager:RegisterByList(observer, evendIDList)
---    if evendIDList ~= nil and observer ~= nil then
---        for _, id in pairs(evendIDList) do
---            self:RegisterByID(observer, id)
---        end
---    end
---end
---
------通过事件ID注册
------@private
------@param observer BaseUIView|BaseViewComponent 载体
------@param eventID EventID
---function EventManager:RegisterByID(observer, eventID)
---    if self.ObserverList[eventID] == nil then
---        self.ObserverList[eventID] = {}
---    end
---    self.ObserverList[eventID][observer] = true
---end
---
------移除注册事件载体
---function EventManager:Unregister(observer)
---    if observer ~= nil and observer.GetEventIDList ~= nil then
---        self:UnregisterByList(observer, observer:GetEventIDList())
---    end
---end
---
------移除注册事件载体中的事件列表
------@private
------@param evendIDList EventID[] 事件ID列表
---function EventManager:UnregisterByList(observer, evendIDList)
---    if evendIDList ~= nil and observer ~= nil then
---        for _, id in pairs(evendIDList) do
---            self:UnregisterByID(observer, id)
---        end
---    end
---end
---
------移除注册事件ID
------@private
------@param observer BaseUIView|BaseViewComponent 载体
------@param eventID EventID
---function EventManager:UnregisterByID(observer, eventID)
---    if self.ObserverList[eventID] ~= nil then
---        self.ObserverList[eventID][observer] = nil
---    end
---end
+---注册事件载体
+---@param observer UIBase|UIComBase 载体
+function EventManager:Register(observer)
+    if observer ~= nil and observer.GetEventIDList ~= nil then
+        self:RegisterByList(observer, observer:GetEventIDList())
+    end
+end
+
+---注册事件载体中的事件列表
+---@private
+---@param evendIDList EventID[] 事件ID列表
+function EventManager:RegisterByList(observer, evendIDList)
+    if evendIDList ~= nil and observer ~= nil then
+        for _, id in pairs(evendIDList) do
+            self:RegisterByID(observer, id)
+        end
+    end
+end
+
+---通过事件ID注册
+---@private
+---@param observer UIBase|UIComBase 载体
+---@param eventID EventID
+function EventManager:RegisterByID(observer, eventID)
+    if self.ObserverList[eventID] == nil then
+        self.ObserverList[eventID] = {}
+    end
+    self.ObserverList[eventID][observer] = true
+end
+
+---移除注册事件载体
+function EventManager:Unregister(observer)
+    if observer ~= nil and observer.GetEventIDList ~= nil then
+        self:UnregisterByList(observer, observer:GetEventIDList())
+    end
+end
+
+---移除注册事件载体中的事件列表
+---@private
+---@param evendIDList EventID[] 事件ID列表
+function EventManager:UnregisterByList(observer, evendIDList)
+    if evendIDList ~= nil and observer ~= nil then
+        for _, id in pairs(evendIDList) do
+            self:UnregisterByID(observer, id)
+        end
+    end
+end
+
+---移除注册事件ID
+---@private
+---@param observer UIBase|UIComBase 载体
+---@param eventID EventID
+function EventManager:UnregisterByID(observer, eventID)
+    if self.ObserverList[eventID] ~= nil then
+        self.ObserverList[eventID][observer] = nil
+    end
+end
 
 --endregion
 

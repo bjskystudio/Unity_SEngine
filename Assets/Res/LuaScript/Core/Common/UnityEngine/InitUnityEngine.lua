@@ -13,6 +13,7 @@ _G.Quaternion = require "Quaternion"
 _G.Color = require "Color"
 _G.Ray = require "Ray"
 _G.Bounds = require "Bounds"
+_G.BoundsInt = require("BoundsInt")
 _G.RaycastHit = require "RaycastHit"
 _G.Touch = require "Touch"
 _G.Plane = require "Plane"

@@ -1,0 +1,7 @@
+int	int	int	string	string	string	string	int[]	int	int[]	int[][]	int[][]
+房间id	排序	房间类型（0室外，1功能房，2单间）	说明（不读取）	房间名称	房间说明	人气需求	消耗1.金币；2.钻石“类型#数量”	是否默认解锁	默认解锁家具(初始地板及墙面等初始家具)	阻挡信息	行动边界
+Id	sort	type	desc	name	text	term	cost	unlock	initial_furniture	collider	Border
+1000		0	室外							-5#-51#4#11|-17#-40#34#3|-28#-32#7#11|21#-32#6#11|-12#-24#22#5|9#-19#2#3|11#-17#2#11|13#-15#2#6|16#-6#5#10|-21#-8#5#11|	-27#-56#52#59
+1001	1	1	休息室	Function_house_name_01	Function_house_desc_01	0	1#5	1	101501#101401#101301	-35#-4#10#1|-16#-4#20#1	-35#-32#51#46
+1002	2	1	餐厅	Function_house_name_03	Function_house_desc_03	7	1#50	0			
+1003	3	1	温泉	Function_house_name_05	Function_house_desc_05	15	1#750	0			

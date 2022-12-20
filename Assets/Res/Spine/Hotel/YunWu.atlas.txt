@@ -1,0 +1,55 @@
+
+YunWu.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+w1
+  rotate: false
+  xy: 2, 555
+  size: 735, 87
+  orig: 735, 87
+  offset: 0, 0
+  index: -1
+w2
+  rotate: true
+  xy: 696, 173
+  size: 236, 265
+  orig: 236, 265
+  offset: 0, 0
+  index: -1
+w3
+  rotate: true
+  xy: 739, 411
+  size: 231, 255
+  orig: 231, 255
+  offset: 0, 0
+  index: -1
+y1
+  rotate: false
+  xy: 322, 278
+  size: 372, 185
+  orig: 372, 185
+  offset: 0, 0
+  index: -1
+y2
+  rotate: false
+  xy: 2, 309
+  size: 318, 154
+  orig: 318, 154
+  offset: 0, 0
+  index: -1
+y3
+  rotate: false
+  xy: 2, 465
+  size: 577, 88
+  orig: 577, 88
+  offset: 0, 0
+  index: -1
+y4
+  rotate: false
+  xy: 2, 2
+  size: 398, 274
+  orig: 398, 274
+  offset: 0, 0
+  index: -1

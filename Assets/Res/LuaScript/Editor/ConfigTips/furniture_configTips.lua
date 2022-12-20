@@ -1,0 +1,27 @@
+---@class furniture_Item
+---@field public id number @序号
+---@field public sort number @排序
+---@field public house_type number @对应房间
+---@field public desc string @说明
+---@field public name string @名称文本
+---@field public core number @核心家具(标记为1)
+---@field public profit_trigger number @收益触发
+---@field public Effects_type number @升级效果
+---@field public Effects_coord number[][] @特效位置
+---@field public unlock number @是否默认解锁
+---@field public unlock_terms number[] @解锁条件（8：需求人气 9：需求前置房间 10：需求家具）
+---@field public term_num number[] @解锁参数
+---@field public cost number[] @消耗1.金币；2.钻石“类型#数量”
+---@field public furniture_used number @家具使用情况（1入户交互，2必须交互家具，3随机交互）
+---@field public lifetime number @交互时间（s）
+---@field public animation_tags string @交互动画
+---@field public collider number[][] @阻挡信息
+---@field public position number[][] @排队位置
+---@field public usedrange number[][] @交互点
+---@field public direction number[] @朝向
+---@field public excursion number[][] @交互点偏移
+---@field public range number[][] @站立点
+---@field public coinrange number[][] @金币掉落点
+---@field public queue number[][] @排队点
+
+

@@ -1,0 +1,19 @@
+---@class HotelUpGradeView_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
+---@field public btn_anyClose UnityEngine.UI.Button
+---@field public img_buildImgBg UnityEngine.UI.Image
+---@field public img_costImg SEngine.UI.SImage
+---@field public obj_nextObj UnityEngine.GameObject
+---@field public sbtn_upBtn SEngine.UI.SButton
+---@field public simg_buildImg SEngine.UI.SImage
+---@field public simg_showImg SEngine.UI.SImage
+---@field public stmp_buildMessage SEngine.UI.STMP
+---@field public stmp_buildTitle SEngine.UI.STMP
+---@field public stmp_levelStr SEngine.UI.STMP
+---@field public stmp_nextNum SEngine.UI.STMP
+---@field public stmp_showStr SEngine.UI.STMP
+---@field public stmp_title SEngine.UI.STMP
+---@field public stmp_upNum SEngine.UI.STMP
+---@field public stmp_upStr SEngine.UI.STMP
+

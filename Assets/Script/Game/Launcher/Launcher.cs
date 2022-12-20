@@ -22,6 +22,16 @@ public class Launcher : MonoSingleton<Launcher>
     /// </summary>
     [Label("打印级别")]
     public LogLevel mLogLevel = LogLevel.All;
+    /// <summary>
+    /// 开启emmylua调试
+    /// </summary>
+    [Label("开启emmylua调试")]
+    public bool LuaDebugEnable = false;
+    /// <summary>
+    /// 开启TileMap寻路
+    /// </summary>
+    [Label("开启TileMap寻路")]
+    public bool TileMapEnable = false;
 
     protected override void Init()
     {

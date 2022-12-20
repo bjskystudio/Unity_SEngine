@@ -1,0 +1,20 @@
+---@class DeviceLackView_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
+---@field public btn_anyClose UnityEngine.UI.Button
+---@field public img_ggWupinImg SEngine.UI.SImage
+---@field public img_wupinImg SEngine.UI.SImage
+---@field public sbtn_lookgg SEngine.UI.SButton
+---@field public sbtn_qianwang SEngine.UI.SButton
+---@field public sbtn_qw SEngine.UI.SButton
+---@field public stmp_adHuoQu SEngine.UI.STMP
+---@field public stmp_ggcishu SEngine.UI.STMP
+---@field public stmp_guanggaohuoqu SEngine.UI.STMP
+---@field public stmp_hq SEngine.UI.STMP
+---@field public stmp_huoqu SEngine.UI.STMP
+---@field public stmp_huoqu1 SEngine.UI.STMP
+---@field public stmp_miaosu SEngine.UI.STMP
+---@field public stmp_needNum SEngine.UI.STMP
+---@field public stmp_title SEngine.UI.STMP
+---@field public stmp_wpName SEngine.UI.STMP
+

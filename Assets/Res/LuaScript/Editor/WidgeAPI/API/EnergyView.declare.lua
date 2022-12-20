@@ -1,0 +1,18 @@
+---@class EnergyView_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
+---@field public btn_anyClose UnityEngine.UI.Button
+---@field public img_IconImageFast SEngine.UI.SImage
+---@field public sbtn_buy SEngine.UI.SButton
+---@field public sbtn_confirm SEngine.UI.SButton
+---@field public simg_wuimg SEngine.UI.SImage
+---@field public stmp_buyCs SEngine.UI.STMP
+---@field public stmp_buyStr SEngine.UI.STMP
+---@field public stmp_costDiamond SEngine.UI.STMP
+---@field public stmp_energyMes SEngine.UI.STMP
+---@field public stmp_eneryNum SEngine.UI.STMP
+---@field public stmp_message SEngine.UI.STMP
+---@field public stmp_smallTitle SEngine.UI.STMP
+---@field public stmp_title SEngine.UI.STMP
+---@field public stmp_unlockStr SEngine.UI.STMP
+

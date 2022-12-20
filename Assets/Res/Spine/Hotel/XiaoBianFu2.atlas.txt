@@ -1,0 +1,27 @@
+
+XiaoBianFu2.png
+size: 512,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+1
+  rotate: false
+  xy: 334, 71
+  size: 61, 77
+  orig: 61, 77
+  offset: 0, 0
+  index: -1
+2
+  rotate: false
+  xy: 162, 14
+  size: 170, 134
+  orig: 170, 134
+  offset: 0, 0
+  index: -1
+3
+  rotate: true
+  xy: 2, 2
+  size: 146, 158
+  orig: 146, 158
+  offset: 0, 0
+  index: -1

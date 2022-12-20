@@ -71,4 +71,229 @@ CS.CSCallLuaHelp.CallLuaGameObject = CSCallLua.Call
 CS.CSCallLuaHelp.CallLuaAssetResRef = CSCallLua.Call
 CS.CSCallLuaHelp.CallLuaTransInt = CSCallLua.Call
 
+
+--region -------------点击事件-------------
+
+local BtnClickCsListener = {}
+_G.BtnClickCsListener = BtnClickCsListener
+
+function BtnClickCsListener.CsCallLuaBtnClick(go_table, go, name)
+    if go_table._onClickBtn ~= nil then
+        go_table._onClickBtn(go, name)
+    end
+end
+
+CS.UIGoTable.luaOnClickBtn = BtnClickCsListener.CsCallLuaBtnClick
+
+function BtnClickCsListener.CsCallLuaToggleClick(go_table, go, isOn, name)
+    if go_table._onClickToggle ~= nil then
+        go_table._onClickToggle(go, isOn ~= 0, name)
+    end
+end
+
+CS.UIGoTable.luaOnClickToggle = BtnClickCsListener.CsCallLuaToggleClick
+
+function BtnClickCsListener.CsCallLuaTmpClick(go_table, go, linkId)
+    if go_table._onClickTmp ~= nil then
+        go_table._onClickTmp(go, linkId)
+    end
+end
+CS.UIGoTable.luaOnClickTmp = BtnClickCsListener.CsCallLuaTmpClick
+--endregion
+
+--region ----------------场景拖动事件-------------
+local SceneDragListener = {}
+_G.SceneDragListener = SceneDragListener
+
+function SceneDragListener.CsCallLuaBeginDrag(go_table, eventData)
+    if go_table._onBeginDrag ~= nil then
+        go_table._onBeginDrag(go, eventData)
+    end
+end
+
+CS.SceneDragHandler.luaOnBeginDrag = SceneDragListener.CsCallLuaBeginDrag
+
+function SceneDragListener.CsCallLuaDrag(go_table, eventData)
+    if go_table._onDrag ~= nil then
+        go_table._onDrag(go, eventData)
+    end
+end
+
+CS.SceneDragHandler.luaOnDrag = SceneDragListener.CsCallLuaDrag
+
+function SceneDragListener.CsCallLuaEndDrag(go_table, eventData)
+    if go_table._onEndDrag ~= nil then
+        go_table._onEndDrag(go, eventData)
+    end
+end
+CS.SceneDragHandler.luaOnEndDrag = SceneDragListener.CsCallLuaEndDrag
+--endregion
+
+----region ----------循环列表-------------
+--local LoopListViewListener = {}
+--_G.LoopListViewListener = LoopListViewListener
+--LoopListViewListener.RefreshFunction = {}
+--LoopListViewListener.DragFunction = {}
+--LoopListViewListener.SelectCallBack = {}
+-----添加循环列表刷新事件
+-----@param loopListView SuperScrollView.LoopListView
+-----@param getItemEvent fun(index:number):UnityEngine.Transform
+--function LoopListViewListener.AddListener(loopListView, getItemEvent)
+--    LoopListViewListener.RefreshFunction[loopListView:GetInstanceID()] = getItemEvent
+--end
+-----添加无限循环列表的中间选中事件
+--function LoopListViewListener.AddSelectLister(loopListView, call)
+--    LoopListViewListener.SelectCallBack[loopListView:GetInstanceID()] = call
+--end
+-----移除循环列表刷新事件
+-----@param loopListView SuperScrollView.LoopListView
+--function LoopListViewListener.RemoveListener(loopListView)
+--    LoopListViewListener.RefreshFunction[loopListView:GetInstanceID()] = nil
+--end
+--
+-----注册停止拖拽事件
+-----@param loopListView SuperScrollView.LoopListView
+-----@param callback fun()
+--function LoopListViewListener.RegisterEndDragListener(loopListView, callback)
+--    local comId = loopListView:GetInstanceID()
+--    LoopListViewListener.DragFunction[comId] = callback
+--    CS.LoopListViewHelp.RegisterEndDragEvent(loopListView, comId)
+--end
+--
+-----移除停止拖拽事件
+-----@param loopListView SuperScrollView.LoopListView
+--function LoopListViewListener.UnRegisterEndDragListener(loopListView)
+--    local comId = loopListView:GetInstanceID()
+--    LoopListViewListener.DragFunction[comId] = nil
+--    CS.LoopListViewHelp.UnRegisterEndDragEvent(loopListView)
+--end
+--
+-----初测到顶或到底了
+-----@param loopListView SuperScrollView.LoopListView
+-----@param callback fun(IsToTop:boolean)
+--function LoopListViewListener.RegisterToTopAndBottomListener(loopListView, callback)
+--    LoopListViewListener.RegisterEndDragListener(loopListView, function()
+--        if (loopListView.EndDragDelta < 0) then
+--            if (loopListView.ItemViewFirstIndex == 0) then
+--                if (callback ~= nil) then
+--                    callback(true)
+--                end
+--            end
+--        elseif (loopListView.EndDragDelta > 0) then
+--            if (loopListView.ItemViewLastIndex == loopListView.ItemTotalCount - 1) then
+--                if (callback ~= nil) then
+--                    callback(false)
+--                end
+--            end
+--        end
+--    end)
+--end
+--
+--CS.LoopListViewHelp.onDestroyEvent = function(comId)
+--    LoopListViewListener.RefreshFunction[comId] = nil
+--    LoopListViewListener.DragFunction[comId] = nil
+--end
+--
+--CS.LoopListViewHelp.onRefreshEvent = function(comId, index)
+--    local callback = LoopListViewListener.RefreshFunction[comId]
+--    if (callback ~= nil) then
+--        return callback(index)
+--    end
+--end
+--
+--CS.LoopListViewHelp.OnCenterDragEvent = function(comId, index)
+--    local callback = LoopListViewListener.SelectCallBack[comId]
+--    if (callback ~= nil) then
+--        return callback(index)
+--    end
+--end
+--
+--CS.LoopListViewHelp.onEndDragEvent = function(comId)
+--    local func = LoopListViewListener.DragFunction[comId]
+--    if (func ~= nil) then
+--        func()
+--    end
+--end
+----endregion
+--
+----region ------------循环网格列表----------------
+--local LoopGridViewListener = {}
+--_G.LoopGridViewListener = LoopGridViewListener
+--LoopGridViewListener.RefreshFunction = {}
+--LoopGridViewListener.DragFunction = {}
+--
+-----开始监听更新事件
+-----@param loopGridView SuperScrollView.LoopGridView
+-----@param callback fun()
+--function LoopGridViewListener.AddRefreshListener(loopGridView, callback)
+--    LoopGridViewListener.RefreshFunction[loopGridView:GetInstanceID()] = callback
+--end
+--
+-----结束监听更新事件
+-----@param loopGridView SuperScrollView.LoopGridView
+--function LoopGridViewListener.RemoveRefreshListener(loopGridView)
+--    LoopGridViewListener.RefreshFunction[loopGridView:GetInstanceID()] = nil
+--end
+--
+-----注册结束事件监听
+-----@param loopGridView SuperScrollView.LoopGridView
+-----@param callback fun()
+--function LoopGridViewListener.RegisterEndDragListener(loopGridView, callback)
+--    local comId = loopGridView:GetInstanceID()
+--    LoopGridViewListener.DragFunction[comId] = callback
+--    CS.LoopGridViewHelp.RegisterEndDragEvent(loopGridView, comId)
+--end
+--
+-----注销结束事件监听
+-----@param loopGridView SuperScrollView.LoopGridView
+--function LoopGridViewListener.UnRegisterEndDragListener(loopGridView)
+--    local comId = loopGridView:GetInstanceID()
+--    LoopGridViewListener.DragFunction[comId] = nil
+--    CS.LoopGridViewHelp.UnRegisterEndDragEvent(loopGridView)
+--end
+--
+-----初测到顶或到底了
+-----@param loopGridView SuperScrollView.LoopGridView
+-----@param callback fun(IsToTop:boolean)
+--function LoopGridViewListener.RegisterToTopAndBottomListener(loopGridView, callback)
+--    LoopGridViewListener.RegisterEndDragListener(loopGridView, function()
+--        if (loopGridView.EndDragDelta < 0) then
+--            if (loopGridView.ItemViewFirstIndex == 0) then
+--                if (callback ~= nil) then
+--                    callback(true)
+--                end
+--            end
+--        elseif (loopGridView.EndDragDelta > 0) then
+--            if (loopGridView.ItemViewLastIndex == loopGridView.ItemTotalCount - 1) then
+--                if (callback ~= nil) then
+--                    callback(false)
+--                end
+--            end
+--        end
+--    end)
+--end
+--
+-----C#view销毁时
+--CS.LoopGridViewHelp.onDestroyEvent = function(comId)
+--    LoopGridViewListener.RefreshFunction[comId] = nil
+--    LoopGridViewListener.DragFunction[comId] = nil
+--end
+--
+-----C#刷新事件回调
+--CS.LoopGridViewHelp.onRefreshEvent = function(comId, index)
+--    local callback = LoopGridViewListener.RefreshFunction[comId]
+--    if (callback) then
+--        return callback(index)
+--    end
+--end
+--
+-----C#拖拽结束事件回调
+--CS.LoopGridViewHelp.onEndDragEvent = function(comId)
+--    local func = LoopGridViewListener.DragFunction[comId]
+--    if (func ~= nil) then
+--        func()
+--    end
+--end
+----endregion
+
 return CSCallLua

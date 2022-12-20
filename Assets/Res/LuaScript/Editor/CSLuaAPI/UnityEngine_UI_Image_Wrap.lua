@@ -44,4 +44,29 @@ function Image:CalculateLayoutInputVertical() end
 ---@return System.Boolean
 function Image:IsRaycastLocationValid(screenPoint,eventCamera) end
 
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Image:DOColor(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Image:DOFade(endValue,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Image:DOFillAmount(endValue,duration) end
+
+---@param gradient UnityEngine.Gradient
+---@param duration number
+---@return DG.Tweening.Sequence
+function Image:DOGradientColor(gradient,duration) end
+
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Image:DOBlendableColor(endValue,duration) end
+
 return Image

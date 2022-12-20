@@ -18,6 +18,9 @@ function Object:Equals(other) end
 ---@return string
 function Object:ToString() end
 
+---@return System.Boolean
+function Object:IsNull() end
+
 ---@param original UnityEngine.Object
 ---@param position UnityEngine.Vector3
 ---@param rotation UnityEngine.Quaternion

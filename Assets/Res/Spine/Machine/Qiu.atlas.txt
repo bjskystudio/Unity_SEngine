@@ -1,0 +1,41 @@
+
+Qiu.png
+size: 512,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+002
+  rotate: false
+  xy: 2, 2
+  size: 102, 92
+  orig: 105, 95
+  offset: 2, 2
+  index: -1
+003
+  rotate: false
+  xy: 106, 2
+  size: 102, 92
+  orig: 105, 95
+  offset: 2, 2
+  index: -1
+004
+  rotate: false
+  xy: 210, 2
+  size: 102, 92
+  orig: 105, 95
+  offset: 2, 2
+  index: -1
+qiu1
+  rotate: true
+  xy: 417, 47
+  size: 47, 28
+  orig: 47, 28
+  offset: 0, 0
+  index: -1
+qiu2
+  rotate: false
+  xy: 314, 3
+  size: 101, 91
+  orig: 104, 94
+  offset: 1, 2
+  index: -1

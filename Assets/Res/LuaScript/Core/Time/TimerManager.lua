@@ -9,7 +9,7 @@ local Timer = realRequire("Timer")
 ---@class TimerManager:Singleton 定时器管理：负责定时器获取、回收、缓存、调度等管理
 local TimerManager = Class("TimerManager", Singleton)
 -- 延后回收定时器，必须全部更新完毕再回收，否则会有问题
-local function DelayRecycle(self, timers)
+function TimerManager:DelayRecycle(timers)
     if table.IsNilOrEmpty(timers) then
         return
     end
@@ -23,7 +23,7 @@ local function DelayRecycle(self, timers)
     end
 end
 -- Update回调
-local function UpdateHandle(self)
+function TimerManager:UpdateHandle()
     -- 更新定时器
     ---@param timer Timer Timer
     for timer, _ in pairs(self.__update_toadd) do
@@ -36,11 +36,11 @@ local function UpdateHandle(self)
         timer:Update(false)
     end
 
-    DelayRecycle(self, self.__update_timer)
+    self:DelayRecycle(self.__update_timer)
 end
 
 -- LateUpdate回调
-local function LateUpdateHandle(self)
+function TimerManager:LateUpdateHandle()
     -- 更新定时器
     for timer, _ in pairs(self.__lateupdate_toadd) do
         self.__lateupdate_timer[timer] = true
@@ -51,11 +51,11 @@ local function LateUpdateHandle(self)
         timer:Update(false)
     end
 
-    DelayRecycle(self, self.__lateupdate_timer)
+    self:DelayRecycle(self.__lateupdate_timer)
 end
 
 -- FixedUpdate回调
-local function FixedUpdateHandle(self)
+function TimerManager:FixedUpdateHandle()
     -- 更新定时器
     for timer, _ in pairs(self.__fixedupdate_toadd) do
         self.__fixedupdate_timer[timer] = true
@@ -66,12 +66,12 @@ local function FixedUpdateHandle(self)
         timer:Update(true)
     end
 
-    DelayRecycle(self, self.__fixedupdate_timer)
+    self:DelayRecycle(self.__fixedupdate_timer)
 end
 
 
 -- 构造函数
-local function __init(self)
+function TimerManager:__init()
     -- handle
     self.__update_handle = nil
     self.__lateupdate_handle = nil
@@ -86,11 +86,31 @@ local function __init(self)
     self.__update_toadd = {}
     self.__lateupdate_toadd = {}
     self.__fixedupdate_toadd = {}
+
+    -- 注册
+    self.__update_handle = UpdateBeat:CreateListener(self.UpdateHandle, self)
+    self.__lateupdate_handle = LateUpdateBeat:CreateListener(self.LateUpdateHandle, self)
+    self.__fixedupdate_handle = FixedUpdateBeat:CreateListener(self.FixedUpdateHandle, self)
+    UpdateBeat:AddListener(self.__update_handle)
+    LateUpdateBeat:AddListener(self.__lateupdate_handle)
+    FixedUpdateBeat:AddListener(self.__fixedupdate_handle)
 end
 
 -- 释放
-local function Dispose(self)
+function TimerManager:Dispose()
     self:Cleanup()
+    if self.__update_handle ~= nil then
+        UpdateBeat:RemoveListener(self.__update_handle)
+        self.__update_handle = nil
+    end
+    if self.__lateupdate_handle ~= nil then
+        LateUpdateBeat:RemoveListener(self.__lateupdate_handle)
+        self.__lateupdate_handle = nil
+    end
+    if self.__fixedupdate_handle ~= nil then
+        FixedUpdateBeat:RemoveListener(self.__fixedupdate_handle)
+        self.__fixedupdate_handle = nil
+    end
     self.__update_handle = nil
     self.__lateupdate_handle = nil
     self.__fixedupdate_handle = nil
@@ -106,7 +126,7 @@ local function Dispose(self)
 end
 
 -- 清理：可用在场景切换前，不清理关系也不大，只是缓存池不会下降
-local function Cleanup(self)
+function TimerManager:Cleanup()
     self.__update_timer = {}
     self.__lateupdate_timer = {}
     self.__fixedupdate_timer = {}
@@ -118,7 +138,7 @@ local function Cleanup(self)
 end
 
 --获取定时器
-local function InnerGetTimer(_, delay, func, obj, one_shot, use_frame, unscaled, ...)
+function TimerManager:InnerGetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
     local timer
     --[[
     --TODO 2019.9.6 使用回收的Timer会出现问题  暂时没找到
@@ -141,33 +161,29 @@ end
 ---@param use_frame boolean 是否是帧定时器，否则为秒定时器
 ---@param unscaled boolean 使用deltaTime计时，还是采用unscaledDeltaTime计时, 默认为true（不受时间影响），使用unscale
 ---@return Timer
-local function GetTimer(self, delay, func, obj, one_shot, use_frame, unscaled, ...)
-    local timer = InnerGetTimer(self, delay, func, obj, one_shot, use_frame, unscaled, ...)
+function TimerManager:GetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    local timer = self:InnerGetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
     assert(not self.__update_timer[timer] and not self.__update_toadd[timer])
     self.__update_toadd[timer] = true
     return timer
 end
 
 -- 获取LateUpdate定时器
-local function GetLateTimer(self, delay, func, obj, one_shot, use_frame, unscaled, ...)
-    local timer = InnerGetTimer(self, delay, func, obj, one_shot, use_frame, unscaled, ...)
+function TimerManager:GetLateTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    local timer = self:InnerGetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
     assert(not self.__lateupdate_timer[timer] and not self.__lateupdate_toadd[timer])
     self.__lateupdate_toadd[timer] = true
     return timer
 end
 
 -- 获取FixedUpdate定时器
-local function GetFixedTimer(self, delay, func, obj, one_shot, use_frame, ...)
-    local timer = InnerGetTimer(self, delay, func, obj, one_shot, use_frame, false, ...)
+function TimerManager:GetFixedTimer(delay, func, obj, one_shot, use_frame, ...)
+    local timer = self:InnerGetTimer(delay, func, obj, one_shot, use_frame, false, ...)
     assert(not self.__fixedupdate_timer[timer] and not self.__fixedupdate_toadd[timer])
     self.__fixedupdate_toadd[timer] = true
     return timer
 end
-
-TimerManager.__init = __init
-TimerManager.Cleanup = Cleanup
-TimerManager.Dispose = Dispose
----获取Update定时器
+---获取Update定时器立即开始
 ---@param delay number 时长，秒或者帧
 ---@param func function 回调函数
 ---@param obj table 对应的Lua对象
@@ -175,7 +191,33 @@ TimerManager.Dispose = Dispose
 ---@param use_frame boolean 是否是帧定时器，否则为秒定时器
 ---@param unscaled boolean 使用deltaTime计时，还是采用unscaledDeltaTime计时, 默认为true（不受时间影响），使用unscale
 ---@return Timer
-TimerManager.GetTimer = GetTimer
-TimerManager.GetLateTimer = GetLateTimer
-TimerManager.GetFixedTimer = GetFixedTimer
+function TimerManager:GetTimerStart(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    local timer = self:GetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    timer:Start()
+    return timer
+end
+
+---获取Update定时器立即执行
+---@param delay number 时长，秒或者帧
+---@param func function 回调函数
+---@param obj table 对应的Lua对象
+---@param one_shot boolean 是否是一次性计时
+---@param use_frame boolean 是否是帧定时器，否则为秒定时器
+---@param unscaled boolean 使用deltaTime计时，还是采用unscaledDeltaTime计时, 默认为true（不受时间影响），使用unscale
+---@return Timer
+function TimerManager:GetTimerStartImme(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    local timer = self:GetTimer(delay, func, obj, one_shot, use_frame, unscaled, ...)
+    timer:Start()
+    pcall(func,obj,...)
+    return timer
+end
+---停止并清除timer
+---@param timer Timer
+function TimerManager:StopAndClearTimer(timer)
+    if not IsNil(timer) then
+        timer:Stop()
+        timer = nil
+    end
+end
+
 return TimerManager

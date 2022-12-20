@@ -127,6 +127,19 @@ function GameObject:BroadcastMessage(methodName,parameter) end
 ---@param methodName string
 function GameObject:BroadcastMessage(methodName) end
 
+function GameObject:ResetPRS() end
+
+---@param s number
+function GameObject:SetLocalScaleXYZ(s) end
+
+function GameObject:DestroyGameObj() end
+
+---@param time number
+function GameObject:DestroyGameObjDelay(time) end
+
+---@param index int32
+function GameObject:ClearChildren(index) end
+
 ---@param type UnityEngine.PrimitiveType
 ---@return UnityEngine.GameObject
 function GameObject.CreatePrimitive(type) end

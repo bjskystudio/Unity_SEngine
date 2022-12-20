@@ -12,4 +12,9 @@ local CanvasGroup = {}
 ---@return System.Boolean
 function CanvasGroup:IsRaycastLocationValid(sp,eventCamera) end
 
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function CanvasGroup:DOFade(endValue,duration) end
+
 return CanvasGroup

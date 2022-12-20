@@ -1,0 +1,8 @@
+---@class itemsparam_Item
+---@field public id number @ID
+---@field public desc string @说明
+---@field public text string @属性文本
+---@field public icon string @对应ICON
+---@field public icon_lock string @未解锁icon
+
+

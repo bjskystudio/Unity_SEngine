@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mResourceLoadMode: 0
   DEBUG_MODE: 0
+  ASSETBUNDLE_SUFFIX_NAME: .assetbundle
+  MANIFEST_NAME: StreamingResources
+  SHADER_AB_RELATIVE_PATH: shader/allshader
+  RES_LOCAL_ASSETDATABASE_RELATIVE_PATH: Assets/Res
+  RES_LOCAL_AB_RELATIVE_PATH: StreamingAssets/StreamingResources
+  RES_STREAM_AB_RELATIVE_PATH: StreamingResources
+  RES_PERSISTENT_RELATIVE_PATH: GameRes
+  RES_PERSISTENT_AB_RELATIVE_PATH: StreamingResources
   RECYBLEBIN_RES_DESTROY_TIME: 10
-  MANIFEST_NAME: Assetbundle
-  ASSETBUNDLE_SUFFIX_NAME: 
-  RES_LOCAL_ASSETDATABASE_RELATIVE_PATH: Assets/Export
-  RES_LOCAL_AB_RELATIVE_PATH: ../ClientRes/Android/Assetbundle
-  RES_STREAM_AB_RELATIVE_PATH: ClientRes/Android/Assetbundle
-  RES_PERSISTENT_RELATIVE_PATH: ClientRes/Android/Assetbundle
-  RES_PERSISTENT_AB_RELATIVE_PATH: Assetbundle

@@ -396,4 +396,113 @@ function Material:GetTextureScale(name) end
 ---@return UnityEngine.Vector2
 function Material:GetTextureScale(nameID) end
 
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOColor(endValue,duration) end
+
+---@param endValue UnityEngine.Color
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOColor(endValue,property,duration) end
+
+---@param endValue number
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOFade(endValue,duration) end
+
+---@param endValue number
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOFade(endValue,property,duration) end
+
+---@param endValue number
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOFloat(endValue,property,duration) end
+
+---@param endValue UnityEngine.Vector2
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOOffset(endValue,duration) end
+
+---@param endValue UnityEngine.Vector2
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOOffset(endValue,property,duration) end
+
+---@param endValue UnityEngine.Vector2
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOTiling(endValue,duration) end
+
+---@param endValue UnityEngine.Vector2
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOTiling(endValue,property,duration) end
+
+---@param endValue UnityEngine.Vector4
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOVector(endValue,property,duration) end
+
+---@param endValue UnityEngine.Color
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOBlendableColor(endValue,duration) end
+
+---@param endValue UnityEngine.Color
+---@param property string
+---@param duration number
+---@return DG.Tweening.Tweener
+function Material:DOBlendableColor(endValue,property,duration) end
+
+---@param withCallbacks System.Boolean
+---@return int32
+function Material:DOComplete(withCallbacks) end
+
+---@param complete System.Boolean
+---@return int32
+function Material:DOKill(complete) end
+
+---@return int32
+function Material:DOFlip() end
+
+---@param to number
+---@param andPlay System.Boolean
+---@return int32
+function Material:DOGoto(to,andPlay) end
+
+---@return int32
+function Material:DOPause() end
+
+---@return int32
+function Material:DOPlay() end
+
+---@return int32
+function Material:DOPlayBackwards() end
+
+---@return int32
+function Material:DOPlayForward() end
+
+---@param includeDelay System.Boolean
+---@return int32
+function Material:DORestart(includeDelay) end
+
+---@param includeDelay System.Boolean
+---@return int32
+function Material:DORewind(includeDelay) end
+
+---@return int32
+function Material:DOSmoothRewind() end
+
+---@return int32
+function Material:DOTogglePause() end
+
 return Material

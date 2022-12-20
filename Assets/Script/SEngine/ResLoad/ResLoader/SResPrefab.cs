@@ -147,14 +147,14 @@ namespace SEngine
                     InstObj = GameObject.Instantiate(Asset as GameObject);
                     InstObj.name = InstObj.name.Replace("(Clone)", "");
                     // 先不加看看
-                    //PrefabAutoDestroy autoDestroy = InstObj.AddComponent<PrefabAutoDestroy>();
-                    //autoDestroy.mRes = this;
-                    //autoDestroy.mResRef = new SResRef(this);
-                    //autoDestroy.mAssetPath = AssetPath;
-                    //autoDestroy.mAssetPathInit = AssetPathInit;
-                    //callback?.Invoke(InstObj, autoDestroy.mResRef);
-                    SResRef resRef = new SResRef(this);
-                    callback?.Invoke(InstObj, resRef);
+                    PrefabAutoDestroy autoDestroy = InstObj.AddComponent<PrefabAutoDestroy>();
+                    autoDestroy.mRes = this;
+                    autoDestroy.mResRef = new SResRef(this);
+                    autoDestroy.mAssetPath = AssetPath;
+                    autoDestroy.mAssetPathInit = AssetPathInit;
+                    callback?.Invoke(InstObj, autoDestroy.mResRef);
+                    //SResRef resRef = new SResRef(this);
+                    //callback?.Invoke(InstObj, resRef);
                 }
             }
             else

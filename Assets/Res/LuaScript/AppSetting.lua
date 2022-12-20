@@ -15,6 +15,10 @@ AppSetting.UsedAssetBundle = CS.Launcher.Instance.UsedAssetBundle
 
 AppSetting.UsedLuaAssetBundle = CS.Launcher.Instance.UsedLuaAssetBundle
 
+AppSetting.TileMapEnable = CS.Launcher.Instance.TileMapEnable
+
+AppSetting.IsEditor = CS.Launcher.Instance:IsEditor()
+
 ---@type AppSetting
 _G.AppSetting = AppSetting
 ---@type AppSetting

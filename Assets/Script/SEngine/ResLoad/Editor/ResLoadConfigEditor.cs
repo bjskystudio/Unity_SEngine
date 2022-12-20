@@ -40,6 +40,7 @@ namespace SEngine
             //AB
             asset.ASSETBUNDLE_SUFFIX_NAME = ".assetbundle";
             asset.MANIFEST_NAME = "StreamingResources";
+            asset.SHADER_AB_RELATIVE_PATH = "shader/allshader";
             asset.RES_LOCAL_AB_RELATIVE_PATH = "StreamingAssets/StreamingResources";
             asset.RES_STREAM_AB_RELATIVE_PATH = "StreamingResources";
             asset.RES_PERSISTENT_RELATIVE_PATH = "GameRes";

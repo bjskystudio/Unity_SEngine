@@ -109,4 +109,59 @@ function Component:BroadcastMessage(methodName) end
 ---@param options UnityEngine.SendMessageOptions
 function Component:BroadcastMessage(methodName,options) end
 
+function Component:ResetPRS() end
+
+---@param s number
+function Component:SetLocalScaleXYZ(s) end
+
+function Component:DestroyGameObj() end
+
+---@param time number
+function Component:DestroyGameObjDelay(time) end
+
+---@param index int32
+function Component:ClearChildren(index) end
+
+---@param withCallbacks System.Boolean
+---@return int32
+function Component:DOComplete(withCallbacks) end
+
+---@param complete System.Boolean
+---@return int32
+function Component:DOKill(complete) end
+
+---@return int32
+function Component:DOFlip() end
+
+---@param to number
+---@param andPlay System.Boolean
+---@return int32
+function Component:DOGoto(to,andPlay) end
+
+---@return int32
+function Component:DOPause() end
+
+---@return int32
+function Component:DOPlay() end
+
+---@return int32
+function Component:DOPlayBackwards() end
+
+---@return int32
+function Component:DOPlayForward() end
+
+---@param includeDelay System.Boolean
+---@return int32
+function Component:DORestart(includeDelay) end
+
+---@param includeDelay System.Boolean
+---@return int32
+function Component:DORewind(includeDelay) end
+
+---@return int32
+function Component:DOSmoothRewind() end
+
+---@return int32
+function Component:DOTogglePause() end
+
 return Component
