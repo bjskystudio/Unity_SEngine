@@ -14,6 +14,6 @@
 ---@field public waitstime number @运输时间（s)
 ---@field public param_type number[] @家具收益类型（1.房间订单收益/2.挂机收益/3.使用收益/4.额外收益/5.人气值/6.库存数量/7.交互时间减少）
 ---@field public param_num number[] @收益数值
----@field public state_tag number @行为标签，用以判定与该家具交互是否触发角色被动效果（1.睡觉）
+---@field public talk_tage number[] @角色在使用设备时说的话
 
 

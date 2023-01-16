@@ -1,9 +1,0 @@
-int	string	string	string	int	string	string	string	int	int	int[]	int[]	int
-角色id	备注	名字	描述	品质等级（1初级 2中级 3高级）	品质描述	场景形象	立绘	技能1	技能2	等级经验	使用设备时对话id	解锁方式（1：扭蛋机获取 2：需求前置设备 3：需求前置酒店状态）
-id	remark	name	desc	rank	rank_desc	model	drawing	type	time	exp	bubble_id	room_preference
-1	小恶魔	Customer_EM_name	Customer_EM_desc	1		EM					110#111#112#113#114#115#116#117#118#119#120#121#122#123#124	
-2	小恶魔			1								
-3	小恶魔			1								
-4	小恶魔			1								
-5	小恶魔			1								
-6	小恶魔			1								

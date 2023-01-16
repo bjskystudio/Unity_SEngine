@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -10,22 +11,35 @@ namespace SEngine.UI
     public class SButton : Button, IGrayMember
     {
         /// <summary>
-        /// 上次点击时间
+        /// ??ε?????
         /// </summary>
         private static float LastClickTime = -1;
         /// <summary>
-        /// 点击间隔
+        /// ??????
         /// </summary>
-        private readonly float ClickInterval = 0.2f;
+        private float ClickInterval = 0.2f;
 
+        public float NaClickIntervalmes
+        {
+            get
+            {
+                return this.ClickInterval;
+            }
+            set
+            {
+                this.ClickInterval = value;
+            }
+        }
+        
         private float time;
         /// <summary>
-        /// 是否忽略点击间隔保护
+        /// ??????????????
         /// </summary>
         public bool IgnoreClickInterval = false;
 
+        private bool NotClick = false;
         /// <summary>
-        /// 按钮关联文本
+        /// ??????????
         /// </summary>
         public STMP BtnText;
 
@@ -37,7 +51,7 @@ namespace SEngine.UI
         }
 
         /// <summary>
-        /// 设置按钮文本
+        /// ?????????
         /// </summary>
         /// <param name="desc"></param>
         public void SetText(string desc)
@@ -61,9 +75,13 @@ namespace SEngine.UI
                 time = Time.realtimeSinceStartup;
 
                 OnClickInvoke();
-
+                
                 LastClickTime = Time.realtimeSinceStartup;
-
+                NotClick = true;
+            }
+            else
+            {
+                
             }
         }
         protected virtual void OnClickInvoke()
@@ -73,7 +91,7 @@ namespace SEngine.UI
         public bool IsGray { get; private set; }
 
         /// <summary>
-        /// 变灰
+        /// ???
         /// </summary>
         public void SetGray(bool bo)
         {
@@ -101,5 +119,20 @@ namespace SEngine.UI
             SetGray(bo);
         }
 
+        public void Update()
+        {
+            if (NotClick)
+            {
+                if (IgnoreClickInterval || Time.realtimeSinceStartup - LastClickTime >= ClickInterval)
+                {
+                    this.interactable = true;
+                    NotClick = false;
+                }
+                else
+                {
+                    this.interactable  = false;
+                }
+            }
+        }
     }
 }

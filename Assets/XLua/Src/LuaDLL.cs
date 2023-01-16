@@ -361,7 +361,17 @@ namespace XLua.LuaDLL
                 xlua_pushlstring(L, str, str.Length);
             }
         }
-
+        public static void lua_pushlenstring(IntPtr L, byte[] str, int len)
+        {
+            if (str == null)
+            {
+                lua_pushnil(L);
+            }
+            else
+            {
+                xlua_pushlstring(L, str, len);
+            }
+        }
         public static byte[] lua_tobytes(IntPtr L, int index)//[-0, +0, m]
         {
             if (lua_type(L, index) == LuaTypes.LUA_TSTRING)
@@ -579,6 +589,17 @@ namespace XLua.LuaDLL
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr xlua_gl(IntPtr L);
+
+        #region Protobuf
+        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int luaopen_pb(System.IntPtr L);
+
+        [MonoPInvokeCallback(typeof(LuaDLL.lua_CSFunction))]
+        public static int LoadLuaProfobuf(System.IntPtr L)
+        {
+            return luaopen_pb(L);
+        }
+        #endregion
 
 #if GEN_CODE_MINIMIZE
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]

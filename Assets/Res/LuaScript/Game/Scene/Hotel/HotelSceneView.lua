@@ -19,6 +19,7 @@ local TimerInst = require("TimerManager"):GetInstance()
 local AvatarManager = require("AvatarManager")
 local AvatarView = require("AvatarView")
 local AvatarEvent = require("AvatarEvent")
+local ResLoadManager = require("ResLoadManager")
 ---出生点信息
 ---@class AvatarBornNodeInfo
 ---@field Index number 位置id
@@ -56,29 +57,30 @@ HotelSceneView.HotelTask = {
 ---添加Events监听事件
 function HotelSceneView:Awake()
     self:AddEvent(EggMachine.ClickOnce)
+    self:AddEvent(EggMachine.NewBuffStart)
     self:AddEvent(EggMachine.RoundComplete)
     self:AddEvent(GameEvent.FinshHotelTaskEvent)
     self:AddEvent(AvatarEvent.ClearAvatarView)
     self:AddEvent(AvatarEvent.EnterRoom)
     self:AddEvent(AvatarEvent.ExitRoom)
+    self:AddEvent(GameEvent.BtnMachine)
 end
+
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
 function HotelSceneView:OnCreate()
+    self:ResetSceneSize(Vector2.New(1024, 1024), Vector3.New(1, 1.8, 1.1), Vector2.New(0, 150))
     self:InitSceneView()
 
     self.RoomId = SceneManager.eRoomId.Hotel
     self.MaxJDValue = 2.15
     self:InitAvatarBornInfo()
+
     self:InitMachineSpine()
     self:InitAvatars()
     --self.go_table.obj_chuizi.transform.localPosition = self.go_table.obj_changeJar_lock.transform.localPosition
     ---帧刷新
     self.OrderTimer = TimerInst:GetTimerStartImme(2, self.OnOrderTimer, self, false, true);
-
-    ---@type ParticleData[]
-    self.ParticleMap = {}
-    self.ParticleTimer = TimerInst:GetTimerStartImme(0.1, self.ParticleOnTime, self)
 end
 
 ---事件处理
@@ -88,7 +90,14 @@ function HotelSceneView:EventHandle(id, ...)
     if id == EggMachine.ClickOnce then
     elseif id == EggMachine.RoundComplete then
         ---一轮消耗一点体力
-        GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Energy, -1)
+        local costTl
+        if (MachineInst.PlayState == EggMachine.ePlayState.Normal) then
+            costTl = 1
+        else
+            costTl = Config.gashapon_machine_sp[MachineInst.PlayState].energy_cost
+        end
+
+        GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Energy, -costTl)
         self:OnRoundComplete(...)
     elseif id == GameEvent.FinshHotelTaskEvent then
         --完成旅店任务
@@ -99,6 +108,21 @@ function HotelSceneView:EventHandle(id, ...)
         self:OnAvatarEnterRoom(...)
     elseif id == AvatarEvent.ExitRoom then
         self:OnAvatarExitRoom(...)
+    elseif id == EggMachine.NewBuffStart then
+        --扭蛋机获取到了最新BUFF
+        self:InitMachineSpine()
+    elseif id == GameEvent.BtnMachine then
+        self:SafePlayAnim("click1", false, function()
+            self.MachineSpine:PlayAnim("idle", true)
+        end)
+        MachineInst:ClickMachine()
+        --设置进度
+        if (MachineInst.PlayState == EggMachine.ePlayState.Enough) then
+            MachineInst.ClickNum = 1
+        end
+        local value = MachineInst:GetJDValue() * self.MaxJDValue
+        self.MachineSpine:SetBonePropValue("JD", "Y", value)
+        EventInst:Broadcast(GameEvent.EggMachineProgress, MachineInst:GetJDValue())
     end
 end
 
@@ -124,13 +148,19 @@ function HotelSceneView:OnClickBtn(btn)
     if btn == self.go_table.sbtn_Lounge then
         SceneInst:ChangeToRoom(SceneManager.eRoomId.Lounge)
     elseif btn == self.go_table.sbtn_machine then
+        --[[
         self:SafePlayAnim("click1", false, function()
             self.MachineSpine:PlayAnim("idle", true)
         end)
-        MachineInst:ClickMachine()
+        MachineInst:RoundComplete()
         --设置进度
+        if (MachineInst.PlayState == EggMachine.ePlayState.Enough) then
+            MachineInst.ClickNum = 1
+        end
         local value = MachineInst:GetJDValue() * self.MaxJDValue
         self.MachineSpine:SetBonePropValue("JD", "Y", value)
+        EventInst:Broadcast(GameEvent.EggMachineProgress, MachineInst:GetJDValue())
+        ]]
     end
 end
 
@@ -161,11 +191,92 @@ function HotelSceneView:InitAvatarBornInfo()
 end
 
 function HotelSceneView:InitMachineSpine()
+    local clickNum = HotelDataInst.EggMachine.ClickNum --存储的点击次数
+    MachineInst.ClickNum = clickNum
+    MachineInst:GetRoundClickNum()--获取总次数
+
+    local state = MachineInst.PlayState
     ---@type SEngine.UI.UISpine
     self.MachineSpine = self.go_table.obj_machine:GetComponent(typeof(CS.SEngine.UI.UISpine))
     self.MachineSpine:PlayAnim("idle", true)
     --设置进度
-    self.MachineSpine:SetBonePropValue("JD", "Y", 0)
+    if (state == EggMachine.ePlayState.Enough) then
+        MachineInst.ClickNum = 1
+    end
+
+    local value = MachineInst:GetJDValue() * self.MaxJDValue
+    self.MachineSpine:SetBonePropValue("JD", "Y", value)
+    EventInst:Broadcast(GameEvent.EggMachineProgress, MachineInst:GetJDValue())
+    ---处理BUFF显示
+    if (state == EggMachine.ePlayState.Enough) then
+        local path = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Gashapon_lightning"
+
+        ---加载预制
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table.obj_machineBuff.transform)
+                go:ResetPRS()
+                go.transform.localPosition = Vector3.New(0, -41, 0)
+            end
+        end)
+    elseif (state == EggMachine.ePlayState.Double) then
+        local path = "UI/Hotel/Prefabs/bat1"
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table.obj_machineBuff.transform)
+                go:ResetPRS()
+                go.transform:SetLocalScaleXYZ(0.16)
+                go.transform.localPosition = Vector3.New(0, 38, 0)
+                ---@type SEngine.UI.UISpine
+                local batSpine = go.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+                if (MachineInst.isShow) then
+                    batSpine:PlayAnim("idle", true)
+                else
+                    batSpine:PlayAnim("fly", false, function()
+                        batSpine:PlayAnim("idle", true)
+                    end)
+                end
+                MachineInst.isShow = true
+            end
+        end)
+    elseif (state == EggMachine.ePlayState.Spirit) then
+        local path = "UI/Hotel/Prefabs/jingling"
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table.obj_machineBuff.transform)
+                go:ResetPRS()
+                go.transform:SetLocalScaleXYZ(1)
+                go.transform.localPosition = Vector3.New(0, 0, 0)
+
+                if (MachineInst.isShow) then
+                    self:SafePlayAnim("click1", true, function()
+
+                    end)
+                else
+                    self:SafePlayAnim("click1", true, function()
+
+                    end)
+                end
+                MachineInst.isShow = true
+                --[[        local hide = go.transform:GetComponent(typeof(CS.HideNodeSpine))
+                        if hide ~= nil then
+                            hide:HidChildSpine()
+                        end]]
+            end
+        end)
+
+    elseif (state == EggMachine.ePlayState.Intrusion) then
+        local path = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Bug"
+        ---加载预制
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table.obj_machineBuff.transform)
+                go:ResetPRS()
+                go.transform:SetLocalScaleXYZ(0.35)
+                go.transform.localPosition = Vector3.New(0, 11, 0)
+            end
+        end)
+    end
 end
 
 ---初始化角色
@@ -174,9 +285,9 @@ function HotelSceneView:InitAvatars()
     local avatarMachines = AvatarManager:GetInstance():GetRoomAvatarMachines(self.RoomId)
     if avatarMachines ~= nil then
         for i = 1, #avatarMachines do
-            local avatarGo = self:CloneAvatarNode(self.go_table.obj_scene)
+            local avatarGo, shadowGo = self:CloneAvatarNode(self.go_table.obj_scene)
             ---@type AvatarView
-            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true)
+            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true, shadowGo)
             local machine = avatarMachines[i]
             machine:SetView(avatarView)
         end
@@ -185,9 +296,9 @@ end
 
 function HotelSceneView:OnAvatarEnterRoom(roomId, avatarId)
     if roomId == self.RoomId then
-        local avatarGo = self:CloneAvatarNode(self.go_table.obj_scene)
+        local avatarGo, shadowGo = self:CloneAvatarNode(self.go_table.obj_scene)
         ---@type AvatarView
-        local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true)
+        local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true, shadowGo)
         local machine = AvatarManager:GetInstance():GetAvatarMachineById(avatarId)
         machine:SetView(avatarView)
     end
@@ -203,7 +314,7 @@ end
 function HotelSceneView:OnClearAvatarView(avatarId)
     local machine = AvatarManager:GetInstance():GetAvatarMachineById(avatarId)
     local view = machine.View
-    self:DestoryComponentGameObj(view.gameObject)
+    self:RemoveComponentInstance(view)
     machine:SetView(nil)
 end
 
@@ -237,13 +348,38 @@ function HotelSceneView:OnRoundComplete(playState, roundEggs)
             local startPos = self.go_table.obj_machine.transform:ConvertLocalPositionToParent(CSUIModel.UICamera, self.go_table.obj_scene.transform)
             local endPos = nodeInfo.BornNode.transform.localPosition
             local controlPos = Vector3.New((startPos.x + endPos.x) / 2, startPos.y + 20, 0)
-            local ballGo = self:CloneBallNode(self.go_table.obj_scene, startPos)
+            local ballGo = self:CloneBallNode(self.go_table.obj_scene, startPos, v.EggId)
             ballGo.transform:DoBezier2(startPos, controlPos, endPos, 0.4):OnComplete(function()
                 ballGo:DestroyGameObj()
                 self:ShowAvatarAppearEffect(nodeInfo, v)
+
+                if (MachineInst.PlayState ~= EggMachine.ePlayState.Normal and i == #roundEggs) then
+                    MachineInst.BuffUse = MachineInst.BuffUse + 1
+                    if (MachineInst.BuffUse >= Config.gashapon_machine_sp[MachineInst.PlayState].use_number) then
+                        --使用次数用尽
+                        MachineInst.BuffUse = 0
+                        MachineInst.PlayState = EggMachine.ePlayState.Normal
+                        MachineInst.ClickNum = 0
+                        MachineInst.isShow = false
+                        MachineInst:SaveEggMachineData()
+
+                        for j = 1, self.go_table.obj_machineBuff.transform.childCount do
+                            self.go_table.obj_machineBuff.transform:ClearChildren(j - 1)
+                        end
+                        self:InitMachineSpine()
+                        HotelDataInst.EggMachineTime = 0 --从新计算倒计时BUFF
+                    end
+                elseif MachineInst.PlayState == EggMachine.ePlayState.Normal then
+                    MachineInst.ClickNum = 0
+                    MachineInst:SaveEggMachineData()
+                    MachineInst:CheckPlayState()
+
+                end
             end)  :SetEase(CS.DG.Tweening.Ease.OutSine)
         end
     end
+
+
 end
 
 ---显示扭蛋机生成精灵特效
@@ -256,50 +392,19 @@ function HotelSceneView:ShowAvatarAppearEffect(bornInfo, eggInfo)
         ---延时
         uiParticle.gameObject.transform:DOScale(1, 0.2):OnComplete(function()
             ---创建avatar
-            local avatarGo = self:CloneAvatarNode(self.go_table.obj_scene)
+            local avatarGo, shadowGo = self:CloneAvatarNode(self.go_table.obj_scene)
             ---@type AvatarView
-            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true)
+            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.5, true, shadowGo)
             ---@type AvatarStateMachine
             local machine = AvatarManager:GetInstance():CreateAvatar(bornInfo, eggInfo)
             machine:SetView(avatarView)
             bornInfo.Empty = true
 
-            uiParticle.gameObject:DestroyGameObj()
         end)
+        TimerInst:GetTimerStart(1, function()
+            uiParticle.gameObject:DestroyGameObj()
+        end, self, true)
     end)
-end
-
----显示修建锤子打击精灵特效
----@param fxPath string 路径
----@param startTime number 开始计时的时间
----@param showTime number 展示多久的时间
-function HotelSceneView:AddObjEffect(target, fxPath, startTime, showTime)
-
-
-    self:LoadParticle(fxPath, target, function(uiParticle)
-        uiParticle:Pause()
-
-        --uiParticle:Play()
-        --print("播放")
-        --uiParticle.gameObject:DestroyGameObj()
-        self:InsertParticleData(uiParticle, startTime, showTime)
-    end)
-end
-
----新增粒子控制数据
----@param uiParticle  Coffee.UIExtensions.UIParticle
----@param startTime number 开始计时的时间
----@param showTime number 展示多久的时间
-function HotelSceneView:InsertParticleData(uiParticle, startTime, showTime)
-    ---@type ParticleData
-    local pData = {
-        Particle = uiParticle,
-        CountTime = 0,
-        StartTime = startTime,
-        ShowTime = showTime,
-        isPaused = true
-    }
-    table.insert(self.ParticleMap, pData)
 end
 
 ---获取空的出生点
@@ -327,13 +432,19 @@ function HotelSceneView:CloneAvatarNode(pNode)
     avatarGo.transform.gameObject:SetActive(true)
     --avatarGo.transform:SetLocalScaleXYZ(1.5)
 
+    local shadowGo = CS.UnityEngine.Object.Instantiate(self.go_table.img_shadow.gameObject, self.go_table.obj_shadows.transform)
+    shadowGo.transform.gameObject:SetActive(true)
     ---spine
-    return avatarGo
+    return avatarGo, shadowGo
 end
 
-function HotelSceneView:CloneBallNode(pNode, pos)
+function HotelSceneView:CloneBallNode(pNode, pos, eggId)
     ---@type UnityEngine.GameObject
     local ballGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_ball, pNode.transform)
+    ---@type SEngine.UI.UISpine
+    local spine = ballGo.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+    local skin = Config.gashapon_machine_config[eggId].egg_skin
+    spine:SetSkin(skin)
     ballGo.transform.localPosition = pos
     ballGo.transform.gameObject:SetActive(true)
     ballGo.transform:SetLocalScaleXYZ(0.2)
@@ -356,35 +467,6 @@ function HotelSceneView:OnOrderTimer()
     for i = 1, #sceneChildrenTrans do
         sceneChildrenTrans[i]:SetSiblingIndex(i - 1)
     end
-end
-
-function HotelSceneView:ParticleOnTime()
-
-    if (self == nil or self.ParticleTimer == nil) then
-        return
-    end
-    for i, v in pairs(self.ParticleMap) do
-        if (v ~= nil and v.Particle ~= nil) then
-
-
-            v.CountTime = v.CountTime + 0.1 --开始计时
-            if (v.isPaused and v.CountTime >= v.StartTime) then
-                v.Particle:Play()
-                v.isPaused = false
-            end
-
-            if (v.CountTime >= v.ShowTime) then
-                v.Particle:Stop()
-                table.removebyvalue(self.ParticleMap, v)
-                v.Particle.gameObject:DestroyGameObj()
-            end
-
-
-        end
-
-
-    end
-
 end
 --endregion --------------- 扭蛋机精灵 --------------------------------
 
@@ -424,36 +506,28 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_changeJar_open.transform.localPosition.x
             local y = self.go_table.obj_changeJar_open.transform.localPosition.y
             local pos = Vector2.New(x, y)
-            self:BuildSomeThing(pos, function()
+
+            self:ChuiziBuild("idle", pos, false, function()
                 self:ShowChangeJar(true)
                 self.go_table.simg_jarImg:ShowUIShiny(1.5)
             end)
-
         end)
     elseif type == HotelSceneView.HotelTask.Restaurant then
         self:CameraMoveTo(self.go_table.obj_restaurant_open.transform.localPosition, 0.5, function()
             local x = self.go_table.obj_restaurant_open.transform.localPosition.x
             local y = self.go_table.obj_restaurant_open.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:BuildSomeThing(pos, function()
+            self:ChuiziBuild("idle2", pos, false, function()
                 self:ShowRestaurant(true)
                 self.go_table.simg_reastImg:ShowUIShiny(1.5)
             end)
-
         end)
     elseif type == HotelSceneView.HotelTask.Stairs then
         self:CameraMoveTo(self.go_table.obj_stairs_open.transform.localPosition, 0.5, function()
-
             local pos = self.go_table.obj_stairs_open.transform.localPosition
-            self:ShowSaoBa("idle", false, pos, function()
-                self:ShowSaoBa("idle", false, pos, function()
-                    -- self.go_table.obj_saoba:SetActive(false)
-                    self.SaoBaMap[pos]:SetActive(false)
-                    self.SaoBaMap[pos].gameObject:DestroyGameObj()
-                    self.SaoBaMap[pos] = nil
-                    self:ShowStairs(true)
-                    self.go_table.simg_stairsimg:ShowUIShiny(1.5)
-                end)
+            self:ChuiziBuild("idle2", pos, false, function()
+                self:ShowStairs(true)
+                self.go_table.simg_stairsimg:ShowUIShiny(1.5)
             end)
         end)
     elseif type == HotelSceneView.HotelTask.Room201 then
@@ -462,18 +536,13 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_room201_break.transform.localPosition.x
             local y = self.go_table.obj_room201_break.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:BuildSomeThing(pos, function()
+            self:ChuiziBuild("idle2", pos, false, function()
                 self:ShowRoom201(true)
                 self.go_table.simg_room201img:ShowUIShiny(1.5)
             end)
-
         end)
     elseif type == HotelSceneView.HotelTask.Hall then
         self:CameraMoveTo(self.go_table.obj_hall_ditan.transform.localPosition, 0.5, function()
-
-            --[[          local path = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Broom"
-                      self:AddObjEffect(self.go_table.obj_saoba, path, 0, 20)]]
-
             ---固定点位出现
             self.saobaPosArray = {}
             for i = 1, self.go_table.obj_saobaPos.transform.childCount do
@@ -482,8 +551,19 @@ function HotelSceneView:OnFinishHotelTask(taskId)
                     table.insert(self.saobaPosArray, childNode.transform.localPosition)
                 end
             end
-            local index = 1
-            self:DoSaoBaAction(index)
+
+            local path = "UI/Hotel/Prefabs/saoba"
+            ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+                if go ~= nil then
+                    go.transform:SetParent(self.go_table.obj_saobaNodes.transform)
+                    go:ResetPRS()
+                    go.transform:SetLocalScaleXYZ(0.05)
+
+                    self.saobaPreFab = go
+                    local index = 1
+                    self:DoSaoBaFourAction(index)
+                end
+            end)
 
 
         end)
@@ -493,11 +573,10 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_room202_break.transform.localPosition.x
             local y = self.go_table.obj_room202_break.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:BuildSomeThing(pos, function()
+            self:ChuiziBuild("idle2", pos, false, function()
                 self:ShowRoom202(true)
                 self.go_table.simg_room202img:ShowUIShiny(1.5)
             end)
-
         end)
     elseif type == HotelSceneView.HotelTask.Rooftop then
         self:CameraMoveTo(self.go_table.obj_rooftop_room.transform.localPosition, 0.5, function()
@@ -514,15 +593,22 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_sbTopStartPos.transform.localPosition.x
             local y = self.go_table.obj_sbTopStartPos.transform.localPosition.y
             local pos = Vector2.New(x, y)
-            self:ShowSaoBa("idle", true, pos, function()
-                --self:ShowSecondFloor(true)
+            local path = "UI/Hotel/Prefabs/saoba"
+            ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+                if go ~= nil then
+                    go.transform:SetParent(self.go_table.obj_saobaNodes.transform)
+                    go:ResetPRS()
+                    go.transform:SetLocalScaleXYZ(0.05)
+                    go.transform.localPosition = pos
+                    ---从一个点到一个点 移动出现
+                    self:DoSaoBaActionMove(go, pos, function()
+                        self:ShowRooftop(true)
+                        self.go_table.simg_rooftoproomImg:ShowUIShiny(1.5)
+                    end)
+                end
             end)
 
-            ---从一个点到一个点 移动出现
-            self:DoSaoBaActionMove(pos, function()
-                self:ShowRooftop(true)
-                self.go_table.simg_rooftoproomImg:ShowUIShiny(1.5)
-            end)
+
         end)
     elseif type == HotelSceneView.HotelTask.Notice then
         self:CameraMoveTo(self.go_table.obj_notice_open.transform.localPosition, 0.5, function()
@@ -530,7 +616,7 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_notice_lock.transform.localPosition.x
             local y = self.go_table.obj_notice_lock.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:BuildSomeThing(pos, function()
+            self:ChuiziBuild("idle2", pos, false, function()
                 self:ShowNotice(true)
                 self.go_table.simg_noticeimg:ShowUIShiny(1.5)
             end)
@@ -550,16 +636,22 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_sbMoveStartPos.transform.localPosition.x
             local y = self.go_table.obj_sbMoveStartPos.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:ShowSaoBa("idle", true, pos, function()
-                --self:ShowSecondFloor(true)
-            end)
+            local path = "UI/Hotel/Prefabs/saoba"
+            ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+                if go ~= nil then
+                    go.transform:SetParent(self.go_table.obj_saobaNodes.transform)
+                    go:ResetPRS()
+                    go.transform:SetLocalScaleXYZ(0.05)
+                    go.transform.localPosition = pos
 
-            ---从一个点到一个点 移动出现
-            self:DoSaoBaActionMove(pos, function()
-                self:ShowSecondFloor(true)
-                self.go_table.obj_csmOpen:SetActive(true)
-                self.go_table.simg_csmimg:ShowUIShiny(1.5)
-                self.go_table.simg_bgimg:ShowUIShiny(1.5)
+                    ---从一个点到一个点 移动出现
+                    self:DoSaoBaActionMove(go, pos, function()
+                        self:ShowSecondFloor(true)
+                        self.go_table.obj_csmOpen:SetActive(true)
+                        self.go_table.simg_csmimg:ShowUIShiny(1.5)
+                        self.go_table.simg_bgimg:ShowUIShiny(1.5)
+                    end)
+                end
             end)
 
 
@@ -571,7 +663,7 @@ function HotelSceneView:OnFinishHotelTask(taskId)
             local x = self.go_table.obj_funcRoomLock.transform.localPosition.x
             local y = self.go_table.obj_funcRoomLock.transform.localPosition.y
             local pos = Vector2.New(x, y + 10)
-            self:BuildSomeThing(pos, function()
+            self:ChuiziBuild("idle2", pos, false, function()
                 self:ShowFunctionRoom(true)
                 self.go_table.simg_funcRoomimg:ShowUIShiny(1.5)
             end)
@@ -580,137 +672,86 @@ function HotelSceneView:OnFinishHotelTask(taskId)
     end
 end
 
----建造某样东西 锤子特效
-function HotelSceneView:BuildSomeThing(pos, func)
+function HotelSceneView:ChuiziBuild(name, pos, loop, func)
+    local path = "UI/Hotel/Prefabs/chuizi"
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform:SetParent(self.go_table.obj_czNodes.transform)
+            go:ResetPRS()
+            go.transform:SetLocalScaleXYZ(0.05)
+            go.transform.localPosition = pos
+            ---@type SEngine.UI.UISpine
+            local batSpine = go.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            if (name == "idle2") then
+                batSpine:PlayAnim(name, loop, function()
+                    batSpine:PlayAnim(name, loop, function()
+                        batSpine:PlayAnim(name, loop, function()
+                            batSpine:PlayAnim(name, loop, function()
+                                go.gameObject:DestroyGameObj()
+                                func()
+                            end)
+                        end)
+                    end)
+                end)
 
-    --[[    local item = self:GetOrAddComponent(itemNodeClone, require("CoinMoveItem"))
-        item:InitData(num, function()
-            self:DestoryComponentGameObj(item.gameObject)
-        end)]]
+            else
+                batSpine:PlayAnim(name, loop, function()
+                    go.gameObject:DestroyGameObj()
+                    func()
+                end)
+            end
 
-    self:ShowChuizi("idle", false, pos, function()
-        func()
-    end);
+        end
+    end)
 end
 
 ---一个点到另外一个点移动
-function HotelSceneView:DoSaoBaActionMove(pos, func)
-    local sbNode = self.SaoBaMap[pos]
+function HotelSceneView:DoSaoBaActionMove(node, pos, func)
     if (table.count(self.saobaPosMoveArray) <= 0 or self.saobaPosMoveArray[1] == nil) then
         self.saobaPosMoveArray = {}
-        sbNode:SetActive(false)
-        sbNode.gameObject:DestroyGameObj()
-        self.SaoBaMap[pos] = nil
         func()
+        node.gameObject:DestroyGameObj()
         return
     end
-
+    local batSpine = node.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+    batSpine:PlayAnim("idle", true)
     local endPos = self.saobaPosMoveArray[1]
-    sbNode.transform:DOLocalMove(endPos, 2):OnComplete(function()
+    node.transform:DOLocalMove(endPos, 2):OnComplete(function()
         table.removebyvalue(self.saobaPosMoveArray, endPos)
-        self:DoSaoBaActionMove(pos, func)
-    end)
-
-    local effectNode = self.go_table.obj_effectSb
-    effectNode.transform:DOLocalMove(endPos, 2):OnComplete(function()
-        effectNode.gameObject:SetActive(false)
+        self:DoSaoBaActionMove(node, pos, func)
     end)
 end
 
 ---解锁大厅 四个位置播放扫把
-function HotelSceneView:DoSaoBaAction(index)
+function HotelSceneView:DoSaoBaFourAction(index)
     local i = index
     if self.saobaCountNum == nil then
         self.saobaCountNum = 0
     end
-
     if (i > self.go_table.obj_saobaPos.transform.childCount) then
         self.saobaPosArray = {}
-        self.go_table.obj_saoba:SetActive(false)
-
+        self.saobaPreFab.transform:DestroyGameObj()
         self:ShowHall(true)
         self.go_table.simg_ditanimg:ShowUIShiny(1.5)
         return
     end
-    self:ShowSaoBa("idle", false, self.saobaPosArray[i], function()
+    local pos = self.go_table.obj_saobaPos.transform:GetChild(i - 1).localPosition
+    self.saobaPreFab.transform.localPosition = pos
+    ---@type SEngine.UI.UISpine
+    local batSpine = self.saobaPreFab.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+
+    batSpine:PlayAnim("idle", false, function()
         self.saobaCountNum = self.saobaCountNum + 1
         if (self.saobaCountNum >= 2) then
-            self.SaoBaMap[self.saobaPosArray[i]]:SetActive(false)
-            self.SaoBaMap[self.saobaPosArray[i]]:DestroyGameObj()
             i = i + 1
             self.saobaCountNum = 0
-
-            self:DoSaoBaAction(i)
+            self:DoSaoBaFourAction(i)
         else
-            self:DoSaoBaAction(i)
+            self:DoSaoBaFourAction(i)
         end
     end)
 end
 
----显示锤子
-function HotelSceneView:ShowChuizi(name, loop, pos, func)
-
-
-    if (self.ChuiZiMap == nil) then
-        self.ChuiZiMap = {}
-    end
-
-    if (self.ChuiZiMap[pos] == nil) then
-        local itemNodeClone = CS.UnityEngine.Object.Instantiate(self.go_table.obj_chuizi, self.go_table.obj_czNodes.transform)
-        itemNodeClone.transform.gameObject:SetActive(true)
-        --itemNodeClone.transform.gameObject.localPosition = Vector2.New(0, 0, 0)
-        itemNodeClone.transform.localPosition = pos
-        local path = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Fix"
-        self:AddObjEffect(itemNodeClone, path, 0.2, 1)
-
-        self.go_table.obj_effectCz.transform.localPosition = itemNodeClone.transform.localPosition
-        local pathSmook = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Unlock_Room"
-        self.go_table.obj_effectCz.transform:SetLocalScaleXYZ(0.5)
-        self:AddObjEffect(self.go_table.obj_effectCz, pathSmook, 0.8, 20)
-        self.ChuiZiMap[pos] = itemNodeClone
-    end
-
-    local itemNodeClone = self.ChuiZiMap[pos]
-    itemNodeClone:SetActive(true)
-    itemNodeClone.transform.localPosition = pos
-    local chuizi = itemNodeClone:GetComponent(typeof(CS.SEngine.UI.UISpine))
-    chuizi:PlayAnim(name, loop, function()
-        itemNodeClone:SetActive(false)
-        itemNodeClone.gameObject:DestroyGameObj()
-        self.ChuiZiMap[pos] = nil
-        func()
-    end)
-end
-
----显示扫把
-function HotelSceneView:ShowSaoBa(name, loop, pos, func)
-
-
-    if (self.SaoBaMap == nil) then
-        self.SaoBaMap = {}
-    end
-
-    if (self.SaoBaMap[pos] == nil) then
-        local itemNodeClone = CS.UnityEngine.Object.Instantiate(self.go_table.obj_saoba, self.go_table.obj_saobaNodes.transform)
-        itemNodeClone.transform.gameObject:SetActive(true)
-        itemNodeClone.transform.localPosition = pos
-        if (itemNodeClone.transform.childCount == 0) then
-            local path = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Broom"
-            self.go_table.obj_effectSb.transform.localPosition = pos
-            self:AddObjEffect(self.go_table.obj_effectSb, path, 0.2, 4)
-        end
-        self.SaoBaMap[pos] = itemNodeClone
-    end
-
-    self.SaoBaMap[pos]:SetActive(true)
-    self.SaoBaMap[pos].transform.localPosition = pos
-    local saoba = self.SaoBaMap[pos]:GetComponent(typeof(CS.SEngine.UI.UISpine))
-    saoba:PlayAnim(name, loop, function()
-        --itemNodeClone:SetActive(false)
-        --self.SaoBaMap[pos] = nil
-        func()
-    end)
-end
 ---显示小费罐
 function HotelSceneView:ShowChangeJar(isShow)
     self.go_table.obj_changeJar_lock.gameObject:SetActive(not isShow)

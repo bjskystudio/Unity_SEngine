@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(SEngine.UI.SButton);
-			Utils.BeginObjectRegister(type, L, translator, 0, 4, 3, 2);
+			Utils.BeginObjectRegister(type, L, translator, 0, 4, 4, 3);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetText", _m_SetText);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "OnPointerClick", _m_OnPointerClick);
@@ -29,11 +29,13 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetGrayWithInteractable", _m_SetGrayWithInteractable);
 			
 			
-			Utils.RegisterFunc(L, Utils.GETTER_IDX, "IsGray", _g_get_IsGray);
+			Utils.RegisterFunc(L, Utils.GETTER_IDX, "NaClickIntervalmes", _g_get_NaClickIntervalmes);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "IsGray", _g_get_IsGray);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "IgnoreClickInterval", _g_get_IgnoreClickInterval);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "BtnText", _g_get_BtnText);
             
-			Utils.RegisterFunc(L, Utils.SETTER_IDX, "IgnoreClickInterval", _s_set_IgnoreClickInterval);
+			Utils.RegisterFunc(L, Utils.SETTER_IDX, "NaClickIntervalmes", _s_set_NaClickIntervalmes);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "IgnoreClickInterval", _s_set_IgnoreClickInterval);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "BtnText", _s_set_BtnText);
             
 			
@@ -196,6 +198,20 @@ namespace XLua.CSObjectWrap
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_NaClickIntervalmes(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                SEngine.UI.SButton gen_to_be_invoked = (SEngine.UI.SButton)translator.FastGetCSObj(L, 1);
+                LuaAPI.lua_pushnumber(L, gen_to_be_invoked.NaClickIntervalmes);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_IsGray(RealStatePtr L)
         {
 		    try {
@@ -238,6 +254,21 @@ namespace XLua.CSObjectWrap
         }
         
         
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_NaClickIntervalmes(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                SEngine.UI.SButton gen_to_be_invoked = (SEngine.UI.SButton)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.NaClickIntervalmes = (float)LuaAPI.lua_tonumber(L, 2);
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _s_set_IgnoreClickInterval(RealStatePtr L)

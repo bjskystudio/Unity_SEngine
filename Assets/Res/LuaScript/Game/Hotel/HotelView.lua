@@ -17,7 +17,6 @@ local HotelView = Class("HotelView", PopBase)
 function HotelView:Awake()
     self:AddEvent(GameEvent.UpgradeAttributeEvent)
     self:AddEvent(GameEvent.FinshHotelTaskEvent)
-    self:AddEvent(GameEvent.MoveToHotelTask)
 end
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
@@ -28,6 +27,10 @@ function HotelView:OnCreate()
     self:InitData()
 
     self:InitListView()
+
+    if (HotelDataInt.JumpTaskId ~= nil) then
+        self:SetListViewLocation(HotelDataInt.JumpTaskId)
+    end
 end
 function HotelView:InitData()
     self.go_table.stmp_cardName_Tip.text = LanguageUtil:GetValue(HotelDataInt.attributeName.tipName)
@@ -94,7 +97,8 @@ function HotelView:SetListViewLocation(taskId)
         end
     end
 
-    self.HotelList:MovePanelToItemIndex(targetIndex, 200)
+    self.HotelList:MovePanelToItemIndex(targetIndex - 1, 0)
+    HotelDataInt.JumpTaskId = nil
 end
 
 ---事件处理
@@ -128,9 +132,6 @@ function HotelView:EventHandle(id, ...)
             return false
         end)
         self.HotelList:RefreshAllShownItem()
-
-    elseif id == GameEvent.MoveToHotelTask then
-        self:SetListViewLocation(tab[1])
     end
 end
 
@@ -174,6 +175,12 @@ end
 ---@protected
 function HotelView:OnDestroy()
     --HotelView.ParentCls.OnDestroy(self)
+    ---@type MainView
+    local MainView = UIManager:GetInstance():GetOpenedUISingle(UIDefine.MainView.Name)
+    if nil ~= MainView then
+        MainView:SetSelTab(0)
+        MainView:RefreshTab()
+    end
 end
 
 return HotelView

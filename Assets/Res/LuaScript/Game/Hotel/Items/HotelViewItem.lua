@@ -88,7 +88,7 @@ function HotelViewItem:DealFinger(isOver)
         --关闭手指
         self.go_table.obj_finger:SetActive(false)
     else
-        if (table.ContainsValue(HotelDataInst.FinishTask, self.DataItem.id)) then
+        if (HotelDataInst.JumpTaskId == self.DataItem.id) then
             self.go_table.obj_finger:SetActive(true)
             --[[            local breath = self.go_table.transform:Find("@_obj_finger").gameObject:GetComponent(typeof(CS.BreathTween))
                         if breath ~= nil then
@@ -99,6 +99,9 @@ function HotelViewItem:DealFinger(isOver)
             seq:Append(self.go_table.obj_finger.transform:DOLocalMove(Vector3.New(self.go_table.obj_finger.transform.localPosition.x, self.go_table.obj_finger.transform.localPosition.y, 0), 1))
             seq:SetLoops(-1)
         end
+        --if (table.ContainsValue(HotelDataInst.FinishTask, self.DataItem.id)) then
+
+        -- end
     end
 
 

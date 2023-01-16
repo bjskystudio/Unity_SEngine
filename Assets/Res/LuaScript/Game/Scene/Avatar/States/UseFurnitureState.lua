@@ -13,6 +13,7 @@ local AvatarEvent = require("AvatarEvent")
 local HotelData = require("HotelData")
 local DeviceData = require("DeviceData")
 local GameEvent = require("GameEvent")
+local TimeUtil = require("TimeUtil")
 
 ---@class UseFurnitureState:AvatarState 家具排队状态
 ---@field Machine AvatarStateMachine
@@ -20,12 +21,12 @@ local GameEvent = require("GameEvent")
 ---@field QueueIndex number
 ---@field UseTime number 使用时间
 ---@field IsUsing boolean 是否在使用
-local UseFurnitureState = Class("UseFurnitureState",AvatarState)
+local UseFurnitureState = Class("UseFurnitureState", AvatarState)
 ---@class UseFurnitureState.eProfitTrigger 收益触发类型枚举
 UseFurnitureState.eProfitTrigger = {
     Order = 1, --触发订单收益
-    Use = 3,    --触发使用收益
-    Extra = 4,  --触发额外收益
+    Use = 3, --触发使用收益
+    Extra = 4, --触发额外收益
 }
 
 ---@private
@@ -41,17 +42,17 @@ function UseFurnitureState:Enter()
     self.FurnitureConfig = ConfigManager.furniture[self.FurnitureTypeId]
     self.UsedRanges = MapManager:GetInstance().FurnitureUsePosDic[self.FurnitureTypeId]
     ---设置动作
-    self.Machine:SetInfoAnim("idle",true)
+    self.Machine:SetInfoAnim("idle", true)
     self.ViewDirection = AvatarStateMachine.eDirection.LeftTop
 
     ---使用时间
     self.QueueIndex = self.Machine.Info.QueueIndex
     self.UseTime = self.Machine.Info.UseTime
-    self.UseDialogStartTime = 0
-    self.UseDialogTime = 0
     if self.UseTime > 0 then
         --使用中
         self:PlayUseAni()
+        self.Machine:SetViewBubble(self.Machine.Info.BubbleId, self.Machine.Info.BubbleTime)
+        ---气泡
         self.IsUsing = true
     else
         --去使用
@@ -59,14 +60,13 @@ function UseFurnitureState:Enter()
     end
 end
 
-
 function UseFurnitureState:SetTargetAndMove(queueIndex)
     local usePoses = MapManager:GetInstance().FurniturePosDic[self.FurnitureTypeId]
     local targetPos = usePoses[queueIndex]
     ---移动到pos
     if targetPos ~= nil then
-        self.Machine:SetInfoAnim("walk",true)
-        self.Machine:MoveToTarget(targetPos,self.Speed)
+        self.Machine:SetInfoAnim("walk", true)
+        self.Machine:MoveToTarget(targetPos, self.Speed)
     end
 end
 
@@ -74,7 +74,7 @@ function UseFurnitureState:InitViewState()
     if self.IsUsing then
         self.Machine:SetViewDirection(self.ViewDirection)
         local usedRange = self.UsedRanges[self.QueueIndex]
-        self.Machine:SetInfoPosition(usedRange.x,usedRange.y,self.Extensions)
+        self.Machine:SetInfoPosition(usedRange.x, usedRange.y, self.Extensions)
     end
 end
 
@@ -85,29 +85,25 @@ function UseFurnitureState:Update()
         self.Machine.IsArriveTarget = nil
         --self:PlayPreUse()
         self:PlayUseAni()
+        ---气泡
+        self:ShowBubble()
         self:StartUseTime()
-    end
-
-    if self.UseDialogStartTime >0 then
-        if self.Machine.Time - self.UseDialogStartTime > self.UseDialogTime then
-            self:HideUseDialog()
-        end
     end
 
     if self.IsUsing then
         self.UseTime = self.UseTime + Time.deltaTime
-        if self.UseTime >=  self.FurnitureConfig.lifetime then
+        if self.UseTime >= self.FurnitureConfig.lifetime then
             self.IsUsing = false
             self:OnUseEnd()
             ---还原位置
             local pos = MapManager:GetInstance().FurniturePosDic[self.FurnitureTypeId][self.QueueIndex]
-            self.Machine:SetInfoPosition(pos.x,pos.y)
+            self.Machine:SetInfoPosition(pos.x, pos.y)
             self.Machine.Info.UseTime = 0
             --已经使用的id
-            table.insert(self.Machine.Info.UsedFurnitureIds,self.FurnitureTypeId)
+            table.insert(self.Machine.Info.UsedFurnitureIds, self.FurnitureTypeId)
             ---从可能使用中移除
-            if table.ContainsValue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId) then
-                table.removebyvalue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId)
+            if table.ContainsValue(self.Machine.Info.CanUseFurnitureIds, self.FurnitureTypeId) then
+                table.removebyvalue(self.Machine.Info.CanUseFurnitureIds, self.FurnitureTypeId)
             end
             --切换站立
             self.Machine:ChangeState(AvatarStateMachine.eStateName.LoungeStand)
@@ -121,44 +117,54 @@ function UseFurnitureState:Exit()
     self.UseTime = 0
     self.ViewDirection = 1
     self.Extensions = nil
-    self:HideUseDialog()
-end
-
-function UseFurnitureState:HideUseDialog()
-    self.UseDialogStartTime = 0
-    self.UseDialogTime = 0
-    self.Machine:SetInfoBubble(0)
 end
 
 ---播放使用动画
 function UseFurnitureState:PlayUseAni()
-    Log.Info("[使用设备状态]正在使用设备！%s",self.FurnitureTypeId)
+    Log.Info("[使用设备状态]正在使用设备！%s", self.FurnitureTypeId)
     if self.FurnitureConfig.animation_tags ~= nil then
-        self.Machine:SetInfoAnim(self.FurnitureConfig.animation_tags,true)
+        self.Machine:SetInfoAnim(self.FurnitureConfig.animation_tags, true)
     end
-    if self.QueueIndex<= #self.FurnitureConfig.direction then
+    if self.QueueIndex <= #self.FurnitureConfig.direction then
         --设置方向
         self.ViewDirection = self.FurnitureConfig.direction[self.QueueIndex]
         self.Machine:SetViewDirection(self.ViewDirection)
     end
     local usedRange = self.UsedRanges[self.QueueIndex]
     local extensions = MapManager:GetInstance().FurnitureExcursionDic[self.FurnitureTypeId]
-    if extensions~= nil and self.QueueIndex <= #extensions then
+    if extensions ~= nil and self.QueueIndex <= #extensions then
         self.Extensions = extensions[self.QueueIndex]
         --调整偏移
-        self.Machine:SetInfoPosition(usedRange.x,usedRange.y,self.Extensions)
+        self.Machine:SetInfoPosition(usedRange.x, usedRange.y, self.Extensions)
     else
-        self.Machine:SetInfoPosition(usedRange.x,usedRange.y)
+        self.Machine:SetInfoPosition(usedRange.x, usedRange.y)
     end
-    ---气泡
+
+    ---发送界面事件
+    EventManager:GetInstance():Broadcast(GameEvent.UseFurnitureEvent, self.FurnitureTypeId)
+end
+
+function UseFurnitureState:ShowBubble()
     local weight = Config.game_config.takingbubble_weight.paramNum
-    if Mathf.Random(1,100) < weight then
-        local customConfig = Config.customer_config[self.Machine.Info.CustomId]
-        local bubbleId = customConfig.bubble_id[Mathf.Random(1,#customConfig.bubble_id)]
-        local bubbleConfig = Config.expression_bubble[bubbleId]
-        self.Machine:SetInfoBubble(bubbleId)
-        self.UseDialogStartTime = self.Machine.Time
-        self.UseDialogTime = bubbleConfig.time
+    if Mathf.Random(1, 100) < weight then
+        local furId = DeviceData:GetInstance():GetCurUseFurnitureData(self.Machine.Info.RoomId, self.FurnitureTypeId)
+        if furId ~= nil then
+            local customConfig = Config.customer_config[self.Machine.Info.CustomId]
+            local levelConfig = Config.furniture_level[furId]
+            local showBubble = {}
+            for i = 1, #levelConfig.talk_tage do
+                for j = 1, #customConfig.bubble_id do
+                    if levelConfig.talk_tage[i] == customConfig.bubble_id[j] then
+                        table.insert(showBubble, levelConfig.talk_tage[i])
+                    end
+                end
+            end
+            if #showBubble > 0 then
+                local bubbleId = showBubble[Mathf.Random(1, #showBubble)]
+                local bubbleConfig = Config.expression_bubble[bubbleId]
+                self.Machine:SetInfoBubble(bubbleId, bubbleConfig.time)
+            end
+        end
     end
 end
 
@@ -169,23 +175,27 @@ function UseFurnitureState:StartUseTime()
         self.Machine.Info.UseTime = 0.001 --大于1判断是否在使用
         self.IsUsing = true
     else
-        Log.Error("[使用设备状态]没有设备交互时间！%s",self.FurnitureTypeId)
+        Log.Error("[使用设备状态]没有设备交互时间！%s", self.FurnitureTypeId)
     end
 end
 
 ---使用结束
 function UseFurnitureState:OnUseEnd()
-    if self.FurnitureConfig.profit_trigger >0 then
+    if self.FurnitureConfig.profit_trigger > 0 then
         local coinPos = MapManager:GetInstance().FurnitureCoinPosDic[self.FurnitureTypeId]
         if coinPos ~= nil and self.QueueIndex <= #coinPos then
             ---@type HotelCoinData
-            local coinData = HotelData:GetInstance():GetOrAddCoinData(self.Machine.Info.RoomId,self.FurnitureTypeId,self.QueueIndex)
+            local coinData = HotelData:GetInstance():GetOrAddCoinData(self.Machine.Info.RoomId, self.FurnitureTypeId, self.QueueIndex)
             coinData.DropCount = coinData.DropCount + 1
             HotelData:GetInstance():SaveLocalData()
             ---发送界面事件
-            EventManager:GetInstance():Broadcast(GameEvent.TriggerCoin,coinData)
+            EventManager:GetInstance():Broadcast(GameEvent.TriggerCoin, coinData)
+
         end
     end
+
+    ---发送界面事件
+    EventManager:GetInstance():Broadcast(GameEvent.ExitFurnitureEvent, self.FurnitureTypeId)
 end
 
 return UseFurnitureState

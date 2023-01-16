@@ -12,6 +12,8 @@ public class LuaConfigUtils
     public static readonly string OutConfigPath = Application.dataPath + "Res/LuaScript/LuaConfig/Auto";
     public static readonly string OutEditorConfigPath = Application.dataPath + "Res/LuaScript/Editor/ConfigTips";
 
+    public static bool DebugUtil = false;
+
     /// <summary>
     /// 把Txt配置转换为Lua配置
     /// </summary>
@@ -28,7 +30,7 @@ public class LuaConfigUtils
             if (!Directory.Exists(luaPath))
                 Directory.CreateDirectory(luaPath);
         }
-        string[] files = Directory.GetFiles(InputConfigPath, "*.txt", SearchOption.AllDirectories);
+        string[] files = Directory.GetFiles(InputConfigPath, "*.csv", SearchOption.AllDirectories);
         List<string> fileList = new List<string>();
         for (int i = 0; i < files.Length; i++)
         {
@@ -42,6 +44,14 @@ public class LuaConfigUtils
             LuaEnv luaEnv = new LuaEnv();
             luaEnv.AddLoader(CustomLoader);
             luaEnv.DoString(string.Format("require('{0}')", "Editor.Config.OPStaticData"));
+
+            if (DebugUtil)
+            {
+                string debugDll = UnityEngine.Application.dataPath + "/../EmmyLuaDebugger/windows/x64/?.dll";
+                byte[] byteArray = System.Text.Encoding.Default.GetBytes($"package.cpath = package.cpath .. ';{debugDll}'\nlocal dbg = require('emmy_core')\ndbg.tcpConnect('localhost', 9966)");
+                luaEnv.DoString(Encoding.UTF8.GetString(byteArray), "trunk");
+            }
+
             luaEnv.Global.GetInPath<Action<string[], string[]>>("OPStaticData.Start")?.Invoke(files, files);
             // MapEditorUtils.ClearLua();
         }
@@ -56,10 +66,20 @@ public class LuaConfigUtils
     private static byte[] CustomLoader(ref string filepath)
     {
         string scriptPath = string.Empty;
-        filepath = filepath.Replace(".", "/") + ".lua";
+        filepath = filepath.Replace(".", "/");
+        string filepath2 = filepath + ".lua";
         scriptPath = Path.Combine(Application.dataPath, "Res/LuaScript");
-        scriptPath = Path.Combine(scriptPath, filepath);
-        return File.ReadAllBytes(scriptPath);
+        scriptPath = Path.Combine(scriptPath, filepath2);
+        var luaNames = filepath.Split('/');
+        var luaName = luaNames[luaNames.Length - 1];
+        if (luaName == "emmy_core")
+        {
+            return null;
+        }
+        else
+        {
+            return File.ReadAllBytes(scriptPath);
+        }
     }
 
     /// <summary>

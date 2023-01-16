@@ -28,7 +28,9 @@ function CoinMoveItem:InitData(num, func)
     --trans.localScale.x = 0.5
     --trans.localScale.y = 0.5
     trans:DOLocalMoveY(trans.position.y + 30, 1):OnComplete(function()
-        func()
+        self.go_table.stmp_coinStr:DOFade(0, 1):OnComplete(function()
+            func()
+        end)
     end)
 end
 ---事件处理
@@ -63,6 +65,7 @@ end
 ---@protected
 function CoinMoveItem:OnDestroy()
     --CoinMoveItem.ParentCls.OnDestroy(self)
+    self.gameObject:DestroyGameObj()
 end
 
 return CoinMoveItem

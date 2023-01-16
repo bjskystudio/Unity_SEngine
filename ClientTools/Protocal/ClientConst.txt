@@ -1,0 +1,2 @@
+# 背包类型
+1-STORE_TYPE_NORMAL-普通类型

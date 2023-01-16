@@ -449,16 +449,25 @@ function DeviceDescView:OnClickBtn(btn)
                 DeviceDataInst:UpGradeFurnitureByTime(self.furnitureData.id, self.LeastTime)
 
             else
-                --时间不足
-                local time = self.LeastTime
 
-                UIInst:OpenUIDefine(UIDefine.DeviceUseTimeView, nil, self.furnitureData.id, function()
-                    --任性使用
-                    if (GameDataInst.SpeedTime > 0) then
-                        DeviceDataInst:UpGradeFurnitureByTime(self.furnitureData.id, self.LeastTime)
-                    end
-                    --self:Close()
-                end)
+                if (GameDataInst.SpeedTime <= 0) then
+                    local lackId = GameDataInst:GetPlayerPropItemId(GameDefine.ePlayerProp.SpeedTime)
+                    local time = DeviceDataInst:GetFurnitureTiming(self.furnitureData.id)
+                    local needStr = TimeUtil.TimeToString(time, 3, false)
+                    UIInst:OpenUIDefine(UIDefine.DeviceLackView, nil, lackId, needStr)
+                else
+                    --时间不足
+                    local time = self.LeastTime
+
+                    UIInst:OpenUIDefine(UIDefine.DeviceUseTimeView, nil, self.furnitureData.id, function()
+                        --任性使用
+                        if (GameDataInst.SpeedTime > 0) then
+                            DeviceDataInst:UpGradeFurnitureByTime(self.furnitureData.id, self.LeastTime)
+                        end
+                        --self:Close()
+                    end)
+                end
+
             end
 
         end

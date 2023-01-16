@@ -109,6 +109,8 @@ namespace SEngine.Map
 
         private MapService mapService;
 
+        private int mapId;
+        
         PointList tempPathPoints = new PointList(1000);
         public Astar(MapService mapService)
         {
@@ -162,7 +164,7 @@ namespace SEngine.Map
             vOpenList.Clear();
         }
 
-        public bool GetPathByCell(PointList pathPoints, Vector3Int startPoint, Vector3Int endPoint, bool isIgnoreCorner = false)
+        public bool GetPathByCell(PointList pathPoints, Vector3Int startPoint, Vector3Int endPoint, bool isIgnoreCorner = false , Enum.EnTileMapType tilemap = Enum.EnTileMapType.PhyMap)
         {
             if (vMaze == null)
             {
@@ -181,7 +183,7 @@ namespace SEngine.Map
             startPoint -= mapBounds.min;
             endPoint -= mapBounds.min;
 
-            AStarPoint result = FindPath(startPoint, endPoint, isIgnoreCorner);
+            AStarPoint result = FindPath(startPoint, endPoint, isIgnoreCorner,tilemap);
 
             if (result == null)
             {
@@ -276,7 +278,7 @@ namespace SEngine.Map
         public void Clear() { }
 
 
-        public AStarPoint FindPath(Vector3Int startPoint, Vector3Int endPoint, bool isIgnoreCorner)
+        public AStarPoint FindPath(Vector3Int startPoint, Vector3Int endPoint, bool isIgnoreCorner,Enum.EnTileMapType tilemap)
         {
             vOpenList.AddPoint(CreatePoint(startPoint.x, startPoint.y)); //置入起点,拷贝开辟一个节点，内外隔离
             AStarPoint pEndPoint = CreatePoint(endPoint.x, endPoint.y);
@@ -290,7 +292,7 @@ namespace SEngine.Map
                 vOpenList.RemovePoint(curPoint); //从开启列表中删除
 
                 //1,找到当前周围八个格中可以通过的格子
-                getSurroundPoints(curPoint, isIgnoreCorner);
+                getSurroundPoints(curPoint, isIgnoreCorner,tilemap);
 
                 for (int i=0; i< vSurroundPoints.Count; i++)
                 {
@@ -333,7 +335,7 @@ namespace SEngine.Map
             return null;
         }
 
-        private void getSurroundPoints(AStarPoint point, bool isIgnoreCorner)
+        private void getSurroundPoints(AStarPoint point, bool isIgnoreCorner,Enum.EnTileMapType tilemap)
         {
             vSurroundPoints.Clear();
             for (int x = point.Info[0] - 1; x <= point.Info[0] + 1; x++)
@@ -341,15 +343,16 @@ namespace SEngine.Map
                 for (int y = point.Info[1] - 1; y <= point.Info[1] + 1; y++)
                 {
                     AStarPoint newPoint = CreatePoint(x, y);
-                    if (isCanreach(point, newPoint, isIgnoreCorner))
+                    if (isCanreach(point, newPoint, isIgnoreCorner,tilemap))
                     {
                         vSurroundPoints.AddPoint(newPoint);
                     }
                 }
             }
+            
         }
 
-        bool isCanreach(AStarPoint point, AStarPoint target, bool isIgnoreCorner) //判断某点是否可以用于下一步判断
+        bool isCanreach(AStarPoint point, AStarPoint target, bool isIgnoreCorner,Enum.EnTileMapType tilemap) //判断某点是否可以用于下一步判断
         {
             int nTargetIndex = target.Info[0] + target.Info[1] * nWidth;
             int nSize = vMaze.Length;
@@ -391,6 +394,22 @@ namespace SEngine.Map
                     && (vMaze[nTxPyIndex] & (int)Enum.EnPhyFlag.CANT_MOVE) == 0
                     )
                     {
+                        if (mapService.Line)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            if (tilemap == Enum.EnTileMapType.PhyMap)
+                            {
+                                return true;
+                            }
+                            else if (tilemap == Enum.EnTileMapType.PhyRoomMap)
+                            {
+                                return false;
+                            }
+                        }
+                        
                         return true;
                     }
                     else
@@ -539,7 +558,7 @@ namespace SEngine.Map
             }*/
             else
             {
-                if (GetPathByCell(tempPathPoints, startPos, endPos, isIgnoreCorner) == false)
+                if (GetPathByCell(tempPathPoints, startPos, endPos, isIgnoreCorner , tilemap) == false)
                 {
                     return pathPoints;
                 }

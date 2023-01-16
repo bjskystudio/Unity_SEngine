@@ -1,0 +1,3 @@
+﻿int,string,int,int,int,string
+技能id,技能描述,技能等级,技能参数1,技能参数2,备注
+skill_id,image_key,skill_level,skill_coef_1,skill_coef_2,remark

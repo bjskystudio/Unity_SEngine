@@ -24,6 +24,9 @@
 		<type fullname="SuperScrollView.LoopGridView" preserve="all"/>
 		<type fullname="SceneDragHandler" preserve="all"/>
 		<type fullname="SEngine.TransformUtils" preserve="all"/>
+		<type fullname="Game.Network.NetworkKit" preserve="all"/>
+		<type fullname="Game.Network.MessageQueueHandler" preserve="all"/>
+		<type fullname="ServerConfig" preserve="all"/>
 		<type fullname="SEngine.Map.MapService" preserve="all"/>
 		<type fullname="SEngine.Map.InitMap" preserve="all"/>
 		

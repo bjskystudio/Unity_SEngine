@@ -39,11 +39,21 @@ function CoinView:OnCreate(coinData)
     self.go_table.obj_imgNodes:SetActive(false)
 
     self.OffSet = 20
+    self.MaxNum = 15
+    --[[    local inCom = DeviceData:GetInstance():FurnitureRoomIncom(self.RoomId, self.FurnitureFieldId, self.PropType)
+        local inComCount = inCom * self.DropCount
+        print("金币数量:" .. inComCount)]]
 end
 function CoinView:initCoin()
-    for i = 1, self.DropCount do
+
+
+    local count = self.DropCount
+    if (count > self.MaxNum) then
+        count = self.MaxNum
+    end
+    for i = 1, count do
         local endPos = Vector3.New(0, 0, 0)
-        endPos = Vector3.New(endPos.x + Mathf.Random(-5, 5), endPos.y + Mathf.Random(-self.OffSet, self.OffSet), 0)
+        endPos = Vector3.New(endPos.x + Mathf.Random(-self.OffSet, self.OffSet), endPos.y + Mathf.Random(-self.OffSet, self.OffSet), 0)
         ---@type UnityEngine.GameObject
         local coinGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_imgNodes, self.go_table.obj_showCoins.transform)
         coinGo.transform.localPosition = endPos
@@ -75,19 +85,22 @@ function CoinView:ShowCoinEffect()
 
     --Log.Info("掉落次数：%s", self.Data.DropCount)
 
-    local inCom = DeviceData:GetInstance():FurnitureRoomIncom(self.RoomId, self.FurnitureFieldId, self.PropType)
+    --local inCom = DeviceData:GetInstance():FurnitureRoomIncom(self.RoomId, self.FurnitureFieldId, self.PropType)
+    -- if (inCom <= 0) then
+    --    return
+    -- end
 
     --print("收益:" .. inCom)
-    HotelData:GetInstance():UpdateCoinData(self.Data, inCom)
+    -- HotelData:GetInstance():UpdateCoinData(self.Data, inCom)
 
     self.go_table.obj_move.gameObject:SetActive(true)
     self.go_table.obj_move.transform.localPosition = movePos
 
     local targetPos = Vector3.New(0, 0, 0)
-    targetPos = Vector3.New(targetPos.x + Mathf.Random(-5, 5), targetPos.y + Mathf.Random(-self.OffSet, self.OffSet), 0)
+    targetPos = Vector3.New(targetPos.x + Mathf.Random(-self.OffSet, self.OffSet), targetPos.y + Mathf.Random(-self.OffSet, self.OffSet), 0)
     self.go_table.obj_move.transform:DOLocalMove(targetPos, 1):OnComplete(function()
 
-        if (self.DropIndex < 15) then
+        if (self.DropCount < self.MaxNum) then
             ---@type UnityEngine.GameObject
             local coinGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_imgNodes, self.go_table.obj_showCoins.transform)
             local pos = self.go_table.obj_move.transform:ConvertLocalPositionToParent(CSUIModel.UICamera, self.transform)
@@ -103,6 +116,11 @@ function CoinView:ShowCoinEffect()
                 seq:AppendInterval(0.5)
             end
             seq:SetLoops(-1)
+        else
+
+            for i = 1, self.go_table.obj_showCoins.transform.childCount do
+                self.go_table.obj_showCoins.transform:GetChild(i - 1):GetChild(0):GetComponent(typeof(CS.UnityEngine.UI.Image)):ShowUIShiny(1.5)
+            end
         end
 
         self.go_table.btn_anyClick.gameObject:SetActive(true)
@@ -131,9 +149,14 @@ end
 function CoinView:OnClickBtn(btn)
     if btn == self.go_table.btn_anyClick then
         ---处理相关的收益
-        print("点击收集" .. self.Data.InCome)
-        GameData:GetInstance():ChangePlayerProp(GameDefine.ePlayerProp.Gold, self.Data.InCome)
-        GameData:GetInstance():StartFlyCoin(self.transform, self.Data.InCome)
+
+        local inCom = DeviceData:GetInstance():FurnitureRoomIncom(self.RoomId, self.FurnitureFieldId, self.PropType)
+        local inComCount = inCom * self.Data.DropCount
+
+        print("点击收集" .. self.Data.DropCount)
+
+        GameData:GetInstance():ChangePlayerProp(GameDefine.ePlayerProp.Gold, inComCount)
+        GameData:GetInstance():StartFlyCoin(self.transform, self.Data.DropCount)
         --发送收取金币
         HotelData:GetInstance():CollectCoin(self.Data)
         EventManager:GetInstance():Broadcast(GameEvent.CoinCollected, self.Data)
@@ -151,6 +174,7 @@ end
 ---@protected
 function CoinView:OnDestroy()
     --TemplateView.ParentCls.OnDestroy(self)
+    self.gameObject:DestroyGameObj()
 end
 
 return CoinView

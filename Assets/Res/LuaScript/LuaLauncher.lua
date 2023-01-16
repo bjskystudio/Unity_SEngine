@@ -13,6 +13,7 @@ local UIDefine = require("UIDefine")
 local GameData = require("GameData")
 local HotelData = require("HotelData")
 local DeviceData = require("DeviceData")
+local NetManager = require("NetManager")
 
 
 ---@class LuaLauncher 游戏的主入口，一般由C#端调用
@@ -31,6 +32,7 @@ function LuaLauncher:Start()
 end
 
 function LuaLauncher:StartupLuaLogic()
+     NetManager:GetInstance():Startup()
 end
 
 function LuaLauncher:OnTestEvent(arg)

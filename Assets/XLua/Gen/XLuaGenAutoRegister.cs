@@ -653,6 +653,15 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(SEngine.TransformUtils), SEngineTransformUtilsWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(Game.Network.NetworkKit), GameNetworkNetworkKitWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(Game.Network.MessageQueueHandler), GameNetworkMessageQueueHandlerWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(ServerConfig), ServerConfigWrap.__Register);
+        
+        
             translator.DelayWrapLoader(typeof(SEngine.Map.MapService), SEngineMapMapServiceWrap.__Register);
         
         

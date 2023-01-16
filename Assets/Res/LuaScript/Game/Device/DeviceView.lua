@@ -13,6 +13,7 @@ local ConfigManager = require("ConfigManager")
 local LoopListViewHelper = LoopListViewHelper
 local GameDataInst = require("GameData"):GetInstance()
 local HotelDataInst = require("HotelData"):GetInstance()
+local DeviceData = require("DeviceData")
 
 ---@class DeviceView : UIBase 窗口
 ---@field private go_table DeviceView_GoTable GoTable
@@ -38,6 +39,14 @@ function DeviceView:OnCreate(roomId)
     self:SetTitle(LanguageUtil:GetValue("Common_UItips_furniture"))
     self:InitDeviceMenuList()
     self:InitDeviceView(roomId)
+
+    if (DeviceData:GetInstance().JumpFieldId ~= nil) then
+        self:SetListViewLocation(DeviceData:GetInstance().JumpFieldId)
+    end
+    if (DeviceData:GetInstance().FurniturePointId ~= nil) then
+        --场景人物需求跳转
+        self:SetListViewLocation(DeviceData:GetInstance().FurniturePointId)
+    end
 end
 
 ---@param roomId number 房间id
@@ -152,7 +161,7 @@ function DeviceView:SetListViewLocation(field)
         end
     end
 
-    self.DeviceList:MovePanelToItemIndex(targetIndex, 400)
+    self.DeviceList:MovePanelToItemIndex(targetIndex - 1, 100)
 end
 ---可用
 ---@protected
@@ -180,6 +189,7 @@ end
 ---@protected
 function DeviceView:OnDestroy()
     --DeviceView.ParentCls.OnDestroy(self)
+    DeviceData:GetInstance().FurniturePointId = nil
 end
 
 return DeviceView

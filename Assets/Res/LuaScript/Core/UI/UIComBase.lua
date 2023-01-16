@@ -204,6 +204,22 @@ function UIComBase:RemoveComponent(bindtarget, class)
         return false
     end
 end
+---移除指定lua组件实例对象
+---@param componentinstance UIComBase  @lua组件实例对象
+---@return boolean @移除是否成功
+function UIComBase:RemoveComponentInstance(componentinstance)
+    Guard.AssertException(IsClass(componentinstance, UIComBase), "未继承UIComBase")
+    local tager = self.Components[componentinstance.gameObject]
+    if tager ~= nil and tager[componentinstance.__cname] then
+        Log.Info("组件类:%s移除实体对象名:%s绑定的组件脚本:%s实体!", self.__cname, componentinstance.gameObject.name, componentinstance.__cname)
+        tager[componentinstance.__cname]:Destroy()
+        tager[componentinstance.__cname] = nil
+        return true
+    else
+        Log.Error("当前组件类:%s实例对象:%s未绑定组件类:%s，清除失败!", self.__cname, componentinstance.gameObject.name, componentinstance.__cname)
+        return false
+    end
+end
 
 ---清除所有子组件绑定
 ---@private

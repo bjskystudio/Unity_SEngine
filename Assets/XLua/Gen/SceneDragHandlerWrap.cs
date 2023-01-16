@@ -40,17 +40,19 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 1, 3, 3);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 1, 4, 4);
 			
 			
             
 			Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "luaOnBeginDrag", _g_get_luaOnBeginDrag);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "luaOnDrag", _g_get_luaOnDrag);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "luaOnEndDrag", _g_get_luaOnEndDrag);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "luaOnZoom", _g_get_luaOnZoom);
             
 			Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "luaOnBeginDrag", _s_set_luaOnBeginDrag);
             Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "luaOnDrag", _s_set_luaOnDrag);
             Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "luaOnEndDrag", _s_set_luaOnEndDrag);
+            Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "luaOnZoom", _s_set_luaOnZoom);
             
 			
 			Utils.EndClassRegister(type, L, translator);
@@ -293,6 +295,18 @@ namespace XLua.CSObjectWrap
             return 1;
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_luaOnZoom(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    translator.Push(L, SceneDragHandler.luaOnZoom);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -357,6 +371,19 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			    SceneDragHandler.luaOnEndDrag = translator.GetDelegate<SceneDragHandler.LuaEndDragAction>(L, 1);
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_luaOnZoom(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    SceneDragHandler.luaOnZoom = translator.GetDelegate<SceneDragHandler.LuaZoomAction>(L, 1);
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

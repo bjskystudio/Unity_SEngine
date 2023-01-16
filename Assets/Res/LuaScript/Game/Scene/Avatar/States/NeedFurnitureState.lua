@@ -29,9 +29,13 @@ function NeedFurnitureState:Enter()
 
     self.Machine:SetInfoAnim("idle",true)
 
-    self.NeedFurnitureId = self:GetNeedFurnitureId()
-    self.Machine:SetInfoBubble(self.BubbleConfig.id,self.NeedFurnitureId)
-    self.StartTime = self.Machine.Time
+    if self.Machine.Info.BubbleId == self.BubbleConfig.id then
+        self.Machine:SetViewBubble(self.Machine.Info.BubbleId,self.Machine.Info.BubbleTime,self.Machine.Info.BubbleParam)
+        self.NeedFurnitureId = self.Machine.Info.BubbleParam[1]
+    else
+        self.NeedFurnitureId = self:GetNeedFurnitureId()
+        self.Machine:SetInfoBubble(self.BubbleConfig.id,self.BubbleConfig.time,{self.NeedFurnitureId})
+    end
 
     self:AddEvent()
 end
@@ -76,29 +80,26 @@ end
 ---状态机更新
 ---@override
 function NeedFurnitureState:Update()
-    local time = self.Machine.Time
-    ---1秒后move
-    if time -self.StartTime > self.BubbleConfig.time then
-        ---超时没建造
-        self.Machine.Info.IsAngry = true
-        --已经使用的id
-        table.insert(self.Machine.Info.UsedFurnitureIds,self.FurnitureTypeId)
-        ---从可能使用中移除
-        if table.ContainsValue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId) then
-            table.removebyvalue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId)
-        end
-
-        self.Machine:SetInfoBubble(0)
-        --寻找下一个目标
-        self.Machine:ChangeState(AvatarStateMachine.eStateName.LoungeStand)
-    end
 end
 
+function NeedFurnitureState:OnBubbleTimeout()
+    self.Machine:SetInfoBubble(0)
+    ---超时没建造
+    self.Machine.Info.IsAngry = true
+    --已经使用的id
+    table.insert(self.Machine.Info.UsedFurnitureIds,self.FurnitureTypeId)
+    ---从可能使用中移除
+    if table.ContainsValue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId) then
+        table.removebyvalue(self.Machine.Info.CanUseFurnitureIds,self.FurnitureTypeId)
+    end
+
+    --寻找下一个目标
+    self.Machine:ChangeState(AvatarStateMachine.eStateName.LoungeStand)
+end
 
 ---退出状态
 ---@override
 function NeedFurnitureState:Exit()
-    self.StartTime = 0
     self:RemoveEvent()
 end
 

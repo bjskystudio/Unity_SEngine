@@ -4,6 +4,8 @@
 --- DateTime: 2022/11/29 12:48
 local UIBase = require("UIBase")
 local MapManager = require("MapManager")
+local GameEvent = require("GameEvent")
+local SceneManager = require("SceneManager")
 
 ---@class MapView : UIBase 窗口
 ---@field private go_table MapView_GoTable GoTable
@@ -12,7 +14,8 @@ local MapView = Class("MapView", UIBase)
 
 ---添加Events监听事件
 function MapView:Awake()
-
+    self:AddEvent(GameEvent.TileMapScale)
+    self:AddEvent(GameEvent.TileMapPosition)
 end
 
 --- 窗口显示[protected]
@@ -20,6 +23,23 @@ end
 function MapView:OnCreate()
     --初始化地图信息
     self:InitMap()
+end
+
+function MapView:SetScale(scale)
+    local roomid = SceneManager:GetInstance().RoomId
+    if roomid == 1000 then
+        self.go_table.obj_HotelGrid:SetLocalScaleXYZ(scale)
+    elseif roomid == 1001 then
+        self.go_table.obj_LoungeGrid:SetLocalScaleXYZ(scale)
+    end
+end
+function MapView:SetPosition(pos)
+    local roomid = SceneManager:GetInstance().RoomId
+    if roomid == 1000 then
+        self.go_table.obj_HotelGrid.transform.localPosition = pos
+    elseif roomid == 1001 then
+        self.go_table.obj_LoungeGrid.transform.localPosition = pos
+    end
 end
 
 function MapView:InitMap()
@@ -38,4 +58,14 @@ end
 ---@protected
 function MapView:OnDestroy()
 end
+
+function MapView:EventHandle(id, ...)
+    local param = {...}
+    if id == GameEvent.TileMapScale then
+        self:SetScale(param[1])
+    elseif id == GameEvent.TileMapPosition then
+        self:SetPosition(param[1])
+    end
+end
+
 return MapView

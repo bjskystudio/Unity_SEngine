@@ -13,6 +13,8 @@ local UIManager = require("UIManager")
 local UIDefine = require("UIDefine")
 local SceneManager = require("SceneManager")
 local TimerManager = require("TimerManager")
+local DeviceData = require("DeviceData")
+local ResLoadManager = require("ResLoadManager")
 
 ---@class AvatarView : UIComBase 角色组件
 ---@field private go_table AvatarView_GoTable GoTable
@@ -21,42 +23,64 @@ local TimerManager = require("TimerManager")
 ---@field IsHotel boolean 是否主场景avatar
 ---@field UiSkeleton SEngine.UI.UISpine
 ---@field UiSkeleton2 SEngine.UI.UISpine
+---@field Shadow UnityEngine.GameObject
 local AvatarView = Class("AvatarView", UIComBase)
 
 ---@class AvatarView.eBubbleType 气泡类型
 AvatarView.eBubbleType = {
     NeedFurniture = 1,
     Face = 2,
-    Dialog  = 3,
+    Dialog = 3,
 }
-
 ---添加Events监听事件
 function AvatarView:Awake()
     self.Direction = AvatarStateMachine.eDirection.LeftTop
 end
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
-function AvatarView:OnCreate(scale,isHotel)
+function AvatarView:OnCreate(scale, isHotel, shadow)
     self.BaseScale = scale or 1
-    self.transform.localScale = Vector3.New(self.BaseScale,self.BaseScale,1)
+    self.go_table.obj_avatarPrefab.transform.localScale = Vector3.New(self.BaseScale, self.BaseScale, 1)
     self.IsHotel = isHotel or false
-
-    self.UiSkeleton = self.go_table.obj_avatarSkel:GetComponent(typeof(CS.SEngine.UI.UISpine))
-    if self.go_table.obj_avatarSkel2 ~= nil then
-        self.UiSkeleton2 = self.go_table.obj_avatarSkel2:GetComponent(typeof(CS.SEngine.UI.UISpine))
+    self.Shadow = shadow
+    if self.Shadow ~= nil then
+        self.Shadow.transform.localScale = Vector3.New(self.BaseScale * 0.4, self.BaseScale * 0.4, 1)
+        self.Shadow.transform.localPosition = self.transform.localPosition
     end
-    self:ShowNoBubble()
+
+end
+
+function AvatarView:SetPreFab(prefabName, func)
+    ---加载预制
+    local path = "UI/Hotel/Roles/" .. prefabName
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform:SetParent(self.go_table.obj_avatarPrefab.transform, false)
+            self.obj_avatarSkel = go.transform:Find("@_obj_avatarSkel")
+            self.obj_avatarSkel2 = go.transform:Find("@_obj_avatarSkel2")
+            self.UiSkeleton = self.obj_avatarSkel:GetComponent(typeof(CS.SEngine.UI.UISpine))
+
+            if self.obj_avatarSkel2 ~= nil then
+                self.UiSkeleton2 = self.obj_avatarSkel2:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            end
+            self:ShowNoBubble()
+
+            func()
+        else
+            print("加载角色预制错误:" .. prefabName)
+        end
+    end)
 end
 
 ---设置动作
 ---@param name string 动作名
 ---@param loop boolean 循环
 ---@param complete fun() 完成回调
-function AvatarView:SetAnim(name,loop,complete)
-    Log.Info("设置动作：%s",name)
-    self.UiSkeleton:PlayAnim(name,loop,complete)
+function AvatarView:SetAnim(name, loop, complete)
+    Log.Info("设置动作：%s", name)
+    self.UiSkeleton:PlayAnim(name, loop, complete)
     if self.UiSkeleton2 then
-        self.UiSkeleton2:PlayAnim(name,loop)
+        self.UiSkeleton2:PlayAnim(name, loop)
     end
 end
 
@@ -66,10 +90,13 @@ function AvatarView:SetPosition(pos)
     if self.transform ~= nil then
         self.transform.localPosition = pos
     end
+    if self.Shadow ~= nil then
+        self.Shadow.transform.localPosition = pos
+    end
 end
 
 function AvatarView:SetSkin(name)
-    Log.Info("设置皮肤：%s",name)
+    Log.Info("设置皮肤：%s", name)
     self.UiSkeleton:SetSkin(name)
     self.UiSkeleton2:SetSkin(name)
 end
@@ -78,21 +105,21 @@ function AvatarView:SetDirection(dir)
     self.Direction = dir
     if self.transform ~= nil then
         if dir == AvatarStateMachine.eDirection.LeftTop or dir == AvatarStateMachine.eDirection.LeftBottom then
-            self.go_table.obj_avatar.transform.localScale = Vector3.New(1,1,1)
+            self.go_table.obj_avatarPrefab.transform.localScale = Vector3.New(1 * self.BaseScale, 1 * self.BaseScale, 1)
         else
-            self.go_table.obj_avatar.transform.localScale = Vector3.New(-1,1,1)
+            self.go_table.obj_avatarPrefab.transform.localScale = Vector3.New(-1 * self.BaseScale, 1 * self.BaseScale, 1)
         end
     end
     if self.IsHotel then
-        self.go_table.obj_avatarSkel:SetActive( true)
-        self.go_table.obj_avatarSkel2:SetActive(false)
+        self.obj_avatarSkel.transform.gameObject:SetActive(true)
+        self.obj_avatarSkel2.transform.gameObject:SetActive(false)
     else
         if self.Direction == AvatarStateMachine.eDirection.LeftTop or self.Direction == AvatarStateMachine.eDirection.RightTop then
-            self.go_table.obj_avatarSkel2:SetActive( true)
-            self.go_table.obj_avatarSkel:SetActive( false)
+            self.obj_avatarSkel2.transform.gameObject:SetActive(true)
+            self.obj_avatarSkel.transform.gameObject:SetActive(false)
         else
-            self.go_table.obj_avatarSkel:SetActive( true)
-            self.go_table.obj_avatarSkel2:SetActive(false)
+            self.obj_avatarSkel.transform.gameObject:SetActive(true)
+            self.obj_avatarSkel2.transform.gameObject:SetActive(false)
         end
     end
 end
@@ -123,28 +150,14 @@ function AvatarView:ResetDialogHeight()
 end
 
 ---显示表情hud
-function AvatarView:ShowFace(bubbleId,angryBubbleId,angryTime)
+function AvatarView:ShowFace()
     self.go_table.obj_dialog:SetActive(false)
     self.go_table.sbtn_need.gameObject:SetActive(false)
     self.go_table.simg_angry.gameObject:SetActive(true)
-
-    local bubbleConfig = Config.expression_bubble[bubbleId]
-    local angryBubbleConfig = Config.expression_bubble[angryBubbleId]
-    if angryTime > bubbleConfig.time then
-        --显示文字
-        local txt = LanguageUtil:GetValue(angryBubbleConfig.dialogue)
-        self:ShowDialogText(txt)
-    else
-        TimerManager:GetInstance():StopAndClearTimer(self.AngryTimer)
-        local time = bubbleConfig.time - angryTime
-        Log.Info("ShowFace",time)
-        self.AngryText  = LanguageUtil:GetValue(angryBubbleConfig.dialogue)
-        self.AngryTimer = TimerManager:GetInstance():GetTimerStart(time,self.ShowDialogText,self,1)
-    end
 end
 
 function AvatarView:ShowDialogText(text)
-    text = text or self.AngryText
+    text = text
     if text ~= nil then
         self.go_table.obj_dialog:SetActive(true)
         self.go_table.sbtn_need.gameObject:SetActive(false)
@@ -155,7 +168,9 @@ function AvatarView:ShowDialogText(text)
 end
 
 ---显示需求hud
-function AvatarView:ShowNeed(bubbleId,needFurnitureId)
+function AvatarView:ShowNeed(needFurnitureId)
+    self.NeedFurnitureId = needFurnitureId
+
     self.go_table.obj_dialog:SetActive(false)
     self.go_table.sbtn_need.gameObject:SetActive(true)
     self.go_table.simg_angry.gameObject:SetActive(false)
@@ -171,6 +186,7 @@ function AvatarView:ShowNoBubble()
     self.go_table.obj_dialog:SetActive(false)
     self.go_table.sbtn_need.gameObject:SetActive(false)
     self.go_table.simg_angry.gameObject:SetActive(false)
+    self.NeedFurnitureId = nil
 end
 
 ---事件处理
@@ -194,6 +210,10 @@ end
 function AvatarView:OnClickBtn(btn)
     if btn == self.go_table.sbtn_need then
         if SceneManager:GetInstance().RoomId == SceneManager.eRoomId.Lounge then
+            if self.NeedFurnitureId ~= nil then
+                DeviceData:GetInstance().FurniturePointId = DeviceData:GetInstance():GetFieldId(self.NeedFurnitureId)
+                --DeviceData:GetInstance().JumpFieldId = DeviceData:GetInstance():GetFieldId(self.NeedFurnitureId)
+            end
             UIManager:GetInstance():OpenUIDefine(UIDefine.DeviceView, nil, SceneManager:GetInstance().RoomId)
         end
     end
@@ -210,7 +230,10 @@ end
 ---@protected
 function AvatarView:OnDestroy()
     --TemplateView.ParentCls.OnDestroy(self)
-    TimerManager:GetInstance():StopAndClearTimer(self.AngryTimer)
+    self.gameObject:DestroyGameObj()
+    if self.Shadow ~= nil then
+        self.Shadow.gameObject:DestroyGameObj()
+    end
 end
 
 return AvatarView

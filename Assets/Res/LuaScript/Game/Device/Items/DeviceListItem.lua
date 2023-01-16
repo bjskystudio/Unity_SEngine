@@ -50,7 +50,7 @@ function DeviceListItem:OnRefreshItemData(DataItem, index, ...)
     self.fieldId = DataItem.id--栏位id
 
     local isUnLock = DeviceDataInst:FieldIsUnlock(self.houseId, self.fieldId)--当前栏位是否解锁
-
+    self.isUnLock = isUnLock
     self.DataItem = DataItem
 
     local unlockData = DataItem.unlock_terms--解锁条件
@@ -60,11 +60,24 @@ function DeviceListItem:OnRefreshItemData(DataItem, index, ...)
 
     local condition = ""
     local status = 0--0未达到条件 1达到条件未解锁 2已解锁
+    self.go_table.obj_finger:SetActive(false)
 
     status = DeviceData.fieldStats.unlock;
     if (isUnLock) then
-
+        self.go_table.obj_finger:SetActive(false)
     else
+
+        if (DeviceData:GetInstance().FurniturePointId ~= nil) then
+            if (DeviceData:GetInstance().FurniturePointId == self.fieldId) then
+
+                self.go_table.obj_finger:SetActive(true)
+                local seq = CS.DG.Tweening.DOTween.Sequence()
+                seq:Append(self.go_table.obj_finger.transform:DOLocalMove(Vector3.New(self.go_table.obj_finger.transform.localPosition.x, self.go_table.obj_finger.transform.localPosition.y + 5, 0), 1))
+                seq:Append(self.go_table.obj_finger.transform:DOLocalMove(Vector3.New(self.go_table.obj_finger.transform.localPosition.x, self.go_table.obj_finger.transform.localPosition.y, 0), 1))
+                seq:SetLoops(-1)
+            end
+        end
+
         local linkStr
         local uData = DataItem.term_num
         for i, num in pairs(unlockData) do
@@ -259,8 +272,17 @@ function DeviceListItem:OnUpGradeFiled(field)
                 DeviceDataInst.HouseData[self.houseId][field].OnThewayFiledIds[furnitureId] = nil
 
                 --直接朝向场景中家具位置
-                EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, furnitureId)
-                EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, furnitureId)
+                --[[                EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, furnitureId)
+                                EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, furnitureId)]]
+
+                --直接朝向场景中家具位置
+                EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, furnitureId, function()
+                    --if (type ~= DeviceData.UnlockType.Normal) then
+                    --立即完成事件
+                    EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, furnitureId)
+                    --end
+                end)
+
                 self.OwnerUI:Close()
                 return
                 -- break
@@ -276,8 +298,8 @@ end
 function DeviceListItem:OnChangeFurnitureEvent(arg)
     local arg_field = DeviceDataInst:GetFieldId(arg)
     if (arg_field == self.fieldId) then
-        DeviceDataInst:SaveUsingFurniture(self.houseId, self.fieldId, arg)
-        GameDataInst:RefreshPopular()
+        --[[        DeviceDataInst:SaveUsingFurniture(self.houseId, self.fieldId, arg)
+                GameDataInst:RefreshPopular()]]
         self:OnRefreshItemData(self.DataItem)
         --点击运输完成
         EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, arg)
@@ -378,13 +400,13 @@ function DeviceListItem:OnClickTmp(tmp, linkId)
     elseif (math.floor(tonumber(targetId) / 1000) == 1) then
         --跳转到旅店任务
         local taskId = tonumber(targetId)
-        HotelDataInt.FinishTask = {}
-        table.insert(HotelDataInt.FinishTask, taskId)
+        --[[        HotelDataInt.FinishTask = {}
+                table.insert(HotelDataInt.FinishTask, taskId)]]
 
+        --指定跳转任务ID
+        HotelDataInt.JumpTaskId = tonumber(targetId)
         SceneManager:GetInstance():ChangeToHotel()
         UIManager:GetInstance():OpenUIDefine(UIDefine.HotelView)
-        -- EventInst:Broadcast(GameEvent.MoveToHotelTask, tonumber(targetId))
-
 
         self.OwnerUI:Close()
 
@@ -399,6 +421,11 @@ end
 function DeviceListItem:OnDestroy()
     --DeviceListItem.ParentCls.OnDestroy(self)
     self.IsInit = false
+    --[[    if (self.isUnLock) then
+        else
+            DeviceData:GetInstance().JumpFieldId = nil
+        end]]
+
 
 end
 

@@ -82,8 +82,8 @@ namespace SEngine.AseetBundle
             PackageSingleFile(AudioPath);
             //PackageSingleFile(FontPath);
 
-            //config data, zip to one bag
-            //PackageAsFolder(PBData, PBDataBundleName);
+            //config data, zip to one bagbag
+            PackageAsFolder(PBData, PBDataBundleName);
         }
 
         protected override void BuildAllAsset_Impl(bool incremental)

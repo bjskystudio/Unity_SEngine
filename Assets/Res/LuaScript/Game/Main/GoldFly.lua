@@ -54,6 +54,7 @@ end
 ---@protected
 function GoldFly:OnDestroy()
     --GoldFly.ParentCls.OnDestroy(self)
+    self.gameObject:DestroyGameObj()
 end
 
 return GoldFly

@@ -3,6 +3,11 @@
 ---@field public gameObject UnityEngine.GameObject
 ---@field public img_goldimg UnityEngine.UI.Image
 ---@field public img_image SEngine.UI.SImage
+---@field public img_machinebar SEngine.UI.SImage
+---@field public img_tabhotel SEngine.UI.SImage
+---@field public img_tabItask SEngine.UI.SImage
+---@field public img_tabshop SEngine.UI.SImage
+---@field public img_tabstaff SEngine.UI.SImage
 ---@field public obj_bottom UnityEngine.GameObject
 ---@field public obj_coinMove UnityEngine.GameObject
 ---@field public obj_diamond UnityEngine.GameObject
@@ -11,6 +16,8 @@
 ---@field public obj_ghost UnityEngine.GameObject
 ---@field public obj_gold UnityEngine.GameObject
 ---@field public obj_goldFlyitem UnityEngine.GameObject
+---@field public obj_HotelGrid UnityEngine.GameObject
+---@field public obj_LoungeGrid UnityEngine.GameObject
 ---@field public obj_moveEnergyNode UnityEngine.GameObject
 ---@field public obj_moveNode UnityEngine.GameObject
 ---@field public obj_popular UnityEngine.GameObject
@@ -26,6 +33,7 @@
 ---@field public sbtn_device SEngine.UI.SButton
 ---@field public sbtn_friendly SEngine.UI.SButton
 ---@field public sbtn_hotel SEngine.UI.SButton
+---@field public sbtn_machineknob SEngine.UI.SButton
 ---@field public sbtn_rank SEngine.UI.SButton
 ---@field public sbtn_setting SEngine.UI.SButton
 ---@field public sbtn_shop SEngine.UI.SButton
@@ -43,4 +51,12 @@
 ---@field public stmp_gold SEngine.UI.STMP
 ---@field public stmp_nextenergy SEngine.UI.STMP
 ---@field public stmp_popular SEngine.UI.STMP
+
+---@class MainView_HotelGrid_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
+
+---@class MainView_LoungeGrid_GoTable
+---@field public transform UnityEngine.Transform
+---@field public gameObject UnityEngine.GameObject
 

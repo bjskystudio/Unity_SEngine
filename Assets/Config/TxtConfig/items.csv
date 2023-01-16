@@ -1,0 +1,7 @@
+﻿int,string,string,string,string,int,int
+ID,说明,名称文本,描述,图标,类型（1.货币/2.消耗品/3.家具/4.人物物品）,堆叠上限
+id,desc,name,text,icon,type,pilemax
+1000001,金币,Common_coin,Common_coin_desc,Icon_coin,1,999999999
+1000002,钻石,Common_jewel,Common_jewel_desc,Icon_gemstone,1,999999999
+1000003,人气,Common_renqi,Common_renqi_desc,Icon_Popularity,1,999999999
+1000004,加速,Common_jiasu,Common_jiasu_desc,ui_icon_jiasu,1,999999999

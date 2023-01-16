@@ -28,10 +28,38 @@ public class Launcher : MonoSingleton<Launcher>
     [Label("开启emmylua调试")]
     public bool LuaDebugEnable = false;
     /// <summary>
+    /// 不联网运行
+    /// </summary>
+    [Label("不联网运行")]
+    public bool RunOffline = false;
+    /// <summary>
     /// 开启TileMap寻路
     /// </summary>
-    [Label("开启TileMap寻路")]
-    public bool TileMapEnable = false;
+    //[Label("开启TileMap寻路")]
+    //public bool TileMapEnable = false;
+
+    private ServerConfig mServerConfig;
+    public ServerConfig ServerConf
+    {
+        get
+        {
+            if (mServerConfig == null)
+            {
+                ServerConfigRef configRef = GameObject.FindObjectOfType<ServerConfigRef>();
+                if (configRef != null)
+                {
+                    mServerConfig = configRef.mConfig;
+                }
+            }
+
+            if (mServerConfig == null)
+            {
+                Debug.LogError("!!!!!!!!!!!!!没再场景中找到ServerConfig脚本!!!!!!!!!!!!!!!!");
+            }
+
+            return mServerConfig;
+        }
+    }
 
     protected override void Init()
     {
@@ -43,7 +71,7 @@ public class Launcher : MonoSingleton<Launcher>
             + "temporaryCachePath>>>" + Application.temporaryCachePath + "\n\r"
             + "streamingAssetsPath>>>" + Application.streamingAssetsPath + "\n\r"
             + "dataPath>>>" + Application.dataPath);
-
+        Loom.Initialize();
         StartUp();
     }
 

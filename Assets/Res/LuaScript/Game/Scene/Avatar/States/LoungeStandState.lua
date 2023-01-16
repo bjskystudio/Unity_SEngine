@@ -44,12 +44,11 @@ function LoungeStandState:Update()
             if gotoPos == MapManager.ePosition.LoungeDoor then
                 --出去了，显示表情
                 if self.Machine.Info.IsAngry then
-                    self.Machine.Info.AngryStartTime = self.Machine.Time
                     ---@type expression_bubble_Item
                     self.BubbleConfig = Config.GetConfigByField(ConfigManager.expression_bubble,"bubble_type",{AvatarStateMachine.eHudType.Face})[1]
                     local angryBubbles = Config.GetConfigByField(ConfigManager.expression_bubble,"text_type",{1})
                     local angryBubbleId = angryBubbles[Mathf.Random(1,#angryBubbles)].id
-                    self.Machine:SetInfoBubble(self.BubbleConfig.id,0,angryBubbleId)
+                    self.Machine:SetInfoBubble(self.BubbleConfig.id,self.BubbleConfig.time,{angryBubbleId})
                 end
             end
             self.Machine.Info.UseFurnitureId = nextUseId

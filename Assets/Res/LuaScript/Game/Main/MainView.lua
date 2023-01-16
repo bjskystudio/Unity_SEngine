@@ -16,6 +16,7 @@ local GameData = require("GameData")
 local TimeUtil = require("TimeUtil")
 local GameDataInst = require("GameData"):GetInstance()
 local TimerInst = require("TimerManager"):GetInstance()
+local EventInst = require("EventManager"):GetInstance()
 local UILayerEnum = require("UILayerEnum")
 ---@class MainView : UIBase 窗口
 ---@field private go_table MainView_GoTable GoTable
@@ -28,6 +29,7 @@ function MainView:Awake()
     self:AddEvent(GameEvent.GoinMoveEvent)
     self:AddEvent(GameEvent.EnergyMoveEvent)
     self:AddEvent(GameEvent.CoinFlyEvent)
+    self:AddEvent(GameEvent.EggMachineProgress)
 end
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
@@ -40,7 +42,7 @@ function MainView:OnCreate()
     EventManager:GetInstance():AddListener(GameEvent.EnergyChange, self.ChangeEnergy, self)
     self.go_table.obj_timemessage:SetActive(false)
     self.go_table.sbtn_anyClick.gameObject:SetActive(false)
-
+    self.m_currSelTab = 0
     self.go_table.simg_task:LoadSprite(GameDefine.eResPath.AtlasMain .. "icon_task", false, 1, function(sprite)
         --Log.Debug("动态加载图片完成:icon_task")
     end)
@@ -48,6 +50,8 @@ function MainView:OnCreate()
     self:InitHub()
     self.AddMaxTime = 1
     self.CountTime = 0
+    self.RoundClickNum = nil
+    self.go_table.sbtn_machineknob.NaClickIntervalmes = 0.5
 end
 
 ---初始化头部数据
@@ -61,6 +65,11 @@ function MainView:InitHub()
     self.FlyTime = TimerInst:GetTimerStartImme(0.1, self.FlyGold, self)
 
     self.TargetGoldNum = GameDataInst.Gold
+    self.go_table.stmp_hotel.text = LanguageUtil:GetValue("HUD_Button_Hotel")
+    self.go_table.stmp_shop.text = LanguageUtil:GetValue("HUD_Button_Shop")
+    self.go_table.stmp_task.text = LanguageUtil:GetValue("HUD_Button_Task")
+    self.go_table.stmp_staff.text = LanguageUtil:GetValue("HUD_Button_Staff")
+    self.go_table.stmp_machine.text = LanguageUtil:GetValue("HUD_Button_Machine")
 end
 function MainView:ChangeGold(num, value, isAdd)
     self.TargetGoldNum = num
@@ -89,6 +98,11 @@ function MainView:ChangeEnergy(num, value, isAdd)
     self.go_table.stmp_energy.text = num .. "/" .. Config.game_config.Max_energy.paramNum
     EventManager:GetInstance():Broadcast(GameEvent.CoinChangeFinsh)
 end
+
+function MainView:SetSelTab(tabIndex)
+    self.m_currSelTab = tabIndex
+end
+
 ---事件处理
 ---@private
 ---@param id EventID 事件ID
@@ -106,7 +120,7 @@ function MainView:EventHandle(id, ...)
         itemNodeClone.transform.gameObject:SetActive(true)
         local item = self:GetOrAddComponent(itemNodeClone, require("CoinMoveItem"))
         item:InitData(num, function()
-            self:DestoryComponentGameObj(item.gameObject)
+            self:RemoveComponentInstance(item)
         end)
     elseif id == GameEvent.EnergyMoveEvent then
         local num = args[1]
@@ -114,7 +128,7 @@ function MainView:EventHandle(id, ...)
         itemNodeClone.transform.gameObject:SetActive(true)
         local item = self:GetOrAddComponent(itemNodeClone, require("CoinMoveItem"))
         item:InitData(num, function()
-            self:DestoryComponentGameObj(item.gameObject)
+            self:RemoveComponentInstance(item)
         end)
 
     elseif id == GameEvent.CoinFlyEvent then
@@ -128,13 +142,32 @@ function MainView:EventHandle(id, ...)
         local startPos = trans:ConvertLocalPositionToParent(CSUIModel.UICamera, self.go_table.obj_gold.transform)
         local num = args[2]
         if (num > 10) then
-            num = 6
+            num = 10
         end
         local key = Random.Range(1, 100) .. "abv" .. startPos.x .. "b" .. startPos.y
         GameDataInst.StartPosArray[key] = startPos
         table.insert(self.FlyMap, { num, 0, key })
 
         --self:FlyGold()
+    elseif id == GameEvent.EggMachineProgress then
+        local bar = args[1]
+        print("xxxx" .. bar)
+        if bar ~= self.RoundClickNum then
+            self.RoundClickNum = bar
+            if bar == 0 then
+                self.go_table.img_machinebar:DOFillAmount(1 , 0.2):OnComplete(function()
+                    self.go_table.img_machinebar.fillAmount = 0
+                end
+                )
+            else
+                self.go_table.img_machinebar:DOFillAmount(bar , 0.2)
+            end
+
+            self.go_table.sbtn_machineknob.transform:DOLocalRotate(Vector3.New(0,180,360*bar)  , 0.5):OnComplete(function()
+                
+            end
+            )
+        end
     end
 end
 
@@ -166,7 +199,8 @@ function MainView:FlyGold()
                             local endPos = self.go_table.img_goldimg.transform.localPosition
                             local controlPos = Vector3.New((startPos.x + endPos.x) / 2, startPos.y + 20, 0)
                             itemNodeClone.transform:DoBezier2(startPos, controlPos, endPos, 0.4):OnComplete(function()
-                                itemNodeClone:DestroyGameObj()
+                                --itemNodeClone:DestroyGameObj()
+                                self:RemoveComponentInstance(item)
                                 if (i == num) then
                                     table.removebyvalue(self.FlyMap, v)
                                     GameDataInst.StartPosArray[v[3]] = nil
@@ -182,31 +216,40 @@ function MainView:FlyGold()
             end
 
         end
-    end
 
-    ---金币text增长相关
-    local num = tonumber(self.go_table.stmp_gold.text)
-    --print(num .. "  " .. tonumber(self.go_table.stmp_gold.text))
-    if (self.CountTime < self.AddMaxTime and num < self.TargetGoldNum) then
+        ---金币text增长相关
+        local num = tonumber(self.go_table.stmp_gold.text)
+        --print(num .. "  " .. tonumber(self.go_table.stmp_gold.text))
+        if (self.CountTime < self.AddMaxTime and num < self.TargetGoldNum) then
 
-        self.CountTime = self.CountTime + 0.1
-        local value = self.TargetGoldNum - num
-        local speed = value / (self.AddMaxTime * 10)
-        if (speed < 1) then
-            speed = 1
+            self.CountTime = self.CountTime + 0.1
+            local value = self.TargetGoldNum - num
+            local speed = value / (self.AddMaxTime * 10)
+            if (speed < 1) then
+                speed = 1
+            end
+            local showNum = string.format("%.0f", num + speed)
+            self.go_table.stmp_gold.text = showNum
+            self.go_table.img_goldimg.transform:DOScale(1.3, 0.1):OnComplete(function()
+                self.go_table.img_goldimg.transform:DOScale(1, 0.1)
+            end)
         end
-        local showNum = string.format("%.0f", num + speed)
-        self.go_table.stmp_gold.text = showNum
-        self.go_table.img_goldimg.transform:DOScale(1.3, 0.1):OnComplete(function()
-            self.go_table.img_goldimg.transform:DOScale(1, 0.1)
-        end)
+        if (num >= self.TargetGoldNum or self.CountTime >= self.AddMaxTime) then
+            self.CountTime = 0
+            EventManager:GetInstance():Broadcast(GameEvent.CoinChangeFinsh)
+            num = self.TargetGoldNum
+            self.go_table.stmp_gold.text = string.format("%.0f", num)
+        end
+    else
+        local num = tonumber(self.go_table.stmp_gold.text)
+        if (num ~= self.TargetGoldNum) then
+            EventManager:GetInstance():Broadcast(GameEvent.CoinChangeFinsh)
+            self.go_table.stmp_gold.text = string.format("%.0f", self.TargetGoldNum)
+        end
+
     end
-    if (num >= self.TargetGoldNum or self.CountTime >= self.AddMaxTime) then
-        self.CountTime = 0
-        EventManager:GetInstance():Broadcast(GameEvent.CoinChangeFinsh)
-        num = self.TargetGoldNum
-        self.go_table.stmp_gold.text = string.format("%.0f", num)
-    end
+
+
 end
 
 ---可用
@@ -235,6 +278,8 @@ function MainView:OnClickBtn(btn)
                 }
                 UIManager:GetInstance():OpenUIDefine(UIDefine.DeviceCommonTip, setting, LanguageUtil:GetValue("Common_Title_transport"))]]
         UIManager:GetInstance():OpenUIDefine(UIDefine.HotelView)
+        self.m_currSelTab = 1
+        self:RefreshTab()
     elseif btn == self.go_table.sbtn_showenergyMessage then
         --打开精力恢复倒计时UI
         self.go_table.obj_timemessage:SetActive(true)
@@ -251,6 +296,8 @@ function MainView:OnClickBtn(btn)
         --GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Gold, 50)
     elseif btn == self.go_table.sbtn_atlas then
         --GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Gold, 50)
+    elseif btn == self.go_table.sbtn_machineknob then
+        EventInst:Broadcast(GameEvent.BtnMachine)
     end
 end
 function MainView:OpenTimer()
@@ -293,12 +340,31 @@ end
 ---@param roomId number
 function MainView:SetBottom(sceneType, roomId)
     self.go_table.obj_bottom.gameObject:SetActive(sceneType == SceneManager.eSceneType.Hotel)
+    self:RefreshTab()
     ---房间bottom
     if roomId and roomId > 0 then
         self.go_table.obj_PublicBot.gameObject:SetActive(SceneManager:GetInstance():IsPublicRoom(roomId))
     else
         self.go_table.obj_PublicBot.gameObject:SetActive(false)
     end
+end
+
+function MainView:RefreshTab()
+    self.go_table.simg_tabhotel.gameObject:SetActive(false)
+    self.go_table.simg_tabItask.gameObject:SetActive(false)
+    self.go_table.simg_tabshop.gameObject:SetActive(false)
+    self.go_table.simg_tabstaff.gameObject:SetActive(false)
+    
+    if self.m_currSelTab == 1 then
+        self.go_table.simg_tabhotel.gameObject:SetActive(true)
+    elseif self.m_currSelTab == 2 then
+        self.go_table.simg_tabshop.gameObject:SetActive(true)
+    elseif self.m_currSelTab == 3 then
+        self.go_table.simg_tabItask.gameObject:SetActive(true)
+    elseif self.m_currSelTab == 4 then
+        self.go_table.simg_tabstaff.gameObject:SetActive(true)
+    end
+    
 end
 
 ---数据清理

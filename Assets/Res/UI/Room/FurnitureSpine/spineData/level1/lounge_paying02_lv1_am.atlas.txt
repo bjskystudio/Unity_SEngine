@@ -1,0 +1,111 @@
+
+lounge_paying02_lv1_am.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+guang1
+  rotate: false
+  xy: 303, 13
+  size: 47, 47
+  orig: 49, 49
+  offset: 1, 1
+  index: -1
+guang2
+  rotate: false
+  xy: 279, 387
+  size: 138, 123
+  orig: 138, 123
+  offset: 0, 0
+  index: -1
+guangdian
+  rotate: true
+  xy: 419, 336
+  size: 75, 86
+  orig: 75, 86
+  offset: 0, 0
+  index: -1
+guangyun2
+  rotate: true
+  xy: 219, 19
+  size: 97, 82
+  orig: 97, 82
+  offset: 0, 0
+  index: -1
+huo4
+  rotate: false
+  xy: 279, 263
+  size: 117, 122
+  orig: 117, 122
+  offset: 0, 0
+  index: -1
+shouji14_2
+  rotate: false
+  xy: 398, 251
+  size: 85, 83
+  orig: 91, 90
+  offset: 3, 4
+  index: -1
+shouji14_3
+  rotate: true
+  xy: 303, 62
+  size: 93, 92
+  orig: 101, 101
+  offset: 4, 4
+  index: -1
+shouji14_4
+  rotate: false
+  xy: 114, 15
+  size: 103, 101
+  orig: 111, 110
+  offset: 4, 4
+  index: -1
+shouji14_5
+  rotate: false
+  xy: 279, 157
+  size: 110, 104
+  orig: 118, 113
+  offset: 4, 4
+  index: -1
+shouji14_6
+  rotate: false
+  xy: 2, 7
+  size: 110, 109
+  orig: 123, 121
+  offset: 8, 5
+  index: -1
+shuijing1
+  rotate: false
+  xy: 391, 166
+  size: 82, 83
+  orig: 82, 83
+  offset: 0, 0
+  index: -1
+shuijing2
+  rotate: false
+  xy: 397, 83
+  size: 79, 81
+  orig: 80, 81
+  offset: 0, 0
+  index: -1
+yanwu
+  rotate: true
+  xy: 397, 2
+  size: 79, 78
+  orig: 84, 81
+  offset: 4, 1
+  index: -1
+yanwubaozha
+  rotate: true
+  xy: 419, 413
+  size: 97, 88
+  orig: 97, 88
+  offset: 0, 0
+  index: -1
+zhuo
+  rotate: false
+  xy: 2, 118
+  size: 275, 392
+  orig: 281, 393
+  offset: 4, 1
+  index: -1

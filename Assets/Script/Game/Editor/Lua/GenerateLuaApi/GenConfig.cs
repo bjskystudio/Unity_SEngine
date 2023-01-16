@@ -1,5 +1,6 @@
 using Coffee.UIExtensions;
 using DG.Tweening;
+using Game.Network;
 using SEngine;
 using SEngine.Map;
 using SEngine.UI;
@@ -261,8 +262,14 @@ public static class GenConfig
         typeof(TransformUtils),
         #endregion
 
+        #region 网络
+        typeof(NetworkKit),
+        typeof(MessageQueueHandler),
+        typeof(ServerConfig),
+        #endregion
+
         #region 自定义unity扩展
-        
+
         typeof(UnityObjectExtends),
         typeof(TransformExtend),
         #endregion
@@ -343,6 +350,7 @@ public static class GenConfig
         typeof(Action<GameObject>),
         typeof(Action<GameObject, int>),
         typeof(Action<GameObject, GameObject, int, int>),
+        //typeof(Action<int,SEngine.Net.ISocket,string>),
 
         typeof(SuperScrollView.LoopListView2),
         typeof(SuperScrollView.LoopGridView),

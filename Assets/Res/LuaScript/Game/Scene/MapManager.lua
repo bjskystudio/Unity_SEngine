@@ -263,6 +263,53 @@ function MapManager:InitMap(mapId)
         end
     end
 
+    for i =1 , #furnitureConfigs do
+        local FurniturePos = self.FurniturePosDic[furnitureConfigs[i].id]
+        if FurniturePos ~= nil then
+            for j = 1, #FurniturePos do
+                local pos = Vector2.New(FurniturePos[j].x, FurniturePos[j].y)
+                local size = Vector2.New(1, 1)
+                ---设置站立格
+                CS.SEngine.Map.MapService.Instance:SetCanStand(mapId, pos, size)
+            end
+        end
+    end
+
+    for i =1 , #furnitureConfigs do
+        local FurnitureUse = self.FurnitureUsePosDic[furnitureConfigs[i].id]
+        if FurnitureUse ~= nil then
+            for j = 1, #FurnitureUse do
+                local pos = Vector2.New(FurnitureUse[j].x, FurnitureUse[j].y)
+                local size = Vector2.New(1, 1)
+                ---设置交互格
+                CS.SEngine.Map.MapService.Instance:SetCanInteract(mapId, pos, size)
+            end
+        end
+    end
+
+    for i =1 , #furnitureConfigs do
+        local FurnitureQueue = self.FurnitureQueuePosDic[furnitureConfigs[i].id]
+        if FurnitureQueue ~= nil then
+            for j = 1, #FurnitureQueue do
+                local pos = Vector2.New(FurnitureQueue[j].x, FurnitureQueue[j].y)
+                local size = Vector2.New(1, 1)
+                ---设置排队格
+                CS.SEngine.Map.MapService.Instance:SetCanQueue(mapId, pos, size)
+            end
+        end
+    end
+    for i =1 , #furnitureConfigs do
+        local FurnitureCoinPos = self.FurnitureCoinPosDic[furnitureConfigs[i].id]
+        if FurnitureCoinPos ~= nil then
+            for j = 1, #FurnitureCoinPos do
+                local pos = Vector2.New(FurnitureCoinPos[j].x, FurnitureCoinPos[j].y)
+                local size = Vector2.New(1, 1)
+                ---设置金币掉落格
+                CS.SEngine.Map.MapService.Instance:SetCanCoinPos(mapId, pos, size)
+            end
+        end
+    end
+    
 end
 function MapManager:IsMapInit()
     return self.InitComplete --AppSetting.TileMapEnable and

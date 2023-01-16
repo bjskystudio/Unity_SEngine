@@ -1,7 +1,0 @@
-int	string	int	int	int	int	int
-序号	说明	点击次数	体力消耗	出现蛋的数量	出现权重	出现后可使用的次数
-id	desc	click_number	energy_cost	egg_number	weight	use_number
-1	电力充足：只需点击1次扭蛋机即可完成扭蛋	1	1	1	30	5
-2	双子传说：连续点击6次扭蛋机，能同时出现2个扭蛋	6	1	2	20	5
-3	捣蛋小精灵：连续点击6次扭蛋机，能同时出现4个扭蛋	6	1	4	15	5
-4	骇客入侵：连续点击6次扭蛋，能同时出现8个扭蛋	6	1	8	8	5

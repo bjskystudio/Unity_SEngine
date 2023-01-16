@@ -21,24 +21,25 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(Launcher);
-			Utils.BeginObjectRegister(type, L, translator, 0, 3, 5, 5);
+			Utils.BeginObjectRegister(type, L, translator, 0, 3, 6, 5);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "StartUp", _m_StartUp);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "IsEditor", _m_IsEditor);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Dispose", _m_Dispose);
 			
 			
-			Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedAssetBundle", _g_get_UsedAssetBundle);
+			Utils.RegisterFunc(L, Utils.GETTER_IDX, "ServerConf", _g_get_ServerConf);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedAssetBundle", _g_get_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "UsedLuaAssetBundle", _g_get_UsedLuaAssetBundle);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "mLogLevel", _g_get_mLogLevel);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "LuaDebugEnable", _g_get_LuaDebugEnable);
-            Utils.RegisterFunc(L, Utils.GETTER_IDX, "TileMapEnable", _g_get_TileMapEnable);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "RunOffline", _g_get_RunOffline);
             
 			Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedAssetBundle", _s_set_UsedAssetBundle);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "UsedLuaAssetBundle", _s_set_UsedLuaAssetBundle);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "mLogLevel", _s_set_mLogLevel);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "LuaDebugEnable", _s_set_LuaDebugEnable);
-            Utils.RegisterFunc(L, Utils.SETTER_IDX, "TileMapEnable", _s_set_TileMapEnable);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "RunOffline", _s_set_RunOffline);
             
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
@@ -170,6 +171,20 @@ namespace XLua.CSObjectWrap
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_ServerConf(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked.ServerConf);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_UsedAssetBundle(RealStatePtr L)
         {
 		    try {
@@ -226,13 +241,13 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_TileMapEnable(RealStatePtr L)
+        static int _g_get_RunOffline(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
                 Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
-                LuaAPI.lua_pushboolean(L, gen_to_be_invoked.TileMapEnable);
+                LuaAPI.lua_pushboolean(L, gen_to_be_invoked.RunOffline);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -303,13 +318,13 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _s_set_TileMapEnable(RealStatePtr L)
+        static int _s_set_RunOffline(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
                 Launcher gen_to_be_invoked = (Launcher)translator.FastGetCSObj(L, 1);
-                gen_to_be_invoked.TileMapEnable = LuaAPI.lua_toboolean(L, 2);
+                gen_to_be_invoked.RunOffline = LuaAPI.lua_toboolean(L, 2);
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

@@ -177,6 +177,34 @@ namespace XLua
 #endif
         }
 
+        public void CallSpecial(int sInt, byte[] sBuff, int sLen)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+
+            var L = luaEnv.L;
+            var translator = luaEnv.translator;
+            int oldTop = LuaAPI.lua_gettop(L);
+
+            int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+            LuaAPI.lua_getref(L, luaReference);
+
+            LuaAPI.xlua_pushinteger(L, sInt);
+            LuaAPI.lua_pushlenstring(L, sBuff, sLen);
+
+            int error = LuaAPI.lua_pcall(L, 2, -1, errFunc);
+            if (error != 0)
+                luaEnv.ThrowExceptionFromError(oldTop);
+
+            LuaAPI.lua_remove(L, errFunc);
+            translator.popValues(L, oldTop);
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
         //deprecated
         public object[] Call(params object[] args)
         {

@@ -20,13 +20,14 @@ local MapManager = require("MapManager")
 local SceneManager = require("SceneManager")
 local DeviceData = require("DeviceData")
 local ConfigManager = require("ConfigManager")
+local ResLoadManager = require("ResLoadManager")
 
 ---@class AvatarStateMachine:StateMachine 角色状态机
 ---@field CurrentState AvatarState 当前状态
 ---@field View AvatarView 角色界面
 ---@field Info AvatarInfo 角色数据
 ---@field TargetPos Vector2 目标tile
-local AvatarStateMachine = Class("AvatarStateMachine",StateMachine)
+local AvatarStateMachine = Class("AvatarStateMachine", StateMachine)
 
 AvatarStateMachine.eStateName = {
     ------- hotel -------------
@@ -97,7 +98,7 @@ end
 ------切换状态
 -----@param name string 名字
 function AvatarStateMachine:ChangeState(name)
-    self.super.ChangeState(self,name)
+    self.super.ChangeState(self, name)
     ---保存state
     self.Info.StateName = name
 end
@@ -105,18 +106,32 @@ end
 ---@param avatarView AvatarView 角色界面
 function AvatarStateMachine:SetView(avatarView)
     self.View = avatarView
-    -- 皮肤
-    self:SetViewSkin(self.Info.SkinName)
-    -- 还原位置
-    local pos =   MapManager:GetInstance():CellToLocal(self.Info.RoomId,self.Info.TileX,self.Info.TileY)
-    self:SetViewPosition(pos)
-    self:SetViewDirection(self.Direction)
-    --还原动作
-    self:SetViewAnim(self.Info.AnimName,true)
-    --设置气泡
-    self:SetViewBubble(self.Info.BubbleId,self.Info.NeedFurnitureId,self.Info.AngryBubbleId)
-    if self.CurrentState ~= nil then
-        self.CurrentState:InitViewState()
+    -- 设置Prefab
+    -- local prefabName = self.Info.PrefabName
+    --self:LoadPrefab(prefabName, function()
+
+    --end)
+    self:SetPreFab(self.Info.PrefabName, function()
+        -- 皮肤
+        self:SetViewSkin(self.Info.SkinName)
+        -- 还原位置
+        local pos = MapManager:GetInstance():CellToLocal(self.Info.RoomId, self.Info.TileX, self.Info.TileY)
+        self:SetViewPosition(pos)
+        self:SetViewDirection(self.Direction)
+        --还原动作
+        self:SetViewAnim(self.Info.AnimName, true)
+        --显示气泡
+        self:SetViewBubble(self.Info.BubbleId, self.Info.BubbleTime, self.Info.BubbleParam)
+        if self.CurrentState ~= nil then
+            self.CurrentState:InitViewState()
+        end
+    end)
+
+end
+---设置预制
+function AvatarStateMachine:SetPreFab(prefabName, func)
+    if self.View ~= nil then
+        self.View:SetPreFab(prefabName, func)
     end
 end
 -----是否有界面
@@ -133,7 +148,7 @@ end
 --end
 ---@param tilePos Vector2 位置
 ---@param speed number 速度
-function AvatarStateMachine:MoveToTarget(tilePos,speed)
+function AvatarStateMachine:MoveToTarget(tilePos, speed)
     --if self.View ~= nil then
     --    self.View:MoveTo(pos,speed)
     --end
@@ -142,20 +157,20 @@ function AvatarStateMachine:MoveToTarget(tilePos,speed)
     self.RoadPoses = {}
     ---地图组件加载完成了，使用寻路
     if MapManager:GetInstance():IsMapInit() then
-        local from = Vector3.New(self.Info.TileX,self.Info.TileY)
-        local to = Vector3.New(tilePos.x,tilePos.y,0)
-        local path = MapManager:GetInstance():GetPath(self.Info.RoomId,from,to)
-        if path ~= nil and path.Count > 0  then
+        local from = Vector3.New(self.Info.TileX, self.Info.TileY)
+        local to = Vector3.New(tilePos.x, tilePos.y, 0)
+        local path = MapManager:GetInstance():GetPath(self.Info.RoomId, from, to)
+        if path ~= nil and path.Count > 0 then
             --寻路过去
             for i = 1, path.Count do
-                table.insert(self.RoadPoses,path[i-1])
+                table.insert(self.RoadPoses, path[i - 1])
                 --Log.Info("[GetPath]:%s,%s",self.RoadPoses[i-1].x,self.RoadPoses[i-1].y)
             end
         else
-            table.insert(self.RoadPoses,tilePos)
+            table.insert(self.RoadPoses, tilePos)
         end
     else
-        table.insert(self.RoadPoses,tilePos)
+        table.insert(self.RoadPoses, tilePos)
     end
 
     self.IsArriveTarget = false
@@ -164,13 +179,13 @@ end
 
 function AvatarStateMachine:SetNextMove()
     if #self.RoadPoses > 0 then
-        self.TargetPos = table.remove(self.RoadPoses,1)
-        self.MoveStartPos = MapManager:GetInstance():CellToLocal(self.Info.RoomId,self.Info.TileX,self.Info.TileY)
-        self.MoveEndPos = MapManager:GetInstance():CellToLocal(self.Info.RoomId,self.TargetPos.x,self.TargetPos.y)
-        self.MoveTotalTime = self.MoveStartPos:Clone():Sub(self.MoveEndPos):Magnitude()/self.Speed
+        self.TargetPos = table.remove(self.RoadPoses, 1)
+        self.MoveStartPos = MapManager:GetInstance():CellToLocal(self.Info.RoomId, self.Info.TileX, self.Info.TileY)
+        self.MoveEndPos = MapManager:GetInstance():CellToLocal(self.Info.RoomId, self.TargetPos.x, self.TargetPos.y)
+        self.MoveTotalTime = self.MoveStartPos:Clone():Sub(self.MoveEndPos):Magnitude() / self.Speed
         self.MoveTime = 0
         --方向
-        self:CheckViewDirection(self.MoveStartPos,self.MoveEndPos)
+        self:CheckViewDirection(self.MoveStartPos, self.MoveEndPos)
     else
         self.IsArriveTarget = true
 
@@ -183,18 +198,18 @@ function AvatarStateMachine:SetNextMove()
 
 end
 
-function AvatarStateMachine:CheckViewDirection(from,to)
+function AvatarStateMachine:CheckViewDirection(from, to)
     local vec = to:Clone():Sub(from)
-    local angle = Vector3.AngleAroundAxis(Vector3.New(0,1,0),vec,Vector3.New(0,0,1))
+    local angle = Vector3.AngleAroundAxis(Vector3.New(0, 1, 0), vec, Vector3.New(0, 0, 1))
     --Log.Debug("Angle Current:%s",angle)
     local direction = AvatarStateMachine.eDirection.LeftTop
     if angle > 0 and angle <= 90 then
         direction = AvatarStateMachine.eDirection.LeftTop
-    elseif angle > 90 and angle <=180 then
+    elseif angle > 90 and angle <= 180 then
         direction = AvatarStateMachine.eDirection.LeftBottom
-    elseif angle <= 0 and angle >-90 then
+    elseif angle <= 0 and angle > -90 then
         direction = AvatarStateMachine.eDirection.RightTop
-    elseif angle <=-90 and angle >=-180 then
+    elseif angle <= -90 and angle >= -180 then
         direction = AvatarStateMachine.eDirection.RightBottom
     end
 
@@ -206,7 +221,7 @@ end
 
 function AvatarStateMachine:Update()
     self.super.Update(self)
-    if not self.IsPause then
+    if not self.IsPause and self.Info ~= nil then
         if self.TargetPos ~= nil then
             local pos = nil
             self.MoveTime = self.MoveTime + Time.deltaTime
@@ -221,12 +236,14 @@ function AvatarStateMachine:Update()
             end
             if pos ~= nil then
                 self:SetViewPosition(pos:Clone())
-                local tileX,tileY = MapManager:GetInstance():LocalToCell(self.Info.RoomId,pos)
+                local tileX, tileY = MapManager:GetInstance():LocalToCell(self.Info.RoomId, pos)
                 self.Info.TileX = tileX
                 self.Info.TileY = tileY
             end
 
         end
+        ---气泡
+        self:UpdateBubble()
     end
 end
 
@@ -234,24 +251,23 @@ end
 ---@param tileX number TileX
 ---@param tileY number TileY
 ---@param offset Vector2 偏移
-function AvatarStateMachine:SetInfoPosition(tileX,tileY,offset)
+function AvatarStateMachine:SetInfoPosition(tileX, tileY, offset)
     self.Info.TileX = tileX
     self.Info.TileY = tileY
-    local pos =   MapManager:GetInstance():CellToLocal(self.Info.RoomId,self.Info.TileX,self.Info.TileY)
+    local pos = MapManager:GetInstance():CellToLocal(self.Info.RoomId, self.Info.TileX, self.Info.TileY)
     if offset ~= nil then
-        pos = pos:Add(Vector3.New(offset.x,offset.y,0))
+        pos = pos:Add(Vector3.New(offset.x, offset.y, 0))
 
     end
     self:SetViewPosition(pos:Clone())
 end
-
 
 ---更新位置
 ---@param pos Vector3
 function AvatarStateMachine:SetViewPosition(pos)
     ---移动状态调整
     if self.CurrentState.Name == AvatarStateMachine.eStateName.HotelMove then
-        pos = pos:Add(Vector3.New(0,self.Info.RandomY,0))
+        pos = pos:Add(Vector3.New(0, self.Info.RandomY, 0))
     end
     if self.View ~= nil then
         self.View:SetPosition(pos)
@@ -279,47 +295,88 @@ end
 ---@param name string 动作名
 ---@param loop boolean 循环
 ---@param complete fun() 完成回调
-function AvatarStateMachine:SetInfoAnim(name,loop,complete)
+function AvatarStateMachine:SetInfoAnim(name, loop, complete)
     self.Info.AnimName = name
-    self:SetViewAnim(name,loop,complete)
+    self:SetViewAnim(name, loop, complete)
 end
 
-function AvatarStateMachine:SetViewAnim(name,loop,complete)
+function AvatarStateMachine:SetViewAnim(name, loop, complete)
     if self.View ~= nil then
         if name ~= "" then
-            self.View:SetAnim(name,loop,complete)
+            self.View:SetAnim(name, loop, complete)
         end
     end
 end
 
-function AvatarStateMachine:SetInfoBubble(bubbleId,needFurnitureId,angryBubbleId)
+---@param bubbleId number 气泡id
+---@param time number 气泡显示时间秒
+---@param param number[] 气泡参数
+function AvatarStateMachine:SetInfoBubble(bubbleId, time, param)
     self.Info.BubbleId = bubbleId
-    self.Info.NeedFurnitureId = needFurnitureId or 0
-    self.Info.AngryBubbleId = angryBubbleId or 0
-    self:SetViewBubble(bubbleId,needFurnitureId,angryBubbleId)
+    self.Info.BubbleTime = time or 0
+    self.Info.BubbleParam = param or {}
+    self:SetViewBubble(self.Info.BubbleId, self.Info.BubbleTime, self.Info.BubbleParam)
 end
 
-function AvatarStateMachine:SetViewBubble(bubbleId,needFurnitureId,angryBubbleId)
+---@param bubbleId number 气泡id
+---@param time number 气泡显示时间秒
+---@param param number[] 气泡参数
+function AvatarStateMachine:SetViewBubble(bubbleId, time, param)
     if self.View ~= nil then
         if bubbleId == 0 then
             self.View:ShowNoBubble()
         else
             local bubbleConfig = Config.expression_bubble[bubbleId]
             if bubbleConfig.bubble_type == AvatarView.eBubbleType.NeedFurniture then
-                self.View:ShowNeed(bubbleId,needFurnitureId)
+                self.View:ShowNeed(param[1])
             elseif bubbleConfig.bubble_type == AvatarView.eBubbleType.Face then
-                self.View:ShowFace(bubbleId,angryBubbleId,self.Time - self.Info.AngryStartTime)
+                if time > 0 then
+                    self.View:ShowFace()
+                else
+                    local angryBubbleId = param[1]
+                    self.View:ShowDialog(angryBubbleId)
+                end
             elseif bubbleConfig.bubble_type == AvatarView.eBubbleType.Dialog then
-                self.View:ShowDialog(bubbleId)
+                if time > 0 then
+                    self.View:ShowDialog(bubbleId)
+                else
+                    self.View:ShowNoBubble()
+                end
             end
         end
     end
 end
+
+function AvatarStateMachine:UpdateBubble()
+    if self.Info.BubbleTime > 0 then
+        self.Info.BubbleTime = self.Info.BubbleTime - Time.deltaTime
+        if self.Info.BubbleTime <= 0 then
+            local bubbleConfig = Config.expression_bubble[self.Info.BubbleId]
+            if bubbleConfig.bubble_type == AvatarView.eBubbleType.Dialog then
+                --对话移除
+                self:SetInfoBubble(0)
+            elseif bubbleConfig.bubble_type == AvatarView.eBubbleType.Face then
+                local angryBubbleId = self.Info.BubbleParam[1]
+                ---生气切换文字
+                if self.View ~= nil then
+                    self.View:ShowDialog(angryBubbleId)
+                end
+            elseif bubbleConfig.bubble_type == AvatarView.eBubbleType.NeedFurniture then
+                --- 需求超时
+                if self.CurrentState.Name == AvatarStateMachine.eStateName.NeedFurniture then
+                    self.CurrentState:OnBubbleTimeout()
+                end
+            end
+        end
+    end
+
+end
+
 --region ----------------设置数据--------------
 ---移除精灵
 function AvatarStateMachine:ClearAvatar()
     --界面移除
-    EventManager:GetInstance():Broadcast(AvatarEvent.ClearAvatarView,self.Info.Id)
+    EventManager:GetInstance():Broadcast(AvatarEvent.ClearAvatarView, self.Info.Id)
     AvatarManager:GetInstance():ClearAvatar(self.Info)
 end
 ---进入房间
@@ -329,9 +386,10 @@ function AvatarStateMachine:EnterRoom(roomId)
     local exitRoomId = self.Info.RoomId
     --更新去过的房间
     if roomId ~= SceneManager.eRoomId.Hotel then
-        table.insert(self.Info.FinishRoomIds,roomId)
+        table.insert(self.Info.FinishRoomIds, roomId)
     end
-    if roomId == SceneManager.eRoomId.Lounge then ---休息室
+    if roomId == SceneManager.eRoomId.Lounge then
+        ---休息室
         ---位置切换到休息室入口
         self.Info.TileX = MapManager:GetInstance().Positions[MapManager.ePosition.LoungeDoor][1].x
         self.Info.TileY = MapManager:GetInstance().Positions[MapManager.ePosition.LoungeDoor][1].y
@@ -342,13 +400,13 @@ function AvatarStateMachine:EnterRoom(roomId)
     end
     --更新房间
     self.Info.RoomId = roomId
-    EventManager:GetInstance():Broadcast(AvatarEvent.EnterRoom,roomId,self.Info.Id)
-    EventManager:GetInstance():Broadcast(AvatarEvent.ExitRoom,exitRoomId,self.Info.Id)
+    EventManager:GetInstance():Broadcast(AvatarEvent.EnterRoom, roomId, self.Info.Id)
+    EventManager:GetInstance():Broadcast(AvatarEvent.ExitRoom, exitRoomId, self.Info.Id)
 end
 
 function AvatarStateMachine:SaveEnterRoom(roomId)
 
-    table.insert(self.Info.FinishRoomIds,roomId)
+    table.insert(self.Info.FinishRoomIds, roomId)
 end
 
 --endregion ----------------设置数据--------------
@@ -359,12 +417,12 @@ end
 ---@return boolean
 function AvatarStateMachine:LoungeCanGotoFurniture(furnitureTypeId)
     ---有家具
-    local furnitureDone = DeviceData:GetInstance():GetCurUseFurnitureData(self.Info.RoomId,furnitureTypeId) ~= nil
+    local furnitureDone = DeviceData:GetInstance():GetCurUseFurnitureData(self.Info.RoomId, furnitureTypeId) ~= nil
     if furnitureDone then
-        local hasGoto = #AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.LoungeMove,furnitureTypeId) > 0
+        local hasGoto = #AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.LoungeMove, furnitureTypeId) > 0
         ---没人去
         if not hasGoto then
-            local waiter = AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.WaitFurniture,furnitureTypeId)
+            local waiter = AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.WaitFurniture, furnitureTypeId)
             local posNum = MapManager:GetInstance():GetFurnitureWaitMaxCount(furnitureTypeId)
             ---有空位置
             if #waiter < posNum then

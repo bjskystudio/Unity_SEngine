@@ -9,43 +9,101 @@ local EventInst = require("EventManager"):GetInstance()
 local GameDataInst = require("GameData"):GetInstance()
 local UIManager = require("UIManager")
 local UIDefine = require("UIDefine")
+local HotelData = require("HotelData")
+local ConfigManager = require("ConfigManager")
 
 ---@class EggMachine.EggInfo
 ---@field type EggMachine.eEggType
+---@field ResName string
+---@field EggId number
 
 
 ---@class EggMachine : Singleton @扭蛋机
 ---@field PlayState EggMachine.ePlayState 当前轮次玩法
----@field RoundEggs table<number,EggMachine.eEggType> 当前轮次产生的扭蛋
+---@field RoundEggs table<number,EggMachine.EggInfo> 当前轮次产生的扭蛋
+---@field ClickNum number 当前点击进度
+---@field BuffUse number BUFF使用次数
+---@field BuffStart EggMachine.ePlayState 随机到的BUFF
 local EggMachine = Class("EggMachine", Singleton)
 --region  ---------------------- 扭蛋事件 ----------------------
 ---扭蛋机点击一次
 EggMachine.ClickOnce = EventID:CreateEventID()
 ---扭蛋机点击一轮
 EggMachine.RoundComplete = EventID:CreateEventID()
+---扭蛋机获取了最新BUFF
+EggMachine.NewBuffStart = EventID:CreateEventID()
 --endregion  ---------------------- 扭蛋事件 ----------------------
 
 function EggMachine:__init()
-    self.ClickNum = 0
-    self.PlayState = EggMachine.ePlayState.Normal
+    local eggMachine = HotelData:GetInstance().EggMachine
+    if (eggMachine ~= nil) then
+        self.ClickNum = eggMachine.ClickNum
+        self.PlayState = eggMachine.PlayState
+        self.BuffUse = eggMachine.BuffUse
+        self.BuffStart = eggMachine.BuffStart
+    else
+        self.ClickNum = 0
+        self.PlayState = EggMachine.ePlayState.Normal
+        self.BuffUse = 0
+        self.BuffStart = nil
+    end
+    self.isShow = false
 end
 
+---获取某个数据在数组中的哪个位置
+function EggMachine:GetRandomId(mArray, randomNum)
+    local glNum = 0
+    local targetId
+    for i = 1, #mArray do
+
+        local num = mArray[i][2]
+
+        local id = mArray[i][1]
+        --print(id .. " " .. glNum + num .. "  " .. randomNum)
+        if (i == 1) then
+            if (randomNum <= num) then
+                targetId = id
+                --print("返回id  " .. id)
+                return targetId
+            end
+        elseif i == #mArray then
+            if (randomNum > mArray[i - 1][2] + glNum) then
+                targetId = id
+                --print("返回id  " .. id)
+                return targetId
+            end
+
+        else
+            if (randomNum > glNum and randomNum <= mArray[i + 1][2] + glNum) then
+
+                --print(glNum .. " 比对 " .. mArray[i + 1][2] + glNum)
+                targetId = mArray[i + 1][1]
+                --print("返回id  " .. id)
+                return targetId
+            end
+
+        end
+        glNum = glNum + num
+
+    end
+
+    return targetId
+end
 
 ---扭蛋机玩法状态
 ---@class EggMachine.ePlayState
 EggMachine.ePlayState = {
     ---普通，点三次出一个
-    Normal = 1,
+    Normal = 0,
     ---电力充足，点1次出一个
-    Enough = 2,
+    Enough = 1,
     ---双子，点6次，出2个
-    Double = 3,
+    Double = 2,
     ---捣蛋小精灵，点6次，出4个
-    Spirit = 4,
+    Spirit = 3,
     --- 骇客入侵,点6次，出8个扭蛋
-    Intrusion = 5
+    Intrusion = 4
 }
-
 
 ---@class EggMachine.eEggType
 EggMachine.eEggType = {
@@ -61,29 +119,102 @@ EggMachine.eEggType = {
     Dwarves = 5
 }
 
+function EggMachine:GetRoundClickNum()
+    self.PlayState = HotelData:GetInstance().EggMachine.PlayState
+    if self.PlayState == EggMachine.ePlayState.Normal then
+        ---普通
+        self.RoundClickNum = Config.game_config.Click_Number.paramNum
+    elseif self.PlayState == EggMachine.ePlayState.Enough then
+        self.RoundClickNum = Config.gashapon_machine_sp[self.PlayState].click_number
+    elseif self.PlayState == EggMachine.ePlayState.Double then
+        self.RoundClickNum = Config.gashapon_machine_sp[self.PlayState].click_number
+    elseif self.PlayState == EggMachine.ePlayState.Spirit then
+        self.RoundClickNum = Config.gashapon_machine_sp[self.PlayState].click_number
+    elseif self.PlayState == EggMachine.ePlayState.Intrusion then
+        self.RoundClickNum = Config.gashapon_machine_sp[self.PlayState].click_number
+    end
+    return self.RoundClickNum
+end
 function EggMachine:ClickMachine()
-    if GameDataInst.Energy == 0 then
-        Log.Debug("没有体力")
+    self.PlayState = HotelData:GetInstance().EggMachine.PlayState
+    if GameDataInst.Energy <= 0 then
+        Log.Debug("体力不足")
         UIManager:GetInstance():OpenUIDefine(UIDefine.EnergyView)
         return
     end
     --Log.Debug("点击扭蛋机")
-    if self.ClickNum == 0  then
-        self.PlayState = self:GetNextPlayState(self.PlayState)
-    end
+    --[[    if self.ClickNum == 0 then
+            self.PlayState = self:GetNextPlayState(self.PlayState)
+        end]]
 
-    if self.PlayState == EggMachine.ePlayState.Normal then
-        ---普通
-        self.RoundClickNum = 3
-    end
+    self:GetRoundClickNum()
+
     self.ClickNum = self.ClickNum + 1
-    EventInst:Broadcast(EggMachine.ClickOnce,self.ClickNum)
-
+    EventInst:Broadcast(EggMachine.ClickOnce, self.ClickNum)
+    --保存数据
+    self:SaveEggMachineData()
     if self.ClickNum >= self.RoundClickNum then
         self:CompleteRound(self.PlayState)
-        EventInst:Broadcast(EggMachine.RoundComplete,self.PlayState,self.RoundEggs)
+        EventInst:Broadcast(EggMachine.RoundComplete, self.PlayState, self.RoundEggs)
         self.ClickNum = 0
+
     end
+end
+
+---获取扭蛋机新BUFF
+function EggMachine:GetNewState()
+    local count = 0
+    local mArray = {}
+    for i, v in pairs(ConfigManager.gashapon_machine_sp) do
+        local weight = v.weight
+        count = count + weight
+    end
+
+    for i, v in pairs(ConfigManager.gashapon_machine_sp) do
+        local id = v.id
+        local weight = v.weight
+        local gl = Mathf.Round(weight * 100 / count, 0)
+        table.insert(mArray, { id, gl })
+    end
+    table.sort(mArray, function(a, b)
+        local c = a[2]
+        local d = b[2]
+        return c < d
+    end)
+
+    local randomNum = Mathf.Random(1, count)
+    local stateId = self:GetRandomId(mArray, randomNum)
+    if (stateId == nil) then
+        print("获取扭蛋机随机BUFF异常")
+        return
+    end
+    --self.PlayState = stateId
+    self.BuffStart = stateId
+    --print("获得了BUFF: " .. stateId)
+    self:SaveEggMachineData()
+    --[[
+        ---扭蛋机获取了最新BUFF
+        EventInst:Broadcast(EggMachine.NewBuffStart)
+        --print(stateId .. "  " .. randomNum)]]
+end
+
+--检查是否有新BUFF
+function EggMachine:CheckPlayState()
+    self.BuffStart = HotelData:GetInstance().EggMachine.BuffStart
+    if (self.BuffStart == nil) then
+        return
+    end
+    --print("激活BUFF:  " .. self.BuffStart)
+--[[    if (self.PlayState ~= nil or self.PlayState ~= EggMachine.ePlayState.Normal) then
+        return
+    end]]
+
+    self.PlayState = self.BuffStart
+    self.BuffStart = nil
+    self:SaveEggMachineData()
+    ---扭蛋机获取了最新BUFF
+    EventInst:Broadcast(EggMachine.NewBuffStart)
+    --print(stateId .. "  " .. randomNum)
 end
 
 ---获取当前进度
@@ -105,19 +236,92 @@ end
 
 ---完成轮次产生扭蛋
 function EggMachine:CompleteRound(playState)
-    local eggCount = 0
-    local eggs = {}
-    if playState == EggMachine.ePlayState.Normal then
+    local eggCount
+    if (playState == EggMachine.ePlayState.Normal) then
         eggCount = 1
-        for i = 1, eggCount do
-            ---@type EggMachine.EggInfo
-            local eggInfo = {
-                type = EggMachine.eEggType.Normal
-            }
-            eggs[i] = eggInfo
-        end
+    else
+        eggCount = Config.gashapon_machine_sp[playState].egg_number
     end
+
+    local eggs = {}
+    --if playState == EggMachine.ePlayState.Normal then
+    for i = 1, eggCount do
+        local eggid = self:GetRoundEggId()--获取随机蛋id
+
+        local rolePreFab = self:GerRolePreFaByEggId(eggid)
+
+        ---@type EggMachine.EggInfo
+        local eggInfo = {
+            type = EggMachine.eEggType.Normal,
+            ResName = rolePreFab,
+            EggId = eggid
+        }
+        eggs[i] = eggInfo
+    end
+    --end
     self.RoundEggs = eggs
+end
+function EggMachine:GerRolePreFaByEggId(eggId)
+    local idArray = Config.gashapon_machine_config[eggId].egg_content
+    local wightAray = Config.gashapon_machine_config[eggId].content_wight
+    local count = 0
+    local mArray = {}
+    for i, v in pairs(wightAray) do
+        local weight = v
+        count = count + weight
+    end
+    for i, v in pairs(idArray) do
+        local id = v
+        local weight = wightAray[i]
+        local gl = Mathf.Round(weight * 100 / count, 0)
+        table.insert(mArray, { id, gl })
+    end
+
+    table.sort(mArray, function(a, b)
+        local c = a[2]
+        local d = b[2]
+        return c < d
+    end)
+    local randomNum = Mathf.Random(1, count)
+    local roleId = self:GetRandomId(mArray, randomNum)
+
+    local rolePreFabName = Config.customer_config[roleId].model
+    return rolePreFabName
+
+end
+function EggMachine:GetRoundEggId()
+    local count = 0
+    local mArray = {}
+    for i, v in pairs(ConfigManager.gashapon_machine_config) do
+        local weight = v.egg_wight
+        count = count + weight
+    end
+
+    for i, v in pairs(ConfigManager.gashapon_machine_config) do
+        local id = v.id
+        local weight = v.egg_wight
+        local gl = Mathf.Round(weight * 100 / count, 0)
+        table.insert(mArray, { id, gl })
+
+    end
+    table.sort(mArray, function(a, b)
+        local c = a[2]
+        local d = b[2]
+        return c < d
+    end)
+    local randomNum = Mathf.Random(1, count)
+    local eggId = self:GetRandomId(mArray, randomNum)
+    return eggId
+end
+
+function EggMachine:SaveEggMachineData()
+
+    HotelData:GetInstance().EggMachine.ClickNum = self.ClickNum
+    HotelData:GetInstance().EggMachine.PlayState = self.PlayState
+    HotelData:GetInstance().EggMachine.RoundEggs = self.RoundEggs
+    HotelData:GetInstance().EggMachine.BuffUse = self.BuffUse
+    HotelData:GetInstance().EggMachine.BuffStart = self.BuffStart
+    HotelData:GetInstance():SaveLocalData()
 end
 
 return EggMachine

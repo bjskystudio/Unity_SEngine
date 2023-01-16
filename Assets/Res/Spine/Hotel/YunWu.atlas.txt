@@ -1,55 +1,83 @@
 
 YunWu.png
-size: 1024,1024
+size: 1024,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-w1
-  rotate: false
-  xy: 2, 555
-  size: 735, 87
-  orig: 735, 87
-  offset: 0, 0
-  index: -1
-w2
+wu_l1
   rotate: true
-  xy: 696, 173
-  size: 236, 265
-  orig: 236, 265
+  xy: 283, 285
+  size: 223, 129
+  orig: 223, 129
   offset: 0, 0
   index: -1
-w3
+wu_l2
+  rotate: false
+  xy: 111, 40
+  size: 270, 149
+  orig: 270, 149
+  offset: 0, 0
+  index: -1
+wu_r1
   rotate: true
-  xy: 739, 411
-  size: 231, 255
-  orig: 231, 255
+  xy: 414, 285
+  size: 223, 127
+  orig: 223, 127
   offset: 0, 0
   index: -1
-y1
-  rotate: false
-  xy: 322, 278
-  size: 372, 185
-  orig: 372, 185
+wu_r2
+  rotate: true
+  xy: 133, 238
+  size: 270, 148
+  orig: 270, 148
   offset: 0, 0
   index: -1
-y2
+yun_1
   rotate: false
-  xy: 2, 309
-  size: 318, 154
-  orig: 318, 154
+  xy: 111, 2
+  size: 114, 36
+  orig: 114, 36
   offset: 0, 0
   index: -1
-y3
+yun_2
   rotate: false
-  xy: 2, 465
-  size: 577, 88
-  orig: 577, 88
+  xy: 2, 5
+  size: 42, 14
+  orig: 42, 14
   offset: 0, 0
   index: -1
-y4
+yun_3
+  rotate: true
+  xy: 383, 7
+  size: 192, 72
+  orig: 192, 72
+  offset: 0, 0
+  index: -1
+yun_4
+  rotate: true
+  xy: 2, 191
+  size: 317, 129
+  orig: 317, 129
+  offset: 0, 0
+  index: -1
+yun_5
+  rotate: true
+  xy: 72, 37
+  size: 152, 37
+  orig: 152, 37
+  offset: 0, 0
+  index: -1
+yun_6
   rotate: false
-  xy: 2, 2
-  size: 398, 274
-  orig: 398, 274
+  xy: 283, 201
+  size: 216, 82
+  orig: 216, 82
+  offset: 0, 0
+  index: -1
+yun_7
+  rotate: true
+  xy: 2, 21
+  size: 168, 68
+  orig: 168, 68
   offset: 0, 0
   index: -1

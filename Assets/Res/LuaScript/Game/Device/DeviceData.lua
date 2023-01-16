@@ -362,7 +362,14 @@ DeviceData.ConditionData = {
 --使用家具
 ---@param furnitureId number 更换的家具id
 function DeviceData:ChangeUseFurniture(furnitureId)
+    local houseId = self:GetHouseId(furnitureId)
+    local field = self:GetFieldId(furnitureId)
+    self:SaveUsingFurniture(houseId, field, furnitureId)
+    GameDataInst:RefreshPopular()
     EventInst:Broadcast(GameEvent.ChangeFurnitureEvent, furnitureId)
+    local field = DeviceData:GetInstance():GetFieldId(furnitureId)
+    --记录定位某个栏位
+    DeviceData:GetInstance().JumpFieldId = field
 end
 
 --运输完成
@@ -515,6 +522,8 @@ function DeviceData:UpGradeField(field)
             return
         end
     end
+    --记录定位某个栏位
+    DeviceData:GetInstance().JumpFieldId = field
 end
 --endregion
 
@@ -614,8 +623,6 @@ function DeviceData:UpGradeFurniture(type, id)
         self.HouseData[houseId] = data
         self.HouseData[houseId][field].OnThewayFiledIds[furnitureId] = nil
 
-        --立即完成事件
-        EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, id)
 
 
         --删除在运输的家具 加入到已解锁列表中
@@ -630,7 +637,15 @@ function DeviceData:UpGradeFurniture(type, id)
     self:FurnitureCalculation(type, id)
 
     --直接朝向场景中家具位置
-    EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, id)
+    EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, id, function()
+        if (type ~= DeviceData.UnlockType.Normal) then
+            --立即完成事件
+            EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, id)
+        end
+    end)
+
+    --记录定位某个栏位
+    DeviceData:GetInstance().JumpFieldId = field
 end
 
 --计算扣除解锁家具货币
@@ -813,7 +828,7 @@ end
 function DeviceData:UpGradeFurnitureByAddDiamond(id, costNum)
     local houseId = self:GetHouseId(id)
     local field = self:GetFieldId(id)
-    self:AddFurnitureFinsh(houseId, field, id)
+
     --删除在运输的家具 加入到已解锁列表中
     --self:DeleteFurnitureOnTheWay(houseId, field, id)
     --EventInst:Broadcast(GameEvent.UpGradeFurnitureEvent, id, type)
@@ -825,10 +840,21 @@ function DeviceData:UpGradeFurnitureByAddDiamond(id, costNum)
     GameDataInst:ChangePlayerProp(self.UnlockType.Quick, -costNum)
 
 
-    --直接朝向场景中家具位置
-    EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, id)
-    --立即完成事件
-    EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, id)
+    --[[    --直接朝向场景中家具位置
+        EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, id)
+        --立即完成事件
+        EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, id)]]
+
+    EventInst:Broadcast(GameEvent.RoomFurnitureLookAt, id, function()
+        --if (type ~= DeviceData.UnlockType.Normal) then
+        --立即完成事件
+        self:AddFurnitureFinsh(houseId, field, id)
+        EventInst:Broadcast(GameEvent.UnlockFurnitureImmediately, id)
+        --end
+    end)
+
+    --记录定位某个栏位
+    DeviceData:GetInstance().JumpFieldId = field
 end
 
 --花费时间直接解锁
@@ -867,6 +893,10 @@ function DeviceData:UpGradeFurnitureByTime(furnitureId, leastTime)
 
     GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.SpeedTime, -leastTime)
     EventInst:Broadcast(GameEvent.FurnitureUnlockByTimeEvent, furnitureId, isOver)
+
+
+    --记录定位某个栏位
+    DeviceData:GetInstance().JumpFieldId = field
 end
 
 --移除正在运输的家具

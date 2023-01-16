@@ -1,4 +1,5 @@
-﻿using SEngine;
+﻿using Game.Network;
+using SEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -94,8 +95,10 @@ public class XLuaManager : MonoSingleton<XLuaManager>
             {
                 for (int i = 0; i < list.Count; i++)
                 {
+                    Debug.Log("添加AB脚本：" + list[i].name);
                     LuaScriptsBytesCaching.Add(list[i].name, list[i].bytes);
                 }
+                Debug.Log("添加AB脚本完成");
                 res.Release();
                 loadcompletedcb?.Invoke();
             }, false);
@@ -130,17 +133,15 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         LuaPBBytesCaching.Clear();
         if (Launcher.Instance.UsedAssetBundle && Launcher.Instance.UsedLuaAssetBundle)
         {
-
-            loadcompletedcb?.Invoke();
-            //ResLoadManager.Instance.LoadABTextAll("pbdata/pbdata_bundle", (list, res) =>
-            //{
-            //    for (int i = 0; i < list.Count; i++)
-            //    {
-            //        LuaPBBytesCaching.Add(list[i].name, list[i].bytes);
-            //    }
-            //    res.Release();
-            //    loadcompletedcb?.Invoke();
-            //}, false);
+            ResLoadManager.Instance.LoadABTextAll("pbdata/pbdata_bundle", (list, res) =>
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    LuaPBBytesCaching.Add(list[i].name, list[i].bytes);
+                }
+                res.Release();
+                loadcompletedcb?.Invoke();
+            }, false);
         }
         else
         {
@@ -181,8 +182,7 @@ public class XLuaManager : MonoSingleton<XLuaManager>
         }
         Debug.Log($"初始化Lua环境!");
         luaEnv = new LuaEnv();
-        // buf 先注掉
-        //luaEnv.AddBuildin("pb", XLua.LuaDLL.Lua.LoadLuaProfobuf);
+        luaEnv.AddBuildin("pb", XLua.LuaDLL.Lua.LoadLuaProfobuf);
         HasGameStart = false;
         if (luaEnv != null)
         {
@@ -204,6 +204,43 @@ public class XLuaManager : MonoSingleton<XLuaManager>
             luaUpdater = gameObject.AddComponent<LuaUpdater>();
         }
         luaUpdater.OnInit(luaEnv);
+    }
+
+    private LuaTable NetMessageScript = null;
+    public void DispatchNetMessage(int cmd, byte[] cacheBuff, int len)
+    {
+        if (null == luaEnv
+        )
+        {
+            return;
+        }
+        if(NetMessageScript == null)
+        {
+            string luaScript = @"
+            local NetManager = require(""NetManager"")
+
+-- - Net静态工具
+local NetUtil = { }
+
+
+function NetUtil.OnRecvMessage(iCmd, bytes)
+    NetManager: GetInstance():OnRecvMessage(iCmd, bytes)
+end
+
+return NetUtil";
+
+            byte[] bytes = System.Text.Encoding.Default.GetBytes(luaScript);
+            NetMessageScript = ExecuteScript(bytes) as LuaTable;
+        }
+        if (null == NetMessageScript)
+        {
+            return;
+        }
+
+        var retFunc = NetMessageScript.Get<LuaFunction>("OnRecvMessage");
+
+        retFunc?.CallSpecial(cmd, cacheBuff, len);
+
     }
 
     /// <summary>

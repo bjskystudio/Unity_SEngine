@@ -3,6 +3,7 @@
 ---@class SEngine.Map.MapService : SEngine.MonoSingleton
 ---@field public DoorPathPosList System.Collections.Generic.List
 ---@field public mapId int32
+---@field public Line System.Boolean
 ---@field static UnUseCellPos UnityEngine.Vector3Int
 ---@field static UnUsePos UnityEngine.Vector3
 local MapService = {}
@@ -56,6 +57,10 @@ function MapService:GetTile(tileMapType,physic) end
 ---@param mapid int32
 ---@return SEngine.Map.Enum.EnTileMapType
 function MapService:GetTileMap(mapid) end
+
+---@param tileMapType SEngine.Map.Enum.EnTileMapType
+---@return int32
+function MapService:GetTileMap(tileMapType) end
 
 ---@param pos UnityEngine.Vector3Int
 ---@param tileMapType SEngine.Map.Enum.EnTileMapType
@@ -119,6 +124,26 @@ function MapService:GetTilePhyFlag(pos,tileMapType) end
 ---@param canMove System.Boolean
 ---@param tileMapType SEngine.Map.Enum.EnTileMapType
 function MapService:SetCellCanMove(pos,canMove,tileMapType) end
+
+---@param pos UnityEngine.Vector3
+---@param canMove System.Boolean
+---@param tileMapType SEngine.Map.Enum.EnTileMapType
+function MapService:SetCellCanStand(pos,canMove,tileMapType) end
+
+---@param pos UnityEngine.Vector3
+---@param canMove System.Boolean
+---@param tileMapType SEngine.Map.Enum.EnTileMapType
+function MapService:SetCellCanQueue(pos,canMove,tileMapType) end
+
+---@param pos UnityEngine.Vector3
+---@param canMove System.Boolean
+---@param tileMapType SEngine.Map.Enum.EnTileMapType
+function MapService:SetCellCanInteract(pos,canMove,tileMapType) end
+
+---@param pos UnityEngine.Vector3
+---@param canMove System.Boolean
+---@param tileMapType SEngine.Map.Enum.EnTileMapType
+function MapService:SetCellCanCoinPos(pos,canMove,tileMapType) end
 
 function MapService:RestPhyPoints() end
 
@@ -195,6 +220,26 @@ function MapService:GetPath(mapId,startPos,endPos,isIgnoreCorner) end
 ---@param pos UnityEngine.Vector2
 ---@param size UnityEngine.Vector2
 function MapService:SetCanMovePoint(mapid,pos,size) end
+
+---@param mapid int32
+---@param pos UnityEngine.Vector2
+---@param size UnityEngine.Vector2
+function MapService:SetCanStand(mapid,pos,size) end
+
+---@param mapid int32
+---@param pos UnityEngine.Vector2
+---@param size UnityEngine.Vector2
+function MapService:SetCanQueue(mapid,pos,size) end
+
+---@param mapid int32
+---@param pos UnityEngine.Vector2
+---@param size UnityEngine.Vector2
+function MapService:SetCanInteract(mapid,pos,size) end
+
+---@param mapid int32
+---@param pos UnityEngine.Vector2
+---@param size UnityEngine.Vector2
+function MapService:SetCanCoinPos(mapid,pos,size) end
 
 ---@param mapId int32
 ---@param pos UnityEngine.Vector3

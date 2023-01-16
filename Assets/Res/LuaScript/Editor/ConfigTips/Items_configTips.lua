@@ -1,4 +1,4 @@
----@class Items_Item
+---@class items_Item
 ---@field public id number @ID
 ---@field public desc string @说明
 ---@field public name string @名称文本

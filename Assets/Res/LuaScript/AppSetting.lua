@@ -7,6 +7,7 @@
 ---@class AppSetting 系统设置
 ---@field UsedAssetBundle boolean 是否使用AssetBundle
 ---@field UsedLuaAssetBundle boolean 是否使用UsedLuaAssetBundle
+---@field ServerConfig ServerConfig
 local AppSetting = {}
 
 AppSetting.LogLevel = CS.System.Convert.ToInt32(CS.Launcher.Instance.mLogLevel)
@@ -15,9 +16,13 @@ AppSetting.UsedAssetBundle = CS.Launcher.Instance.UsedAssetBundle
 
 AppSetting.UsedLuaAssetBundle = CS.Launcher.Instance.UsedLuaAssetBundle
 
-AppSetting.TileMapEnable = CS.Launcher.Instance.TileMapEnable
+AppSetting.RunOffline = CS.Launcher.Instance.RunOffline
+
+AppSetting.TileMapEnable = false--CS.Launcher.Instance.TileMapEnable
 
 AppSetting.IsEditor = CS.Launcher.Instance:IsEditor()
+
+AppSetting.ServerConfig = CS.Launcher.Instance.ServerConf
 
 ---@type AppSetting
 _G.AppSetting = AppSetting

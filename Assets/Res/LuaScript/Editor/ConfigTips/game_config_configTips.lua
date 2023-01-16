@@ -8,6 +8,7 @@
 
 
 ---@class game_config
+---@field public Initial_resources  game_config_Item
 ---@field public Res_GoldAutoRaise  game_config_Item
 ---@field public Res_GoldStart  game_config_Item
 ---@field public Res_DiamondStart  game_config_Item

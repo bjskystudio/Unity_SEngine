@@ -26,37 +26,41 @@ function FurnitureFlyViewItem:InitData(str, iconName, time, func)
     -- trans:SetLocalScaleXYZ(0.5)
     --trans.localScale.x = 0.5
     --trans.localScale.y = 0.5
-    self.Timer = TimerInst:GetTimerStartImme(0.1, self.OnTimer, self)
-    self.Time = time
+    self.Time = time * 0.25
+    self.Timer = TimerInst:GetTimerStart(self.Time, self.OnTimer, self)
     self.func = func
-
-    self.startCount = true
+    --self.startCount = true
 end
 function FurnitureFlyViewItem:OnTimer()
-    if (self.startCount) then
-        if (self.Time > 0) then
-            self.Time = self.Time - 0.25
-        end
+    if not self.start then
+        self.start = true
+        self.gameObject:SetActive(true)
+        ---@type UnityEngine.Transform
+        local trans = self.transform
+        trans:DOLocalMoveY(trans.position.y + 100, 1):OnComplete(function()
+            --self.startCount = false
+            self.start = false
+            TimerInst:StopAndClearTimer(self.Timer)
+            --self.transform.gameObject:SetActive(false)
+            self.func()
+        end)
 
-        if (self.start) then
-
-            self.gameObject:SetActive(true)
-            ---@type UnityEngine.Transform
-            local trans = self.transform
-            trans:DOLocalMoveY(trans.position.y + 80, 1):OnComplete(function()
-                self.startCount = false
-                self.start = false
-                TimerInst:StopAndClearTimer(self.Timer)
-                self.transform.gameObject:SetActive(false)
-                --self:DestoryComponentGameObj(self.transform.gameObject)
-                self.func()
-            end)
-        else
-            if (self.Time <= 0) then
-                self.start = true
-            end
-        end
     end
+    --
+    --if (self.startCount) then
+    --    if (self.Time > 0) then
+    --        self.Time = self.Time - 0.25
+    --    end
+    --
+    --    if (self.start) then
+    --
+    --
+    --    else
+    --        if (self.Time <= 0) then
+    --            self.start = true
+    --        end
+    --    end
+    --end
 
 
 end
@@ -95,6 +99,7 @@ function FurnitureFlyViewItem:OnDestroy()
     --FurnitureFlyViewItem.ParentCls.OnDestroy(self)
     self.start = false
     TimerInst:StopAndClearTimer(self.Timer)
+    self.gameObject:DestroyGameObj()
 end
 
 return FurnitureFlyViewItem

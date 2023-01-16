@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(SEngine.Map.MapService);
-			Utils.BeginObjectRegister(type, L, translator, 0, 43, 2, 2);
+			Utils.BeginObjectRegister(type, L, translator, 0, 51, 3, 3);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetMapBounds", _m_GetMapBounds);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetPutAreaBounds", _m_GetPutAreaBounds);
@@ -47,6 +47,10 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetTileByCellPos", _m_GetTileByCellPos);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetTilePhyFlag", _m_GetTilePhyFlag);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanMove", _m_SetCellCanMove);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanStand", _m_SetCellCanStand);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanQueue", _m_SetCellCanQueue);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanInteract", _m_SetCellCanInteract);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanCoinPos", _m_SetCellCanCoinPos);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "RestPhyPoints", _m_RestPhyPoints);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCellCanUse", _m_SetCellCanUse);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "WorldPosToCellPos", _m_WorldPosToCellPos);
@@ -63,6 +67,10 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "InitPath", _m_InitPath);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetPath", _m_GetPath);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCanMovePoint", _m_SetCanMovePoint);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCanStand", _m_SetCanStand);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCanQueue", _m_SetCanQueue);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCanInteract", _m_SetCanInteract);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetCanCoinPos", _m_SetCanCoinPos);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetPutAreaBounds", _m_SetPutAreaBounds);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "WallObjectFindMovePos", _m_WallObjectFindMovePos);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "WallWorldPosToFloorCellPos", _m_WallWorldPosToFloorCellPos);
@@ -70,9 +78,11 @@ namespace XLua.CSObjectWrap
 			
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "DoorPathPosList", _g_get_DoorPathPosList);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "mapId", _g_get_mapId);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "Line", _g_get_Line);
             
 			Utils.RegisterFunc(L, Utils.SETTER_IDX, "DoorPathPosList", _s_set_DoorPathPosList);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "mapId", _s_set_mapId);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "Line", _s_set_Line);
             
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
@@ -510,7 +520,9 @@ namespace XLua.CSObjectWrap
                 SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
             
             
-                
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 2&& LuaTypes.LUA_TNUMBER == LuaAPI.lua_type(L, 2)) 
                 {
                     int _mapid = LuaAPI.xlua_tointeger(L, 2);
                     
@@ -521,10 +533,23 @@ namespace XLua.CSObjectWrap
                     
                     return 1;
                 }
+                if(gen_param_count == 2&& translator.Assignable<SEngine.Map.Enum.EnTileMapType>(L, 2)) 
+                {
+                    SEngine.Map.Enum.EnTileMapType _tileMapType;translator.Get(L, 2, out _tileMapType);
+                    
+                        var gen_ret = gen_to_be_invoked.GetTileMap( _tileMapType );
+                        LuaAPI.xlua_pushinteger(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
                 
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.GetTileMap!");
             
         }
         
@@ -1080,6 +1105,186 @@ namespace XLua.CSObjectWrap
             }
             
             return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.SetCellCanMove!");
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCellCanStand(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 4&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)&& translator.Assignable<SEngine.Map.Enum.EnTileMapType>(L, 4)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    SEngine.Map.Enum.EnTileMapType _tileMapType;translator.Get(L, 4, out _tileMapType);
+                    
+                    gen_to_be_invoked.SetCellCanStand( _pos, _canMove, _tileMapType );
+                    
+                    
+                    
+                    return 0;
+                }
+                if(gen_param_count == 3&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    
+                    gen_to_be_invoked.SetCellCanStand( _pos, _canMove );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.SetCellCanStand!");
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCellCanQueue(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 4&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)&& translator.Assignable<SEngine.Map.Enum.EnTileMapType>(L, 4)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    SEngine.Map.Enum.EnTileMapType _tileMapType;translator.Get(L, 4, out _tileMapType);
+                    
+                    gen_to_be_invoked.SetCellCanQueue( _pos, _canMove, _tileMapType );
+                    
+                    
+                    
+                    return 0;
+                }
+                if(gen_param_count == 3&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    
+                    gen_to_be_invoked.SetCellCanQueue( _pos, _canMove );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.SetCellCanQueue!");
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCellCanInteract(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 4&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)&& translator.Assignable<SEngine.Map.Enum.EnTileMapType>(L, 4)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    SEngine.Map.Enum.EnTileMapType _tileMapType;translator.Get(L, 4, out _tileMapType);
+                    
+                    gen_to_be_invoked.SetCellCanInteract( _pos, _canMove, _tileMapType );
+                    
+                    
+                    
+                    return 0;
+                }
+                if(gen_param_count == 3&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    
+                    gen_to_be_invoked.SetCellCanInteract( _pos, _canMove );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.SetCellCanInteract!");
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCellCanCoinPos(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+            
+                if(gen_param_count == 4&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)&& translator.Assignable<SEngine.Map.Enum.EnTileMapType>(L, 4)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    SEngine.Map.Enum.EnTileMapType _tileMapType;translator.Get(L, 4, out _tileMapType);
+                    
+                    gen_to_be_invoked.SetCellCanCoinPos( _pos, _canMove, _tileMapType );
+                    
+                    
+                    
+                    return 0;
+                }
+                if(gen_param_count == 3&& translator.Assignable<UnityEngine.Vector3>(L, 2)&& LuaTypes.LUA_TBOOLEAN == LuaAPI.lua_type(L, 3)) 
+                {
+                    UnityEngine.Vector3 _pos;translator.Get(L, 2, out _pos);
+                    bool _canMove = LuaAPI.lua_toboolean(L, 3);
+                    
+                    gen_to_be_invoked.SetCellCanCoinPos( _pos, _canMove );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+            return LuaAPI.luaL_error(L, "invalid arguments to SEngine.Map.MapService.SetCellCanCoinPos!");
             
         }
         
@@ -1742,6 +1947,126 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCanStand(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    int _mapid = LuaAPI.xlua_tointeger(L, 2);
+                    UnityEngine.Vector2 _pos;translator.Get(L, 3, out _pos);
+                    UnityEngine.Vector2 _size;translator.Get(L, 4, out _size);
+                    
+                    gen_to_be_invoked.SetCanStand( _mapid, _pos, _size );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCanQueue(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    int _mapid = LuaAPI.xlua_tointeger(L, 2);
+                    UnityEngine.Vector2 _pos;translator.Get(L, 3, out _pos);
+                    UnityEngine.Vector2 _size;translator.Get(L, 4, out _size);
+                    
+                    gen_to_be_invoked.SetCanQueue( _mapid, _pos, _size );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCanInteract(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    int _mapid = LuaAPI.xlua_tointeger(L, 2);
+                    UnityEngine.Vector2 _pos;translator.Get(L, 3, out _pos);
+                    UnityEngine.Vector2 _size;translator.Get(L, 4, out _size);
+                    
+                    gen_to_be_invoked.SetCanInteract( _mapid, _pos, _size );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetCanCoinPos(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    int _mapid = LuaAPI.xlua_tointeger(L, 2);
+                    UnityEngine.Vector2 _pos;translator.Get(L, 3, out _pos);
+                    UnityEngine.Vector2 _size;translator.Get(L, 4, out _size);
+                    
+                    gen_to_be_invoked.SetCanCoinPos( _mapid, _pos, _size );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _m_SetPutAreaBounds(RealStatePtr L)
         {
 		    try {
@@ -1884,6 +2209,20 @@ namespace XLua.CSObjectWrap
             return 1;
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_Line(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+                LuaAPI.lua_pushboolean(L, gen_to_be_invoked.Line);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -1937,6 +2276,21 @@ namespace XLua.CSObjectWrap
 			
                 SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
                 gen_to_be_invoked.mapId = LuaAPI.xlua_tointeger(L, 2);
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_Line(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                SEngine.Map.MapService gen_to_be_invoked = (SEngine.Map.MapService)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.Line = LuaAPI.lua_toboolean(L, 2);
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

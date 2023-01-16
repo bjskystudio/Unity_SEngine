@@ -21,6 +21,7 @@ local TimeUtil = require("TimeUtil")
 ---@field Ghost number 幽灵数
 ---@field SpeedTime number 加速时间
 ---@field Strength number 体力
+---@field AccountData LocalAccountData 登录账号
 local GameData = Class("GameData", Singleton)
 
 function GameData:__init()
@@ -73,6 +74,7 @@ end
 ---@field EnergyRecoveryTime number
 ---@field EnergyBuyCount number
 ---@field EnergyAdCount number
+---@field AccountData LocalAccountData
 
 
 function GameData:SaveLocalData()
@@ -86,7 +88,8 @@ function GameData:SaveLocalData()
         Energy = self.Energy,
         EnergyRecoveryTime = self.EnergyRecoveryTime,
         EnergyBuyCount = self.EnergyBuyCount,
-        EnergyAdCount = self.EnergyAdCount
+        EnergyAdCount = self.EnergyAdCount,
+        AccountData = self.AccountData
     }
     PlayerPrefsUtil.SetTable("GameLocalData", localData)
 end
@@ -104,6 +107,7 @@ function GameData:InitLocalData()
         self.EnergyRecoveryTime = localData.EnergyRecoveryTime
         self.EnergyBuyCount = localData.EnergyBuyCount
         self.EnergyAdCount = localData.EnergyAdCount
+        self.AccountData = localData.AccountData
     else
         self.Gold = Config.game_config.Res_GoldStart.paramNum
         self.Diamond = Config.game_config.Res_DiamondStart.paramNum
@@ -115,6 +119,11 @@ function GameData:InitLocalData()
         self.EnergyRecoveryTime = TimeUtil.GetSecTime()
         self.EnergyBuyCount = 1--精力购买次数默认为1
         self.EnergyAdCount = 0--当日精力广告次数
+        --本地账号信息
+        self.AccountData =  {
+            Account = "",
+            Password = "",
+        }
         ---初始化完了保存
         self:SaveLocalData()
     end
@@ -153,13 +162,13 @@ end
 ---@param type GameDefine.ePlayerProp 玩家属性类型
 function GameData:GetPlayerPropItemCfg(type)
     if type == GameDefine.ePlayerProp.Gold then
-        return Config.Items[1000001]
+        return Config.items[1000001]
     elseif type == GameDefine.ePlayerProp.Diamond then
-        return Config.Items[1000002]
+        return Config.items[1000002]
     elseif type == GameDefine.ePlayerProp.Popularity then
-        return Config.Items[1000003]
+        return Config.items[1000003]
     elseif type == GameDefine.ePlayerProp.SpeedTime then
-        return Config.Items[1000003]
+        return Config.items[1000003]
     end
     return nil
 end
@@ -304,4 +313,24 @@ function GameData:StartFlyCoin(transform, num)
 
     EventManager:GetInstance():Broadcast(GameEvent.CoinFlyEvent, transform, num)
 end
+
+---@param data HttpServerResponse
+function GameData:CheckAccount(data)
+    if data.account ~= self.AccountData.UserName then
+        ---新号保存本地
+        self.AccountData.UserId = data.user_id
+        self.AccountData.Account = data.account
+        self.AccountData.Password = data.password
+        self.AccountData.Token = data.token
+        self:SaveLocalData()
+    end
+end
+
 return GameData
+
+
+---@class LocalAccountData
+---@field UserId string
+---@field Account string
+---@field Password string
+---@field Token string

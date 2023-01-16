@@ -1,0 +1,146 @@
+
+bianfu.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+b01biyan
+  rotate: false
+  xy: 75, 377
+  size: 70, 13
+  orig: 70, 13
+  offset: 0, 0
+  index: -1
+b01bizi
+  rotate: false
+  xy: 147, 376
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+b01lian
+  rotate: true
+  xy: 2, 43
+  size: 124, 155
+  orig: 127, 155
+  offset: 0, 0
+  index: -1
+b01maofa
+  rotate: false
+  xy: 399, 338
+  size: 59, 52
+  orig: 59, 52
+  offset: 0, 0
+  index: -1
+b01shenti
+  rotate: true
+  xy: 210, 289
+  size: 74, 97
+  orig: 75, 97
+  offset: 1, 0
+  index: -1
+b01youci
+  rotate: false
+  xy: 329, 2
+  size: 168, 135
+  orig: 168, 135
+  offset: 0, 0
+  index: -1
+b01youyan
+  rotate: true
+  xy: 182, 367
+  size: 23, 36
+  orig: 23, 36
+  offset: 0, 0
+  index: -1
+b01zuoci
+  rotate: false
+  xy: 2, 169
+  size: 168, 121
+  orig: 168, 121
+  offset: 0, 0
+  index: -1
+b01zuoer
+  rotate: true
+  xy: 2, 306
+  size: 69, 102
+  orig: 69, 102
+  offset: 0, 0
+  index: -1
+b01zuoyan
+  rotate: true
+  xy: 220, 366
+  size: 24, 35
+  orig: 24, 35
+  offset: 0, 0
+  index: -1
+w01biyan
+  rotate: false
+  xy: 2, 378
+  size: 71, 12
+  orig: 71, 12
+  offset: 0, 0
+  index: -1
+w01bizi
+  rotate: false
+  xy: 163, 375
+  size: 17, 15
+  orig: 17, 15
+  offset: 0, 0
+  index: -1
+w01lian
+  rotate: true
+  xy: 172, 139
+  size: 121, 156
+  orig: 121, 156
+  offset: 0, 0
+  index: -1
+w01maofa
+  rotate: false
+  xy: 331, 339
+  size: 66, 51
+  orig: 66, 51
+  offset: 0, 0
+  index: -1
+w01shenti
+  rotate: true
+  xy: 309, 262
+  size: 74, 105
+  orig: 76, 105
+  offset: 0, 0
+  index: -1
+w01youci
+  rotate: false
+  xy: 330, 139
+  size: 174, 121
+  orig: 174, 121
+  offset: 0, 0
+  index: -1
+w01youer
+  rotate: true
+  xy: 106, 292
+  size: 73, 102
+  orig: 73, 102
+  offset: 0, 0
+  index: -1
+w01youyan
+  rotate: true
+  xy: 257, 366
+  size: 24, 34
+  orig: 24, 34
+  offset: 0, 0
+  index: -1
+w01zuoci
+  rotate: false
+  xy: 159, 4
+  size: 168, 133
+  orig: 168, 133
+  offset: 0, 0
+  index: -1
+w01zuoyan
+  rotate: true
+  xy: 293, 365
+  size: 25, 36
+  orig: 25, 36
+  offset: 0, 0
+  index: -1

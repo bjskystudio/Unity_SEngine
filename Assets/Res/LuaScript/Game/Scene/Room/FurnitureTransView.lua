@@ -16,19 +16,20 @@ local EventInst = require("EventManager"):GetInstance()
 local LoungeSceneView = require("LoungeSceneView")
 local TimerInst = require("TimerManager"):GetInstance()
 local DeviceDataInst = require("DeviceData"):GetInstance()
+local ResLoadManager = require("ResLoadManager")
 
----@class eEffectType 特效类型
-local eEffectType = {
-    Normal = 1,
-    Wall = 2,
-    Floor = 3
-}
 
 ---@class FurnitureTransView : UIComBase 窗口
 ---@field private go_table FurnitureTransView_GoTable GoTable
 ---@field private ParentCls UIBase 父窗口类
 local FurnitureTransView = Class("FurnitureTransView", UIComBase)
 
+---@class FurnitureTransView.eEffectType 特效类型
+FurnitureTransView.eEffectType = {
+    Normal = 1,
+    Wall = 2,
+    Floor = 3
+}
 ---添加Events监听事件
 function FurnitureTransView:Awake()
     self.FloorEffectPlaying = false
@@ -57,7 +58,7 @@ function FurnitureTransView:ShowStateView()
     self.go_table.sbtn_unlock.gameObject:SetActive(self.State == LoungeSceneView.FurnitureNodeState.TransFinish)
     ---运输特效
     if self.State == LoungeSceneView.FurnitureNodeState.TransPort then
-        if self.EffectType == eEffectType.Normal then
+        if self.EffectType == FurnitureTransView.eEffectType.Normal then
             local fxPath = GameDefine.eResPath.EffectPath .. "Fx_Prefab/Fx_Glow_Equipment"
             self:LoadParticle(fxPath, self.go_table.obj_effect, handler(self, self.OnLoadResCompleted))
         else
@@ -82,7 +83,7 @@ function FurnitureTransView:ShowTransFinish()
     if self.EffectTransGo ~= nil then
         self.EffectTransGo:DestroyGameObj()
     end
-    if self.EffectType ~= eEffectType.Normal then
+    if self.EffectType ~= FurnitureTransView.eEffectType.Normal then
         ---墙和地板
         ---@type LoungeSceneView
         local loungeScene = self.OwnerUI
@@ -95,26 +96,34 @@ function FurnitureTransView:PlayFinishEffect()
 
 
     EventInst:Broadcast(GameEvent.RoomFurnitureFinishTransport, self.FurnitureId)
-    if self.EffectType == eEffectType.Normal then
-        ---播放属性预制
-        self.OwnerUI:ShowShuXingUi(self.FurnitureId)
+    if self.EffectType == FurnitureTransView.eEffectType.Normal then
         EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
         self:LoadFinishParticle()
-    elseif self.EffectType == eEffectType.Wall then
+    elseif self.EffectType == FurnitureTransView.eEffectType.Wall then
         self.go_table.obj_spine:SetActive(true)
         --位置
         if #self.EffectPoses > 0 then
             self.go_table.obj_spine.transform.localPosition = Vector3.New(self.EffectPoses[1][1], self.EffectPoses[1][2], 0)
         end
-        ---@type SEngine.UI.UISpine
-        local spine = self.go_table.obj_spine:GetComponent(typeof(CS.SEngine.UI.UISpine))
-        spine:PlayAnim("idle", false, function()
-            EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
-            self.OwnerUI:RemoveTransView(self.FurnitureId)
+        local furnitureConfig = Config.furniture_level[self.FurnitureId]
+        local spinePath = "UI/Room/LoungeWall/"..furnitureConfig.art
+        ResLoadManager:GetInstance():LoadObj(spinePath, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table.obj_spine.transform)
+                go:ResetPRS()
+                local spine = go:GetComponentInChildren(typeof(CS.SEngine.UI.UISpine))
+                spine:PlayAnim("idle", false, function()
+                    EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
+                    TimerInst:GetTimerStart(0.1,function()
+                        self.OwnerUI:RemoveTransView(self.FurnitureId)
+                    end,self,true)
+                end)
+            else
+                EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
+                self.OwnerUI:RemoveTransView(self.FurnitureId)
+            end
         end)
-    elseif self.EffectType == eEffectType.Floor then
-        ---播放属性预制
-        self.OwnerUI:ShowShuXingUi(self.FurnitureId)
+    elseif self.EffectType == FurnitureTransView.eEffectType.Floor then
         self.FloorEffectPoses = {}
         for i = 1, #self.EffectPoses do
             table.insert(self.FloorEffectPoses, Vector3.New(self.EffectPoses[i][1], self.EffectPoses[i][2], 0))
@@ -128,16 +137,19 @@ function FurnitureTransView:PlayFinishEffect()
 end
 
 ---连续播放地板特效
+---
 function FurnitureTransView:OnFloorEffectTimer()
     if #self.FloorEffectPoses > 0 then
         self.CurFloorEffectPos = table.remove(self.FloorEffectPoses, 1)
         self:LoadFinishParticle()
     else
         TimerInst:StopAndClearTimer(self.FloorEffectTimer)
+        ---最后一次替换
+        EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
+        self.OwnerUI:ShowFurnitureImage(self.FurnitureId, false)
+
         self.ParticleDestroyTimer = TimerInst:GetTimerStart(5, function()
             self.FloorEffectPlaying = false
-            --EventInst:Broadcast(GameEvent.RoomFurnitureEffectFinish, self.FurnitureId)
-            self.OwnerUI:ShowFurnitureImage(self.FurnitureId, false)
             self.OwnerUI:RemoveTransView(self.FurnitureId)
         end, self, true)
     end

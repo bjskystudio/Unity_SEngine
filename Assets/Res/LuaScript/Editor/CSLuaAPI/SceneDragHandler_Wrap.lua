@@ -6,6 +6,7 @@
 ---@field static luaOnBeginDrag SceneDragHandler.LuaBeginDragAction
 ---@field static luaOnDrag SceneDragHandler.LuaDragAction
 ---@field static luaOnEndDrag SceneDragHandler.LuaEndDragAction
+---@field static luaOnZoom SceneDragHandler.LuaZoomAction
 local SceneDragHandler = {}
 
 ---@param eventData UnityEngine.EventSystems.PointerEventData

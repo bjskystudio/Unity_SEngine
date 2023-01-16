@@ -60,27 +60,29 @@
     <Compile Include="Assets\Script\SEngine\AssetBundle\Editor\AssetBundleEditor.cs" />
     <Compile Include="Assets\Script\Game\Launcher\Editor\GameStart.cs" />
     <Compile Include="Assets\SuperScrollView\Editor\LoopGridViewEditor.cs" />
+    <Compile Include="Assets\Script\Game\Network\Editor\ServerConfigEditor.cs" />
     <Compile Include="Assets\XLua\Src\Editor\Hotfix.cs" />
     <Compile Include="Assets\Script\Game\Editor\Lua\LuaConfigEditor\LuaConfigUtils.cs" />
     <Compile Include="Assets\Script\SEngine\AssetBundle\Editor\CreateLink.cs" />
     <Compile Include="Assets\Script\SEngine\LuaBind\Editor\UIGoTableEditor.cs" />
-    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\GenConfig.cs" />
     <Compile Include="Assets\Script\SEngine\ResLoad\Editor\ResLoadConfigEditor.cs" />
     <Compile Include="Assets\Script\SEngine\AssetBundle\Editor\AssetBundleTool.cs" />
     <Compile Include="Assets\SuperScrollView\Editor\LoopStaggeredGridViewEditor.cs" />
     <Compile Include="Assets\XLua\Src\Editor\LinkXmlGen\LinkXmlGen.cs" />
     <Compile Include="Assets\Script\SEngine\AssetBundle\Editor\AssetBundleBuilder_SpiritHotel.cs" />
-    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\LuaToolsWindow.cs" />
+    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\FieldOrPropertyInfo.cs" />
     <Compile Include="Assets\Script\SEngine\GUI\UI\Editor\SButtonEditor.cs" />
     <Compile Include="Assets\Script\Game\Editor\Lua\LuaConfigEditor\TxtConfigEditor.cs" />
+    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\GenConfig.cs" />
     <Compile Include="Assets\XLua\Src\Editor\TemplateRef.cs" />
     <Compile Include="Assets\SuperScrollView\Editor\LoopListViewEditor2.cs" />
     <Compile Include="Assets\XLua\Editor\ExampleConfig.cs" />
     <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\GenerateLuaApi.cs" />
     <Compile Include="Assets\XLua\Src\Editor\Generator.cs" />
+    <Compile Include="Assets\XLua\Src\Editor\LuaImporter.cs" />
     <Compile Include="Assets\Script\SEngine\GUI\UI\Editor\SScrollRectEditor.cs" />
-    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\FieldOrPropertyInfo.cs" />
     <Compile Include="Assets\Script\SEngine\AssetBundle\Editor\AssetBundleBuilder.cs" />
+    <Compile Include="Assets\Script\Game\Editor\Lua\GenerateLuaApi\LuaToolsWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\XLua\Src\Editor\Template\LuaInterfaceBridge.tpl.txt" />
@@ -346,6 +348,9 @@
     </Reference>
     <Reference Include="DemiLib">
       <HintPath>Assets\Plugins\Demigiant\DemiLib\Core\DemiLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>Assets\Plugins\protobuf\Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@1.17.2\Lib\Editor\PlasticSCM\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
@@ -841,6 +846,10 @@
     <ProjectReference Include="spine-unity.csproj">
       <Project>{25E180CD-56E4-7920-D1FF-72B7AB3952E0}</Project>
       <Name>spine-unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="UniRx.csproj">
+      <Project>{35934E67-E2B5-D8DF-56DD-1EDDEC91DE8B}</Project>
+      <Name>UniRx</Name>
     </ProjectReference>
     <ProjectReference Include="UIEffect.csproj">
       <Project>{61239C60-81BC-6883-9677-9FA3E4C46DB0}</Project>

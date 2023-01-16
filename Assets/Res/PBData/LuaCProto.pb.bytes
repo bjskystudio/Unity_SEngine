@@ -1,0 +1,28 @@
+
+…
+LuaCProto.protoprotocol"<
+PingReq
+seq (Rseq
+client_time (R
+clientTime"]
+PingRsp
+seq (Rseq
+client_time (R
+clientTime
+server_time (R
+serverTime"P
+
+PlayerData
+uid (Ruid
+nickname (	Rnickname
+level (Rlevel"­
+	LoginInfo 
+AccountType (RAccountType
+Account (	RAccount
+Token (	RToken
+UserID (RUserID
+ServerID (RServerID
+UserName (	RUserName"A
+UserInfo5
+player_data (2.protocol.PlayerDataR
+playerDatabproto3

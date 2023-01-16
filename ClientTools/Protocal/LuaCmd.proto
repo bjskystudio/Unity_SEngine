@@ -1,0 +1,4 @@
+1#LOGIN_REQ#LoginInfo#登陆请求
+2#LOGIN_RSP#UserInfo#登录响应
+19999#PING_REQ#PingReq#ping请求
+20000#PING_RSP#PingRsp#ping响应

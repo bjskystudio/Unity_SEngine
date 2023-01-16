@@ -1,0 +1,90 @@
+
+jingling.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+1
+  rotate: false
+  xy: 220, 225
+  size: 251, 141
+  orig: 251, 141
+  offset: 0, 0
+  index: -1
+2
+  rotate: true
+  xy: 2, 99
+  size: 74, 87
+  orig: 74, 87
+  offset: 0, 0
+  index: -1
+3
+  rotate: true
+  xy: 91, 112
+  size: 61, 97
+  orig: 61, 97
+  offset: 0, 0
+  index: -1
+4
+  rotate: false
+  xy: 410, 117
+  size: 84, 106
+  orig: 92, 106
+  offset: 0, 0
+  index: -1
+5
+  rotate: true
+  xy: 190, 26
+  size: 70, 75
+  orig: 70, 75
+  offset: 0, 0
+  index: -1
+6
+  rotate: true
+  xy: 91, 52
+  size: 58, 97
+  orig: 58, 97
+  offset: 0, 0
+  index: -1
+7
+  rotate: false
+  xy: 220, 98
+  size: 188, 125
+  orig: 189, 125
+  offset: 1, 0
+  index: -1
+ci1
+  rotate: false
+  xy: 410, 22
+  size: 95, 93
+  orig: 95, 93
+  offset: 0, 0
+  index: -1
+ci2
+  rotate: false
+  xy: 63, 12
+  size: 70, 38
+  orig: 70, 38
+  offset: 0, 0
+  index: -1
+ci3
+  rotate: true
+  xy: 2, 2
+  size: 95, 59
+  orig: 95, 59
+  offset: 0, 0
+  index: -1
+ci4
+  rotate: false
+  xy: 135, 10
+  size: 46, 40
+  orig: 46, 40
+  offset: 0, 0
+  index: -1
+maohu
+  rotate: false
+  xy: 2, 175
+  size: 216, 191
+  orig: 216, 191
+  offset: 0, 0
+  index: -1

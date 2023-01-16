@@ -105,6 +105,7 @@ function DeviceUnlockItem:InitStatusShow(status)
     self.go_table.obj_state_3:SetActive(false)
     self.go_table.obj_state_4:SetActive(false)
     self.go_table.obj_state_5:SetActive(false)
+    self.go_table.obj_notUseNode.gameObject:SetActive(false)
 
     local alpha = 1
     if (self.furnitureStatus == DeviceData.furnitureStatus.Lock) then
@@ -128,6 +129,8 @@ function DeviceUnlockItem:InitStatusShow(status)
         alpha = 0.5
     elseif self.furnitureStatus == DeviceData.furnitureStatus.NotUseing then
         --已购买 未使用
+        self.go_table.obj_notUseNode.gameObject:SetActive(true)
+        self.go_table.simg_notUseItem:LoadSprite(GameDefine.eResPath.AtlasFurniture .. self.spritName, false, 1)
 
     elseif self.furnitureStatus == DeviceData.furnitureStatus.OnTheway then
         --正在运输

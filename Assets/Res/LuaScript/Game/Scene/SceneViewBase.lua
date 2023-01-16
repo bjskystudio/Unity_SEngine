@@ -12,15 +12,12 @@ local SceneManager = require("SceneManager")
 local EventManager = require("EventManager")
 local GameEvent = require("GameEvent")
 
----@class SceneFurnitureNode
----@field FurnitureId number 家具栏位id
----@field FurnitureNode UnityEngine.GameObject 节点go
----@field FurnitureImage SEngine.UI.SImage 场景图片gameObject
-
 ---@class SceneViewBase : UIBase 场景的基类，拖动缩放等
 ---@field private go_table SceneView_GoTable GoTable
 ---@field private ParentCls UIComBase 父窗口类
 ---@field CameraMoving boolean 镜头正在移动
+---@field CurrentPos Vector2 当前位置
+---@field CurrentScale number 当前缩放
 local SceneViewBase = Class("SceneViewBase", UIBase)
 
 function SceneViewBase:OnBaseAwake()
@@ -29,14 +26,11 @@ function SceneViewBase:OnBaseAwake()
     self.transform:ResetPRS()
 
     self.SceneSize = Vector2.New(1024,1024)
-    --self.MapMinSize = Vector2.New(1440,1440)
-    self.MapMinSize = Vector2.New(1600,1600)
-    self.MapMaxSize = Vector2.New(2048,2048)
-    self.ScreenSize = Vector2.New(720,1280)
-
+    --self.ScreenSize = Vector2.New(CS.UnityEngine.Screen.width,CS.UnityEngine.Screen.height)--Vector2.New(720,1280)
+    self.ScreenSize = Vector2.New(CSUIModel.UICanvas.rect.size.x,CSUIModel.UICanvas.rect.size.y)
     -- 场景默认scale
-    self.MinScale = self.MapMinSize.x /self.SceneSize.x
-    self.MaxScale = self.MapMaxSize.x /self.SceneSize.x
+    self.MinScale = self.ScreenSize.y / self.SceneSize.y
+    self.MaxScale = 2 * self.MinScale
     --创建拖动代理
     self:CreateDragHandler()
 
@@ -52,11 +46,14 @@ end
 function SceneViewBase:SetCurrentScale(scale)
     self.CurrentScale = scale
     self.Root:SetLocalScaleXYZ(self.CurrentScale)
+    EventManager:GetInstance():Broadcast(GameEvent.TileMapScale, scale)
+    
 end
 ---设置当前位置
 function SceneViewBase:SetCurrentPos(x,y)
     self.CurrentPos = self:CheckMoveArea(Vector2.New(x,y))
     self.Root.transform.localPosition = self.CurrentPos
+    EventManager:GetInstance():Broadcast(GameEvent.TileMapPosition, self.CurrentPos)
 end
 
 ---@param pos Vector2
@@ -77,13 +74,19 @@ end
 
 ---重设场景大小
 ---@param size Vector2 场景大小
-function SceneViewBase:ResetSceneSize(size)
+---@param scaleVec Vector3 场景缩放
+---@param posOffset Vector2 位置偏移
+function SceneViewBase:ResetSceneSize(size,scaleVec,posOffset)
+    scaleVec = scaleVec or Vector2.New(1,2,1.5)
+    posOffset = posOffset or Vector2.zero
     self.SceneSize = size
     -- 场景scale
-    self.MinScale = self.MapMinSize.x /self.SceneSize.x
-    self.MaxScale = self.MapMaxSize.x /self.SceneSize.x
-    self:SetCurrentScale(self.MinScale)
-    self:SetCurrentPos(0,0)
+    local scale = self.ScreenSize.y / self.SceneSize.y
+    self.MinScale = scaleVec.x * scale
+    self.MaxScale = scaleVec.y * scale
+    --self:SetCurrentScale(self.MaxScale)
+    self:SetCurrentScale(scaleVec.z * scale)
+    self:SetCurrentPos(posOffset.x,posOffset.y)
 end
 
 function SceneViewBase:CreateDragHandler()
@@ -91,7 +94,22 @@ function SceneViewBase:CreateDragHandler()
         self.go_table["_onBeginDrag"] = handler(self,self.OnBeginDrag)
         self.go_table["_onDrag"] = handler(self,self.OnDrag)
         self.go_table["_onEndDrag"] = handler(self,self.OnEndDrag)
+        self.go_table["_onZoom"] = handler(self,self.OnZoom)
     end
+end
+
+function SceneViewBase:OnZoom(_,zoomDelta)
+    --Log.Info("lua zoomDelta:"..zoomDelta
+    --Log.Info("lua zoom:"..zoomDelta)
+    local scale = self.CurrentScale - zoomDelta/200
+    if scale > self.MaxScale then
+        scale = self.MaxScale
+    elseif scale < self.MinScale then
+        scale = self.MinScale
+    end
+    self:SetCurrentScale(scale)
+    --Log.Info("lua scene scale:"..self.CurrentScale)
+    self:SetCurrentPos(self.CurrentPos.x,self.CurrentPos.y)
 end
 
 ---拖动开始
@@ -109,7 +127,7 @@ end
 ---@override
 ---@param eventData UnityEngine.EventSystems.PointerEventData
 function SceneViewBase:OnDrag(_,eventData)
-    if self.CameraMoving then
+    if self.CameraMoving or self.DragStartPos == nil then
         return
     end
     --Log.Debug("dragging:"..eventData.position.x..","..eventData.position.y)

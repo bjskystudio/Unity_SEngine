@@ -15,6 +15,11 @@ function XLuaManager:LoadLuaPBRes(loadcompletedcb) end
 
 function XLuaManager:InitLuaEnv() end
 
+---@param cmd int32
+---@param cacheBuff System.Byte[]
+---@param len int32
+function XLuaManager:DispatchNetMessage(cmd,cacheBuff,len) end
+
 ---@return XLua.LuaEnv
 function XLuaManager:GetLuaEnv() end
 

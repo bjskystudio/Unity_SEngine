@@ -1,0 +1,7 @@
+﻿int,string,int,string,string,int,string,string,string,int,int,int[],int[],int
+角色id,备注,1：角色 2：npc,名字,描述,品质等级（1初级 2中级 3高级）,品质描述,场景形象,立绘,技能1,技能2,等级经验,使用设备时对话id,解锁方式（1：扭蛋机获取 2：需求前置设备 3：需求前置酒店状态）
+id,remark,type,name,desc,rank,rank_desc,model,drawing,type,time,exp,bubble_id,room_preference
+1,小恶魔,1,Customer_EM_name,Customer_EM_desc,1,,EM,,,,,110#111#112#113#114#115#116#117#118#119#120#121#122#123#124,
+2,狼人,1,Customer_LR_name,Customer_LR_desc,1,,LR,,,,,110#111#112#113#114#115#116#117#118#119#120#121#122#123#124,
+3,木乃伊,1,Customer_MNY_name,Customer_MNY_desc,1,,MNY,,,,,110#111#112#113#114#115#116#117#118#119#120#121#122#123#124,
+4,科学怪人,1,Customer_KG_name,Customer_KG_desc,1,,KG,,,,,110#111#112#113#114#115#116#117#118#119#120#121#122#123#124,

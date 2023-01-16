@@ -20,6 +20,7 @@ local DeviceData = require("DeviceData")
 ---@field CustomId number 精灵类型
 ---@field RoomId number 房间，0是室外
 ---@field StateName string 当前状态
+---@field PrefabName string 预制名
 ---@field SkinName string 皮肤
 ---@field AnimName string 动作
 ---@field TileX number 当前位置x
@@ -33,10 +34,9 @@ local DeviceData = require("DeviceData")
 ---@field FinishRoomIds number[] 进过的房间
 ---@field RandomY number y轴随机偏移
 ---@field IsAngry boolean 是否生气
----@field AngryStartTime number 开始生气表情时间
 ---@field BubbleId number 气泡id
----@field NeedFurnitureId number 需要的家具
----@field AngryBubbleId number 生气的文本
+---@field BubbleTime number 气泡显示时间
+---@field BubbleParam number[] 气泡参数
 
 ---@class AvatarManager : Singleton @精灵管理器
 ---@field Avatars AvatarInfo[] 旅店精灵
@@ -91,6 +91,7 @@ function AvatarManager:NewAvatarInfo(bornInfo,eggInfo)
             CustomId = 1,
             RoomId = SceneManager.eRoomId.Lounge,
             StateName = AvatarStateMachine.eStateName.LoungeMove,
+            PrefabName = eggInfo.ResName,
             SkinName = "Guest_1",
             AnimName = "idle",
             TileX = -3,--tilePos.x,
@@ -105,8 +106,8 @@ function AvatarManager:NewAvatarInfo(bornInfo,eggInfo)
             RandomY = Mathf.Random(1,100)/1000,
             IsAngry = false,
             BubbleId = 0,
-            NeedFurnitureId = 0,
-            AngryBubbleId = 0
+            BubbleTime = 0,
+            BubbleParam = {0},
         }
         return avatarInfo
     else
@@ -116,6 +117,7 @@ function AvatarManager:NewAvatarInfo(bornInfo,eggInfo)
             CustomId = 1,
             RoomId = SceneManager.eRoomId.Hotel,
             StateName = AvatarStateMachine.eStateName.HotelStand,
+            PrefabName = eggInfo.ResName,
             SkinName = "Guest_1",
             AnimName = "idle",
             TileX = tilePos.x,
@@ -130,8 +132,8 @@ function AvatarManager:NewAvatarInfo(bornInfo,eggInfo)
             RandomY = Mathf.Random(1,100)/1000,
             IsAngry = false,
             BubbleId = 0,
-            NeedFurnitureId = 0,
-            AngryBubbleId = 0
+            BubbleTime = 0,
+            BubbleParam = {0},
         }
         return avatarInfo
     end

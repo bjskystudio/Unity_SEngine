@@ -1,0 +1,7 @@
+﻿int,int,int,string,string,string,int,int[],int[][],int[][]
+房间id,排序,房间类型（0室外，1功能房，2单间）,说明（不读取）,房间名称,房间说明,是否默认解锁,默认解锁家具(初始地板及墙面等初始家具),阻挡信息,行动边界
+Id,sort,type,desc,name,text,unlock,initial_furniture,collider,Border
+1000,,0,室外,,,,,-17#-37#34#3;-28#-29#5#8;23#-30#4#8;-4#-28#8#5,-27#-56#52#59
+1001,1,1,休息室,Function_house_name_01,Function_house_desc_01,1,101501#101401#101301,-35#-4#10#1;-16#-4#20#1,-35#-32#51#46
+1002,2,1,餐厅,Function_house_name_03,Function_house_desc_03,0,,,
+1003,3,1,温泉,Function_house_name_05,Function_house_desc_05,0,,,

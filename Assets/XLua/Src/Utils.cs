@@ -533,10 +533,10 @@ namespace XLua
 				{
 					if (overloads == null)
 					{
-						overloads = new List<MemberInfo>();
-						pending_methods.Add(method_key, overloads);
-					}
-					overloads.Add(method);
+                        overloads = new List<MemberInfo>();
+                        pending_methods.Add(method_key, overloads);
+                    }
+                    overloads.Add(method);
 				}
 			}
 

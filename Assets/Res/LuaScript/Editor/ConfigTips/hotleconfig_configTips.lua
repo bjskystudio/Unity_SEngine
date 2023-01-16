@@ -5,6 +5,6 @@
 ---@field public level number @等级
 ---@field public cost number[] @消耗1.金币；2.钻石“类型#数量”
 ---@field public param number[] @依据type填入参数，1.金币上限数量;2.离线时间（s）;3.招募间隔（s）
----@field public next_param number[] @下一等级参数
+---@field public next_param number @下一等级参数
 
 

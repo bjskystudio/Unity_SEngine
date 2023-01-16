@@ -1,4 +1,5 @@
-﻿using SEngine;
+﻿using Game.Network;
+using SEngine;
 using System.Collections;
 
 /// <summary>
@@ -65,7 +66,6 @@ public class LoadResStep : MonoSingleton<LoadResStep>, ILoadingStep
         {
             yield return null;
         }
-
         Progress = 0.9f;
         Log.Debug("开始启动Lua");
         XLuaManager.Instance.InitLuaEnv();

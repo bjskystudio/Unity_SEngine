@@ -1,0 +1,27 @@
+
+backdrop_ghost.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+yl
+  rotate: false
+  xy: 2, 72
+  size: 408, 429
+  orig: 408, 429
+  offset: 0, 0
+  index: -1
+yl1
+  rotate: false
+  xy: 99, 16
+  size: 104, 54
+  orig: 108, 56
+  offset: 2, 1
+  index: -1
+yl2
+  rotate: false
+  xy: 2, 2
+  size: 95, 68
+  orig: 97, 70
+  offset: 1, 1
+  index: -1

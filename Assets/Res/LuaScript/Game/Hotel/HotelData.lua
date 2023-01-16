@@ -18,6 +18,7 @@ local DeviceData = require("DeviceData")
 local UIManager = require("UIManager")
 local UseFurnitureState = require("UseFurnitureState")
 local MapManager = require("MapManager")
+local EggMachine = require("EggMachine")
 
 ---旅店公共数据管理器（单例）
 ---@class HotelData : Singleton
@@ -34,6 +35,7 @@ local MapManager = require("MapManager")
 ---@field public HotelIncomTime2 number 上次旅店触发30s收益时间戳
 ---@field public CoinDatas HotelCoinData[] 旅店金币掉落
 ---@field public FingerTaskIds number[] 旅店任务手指id
+---@field public EggMachine EggMachine 扭蛋机数据
 local HotelData = Class("HotelData", Singleton)
 
 function HotelData:__init()
@@ -135,7 +137,8 @@ function HotelData:OnTimer()
 
     ---家具正常挂机收益
     local ms = TimeUtil.SECOND_OF_MINUTE
-    -- print(self.timeCount .. "   " .. ms)
+    --ms = 10
+    --print(self.timeCount .. "   " .. ms)
     if (self.timeCount >= ms) then
         --触发一分钟一次的收益
         --一共触发了几次
@@ -178,6 +181,28 @@ function HotelData:OnTimer()
         self:SendCoinMoveEvent(onLineIncom)
         onLineIncom = 0
     end
+
+
+
+    ---扭蛋机BUFF获取倒计时
+
+    ---处于正常状态  可进行获取BUFF倒计时
+    if (self.EggMachine.PlayState == EggMachine.ePlayState.Normal) then
+        if (self.EggMachineTime == nil) then
+            self.EggMachineTime = 0
+        end
+        local maxTime = Config.game_config.gashapon_machine_sp_interval.paramNum
+        --print(self.EggMachineTime .. "aaaaaa" .. maxTime)
+        if (self.EggMachineTime < maxTime) then
+            self.EggMachineTime = self.EggMachineTime + 1
+        elseif self.EggMachineTime == maxTime then
+            if (self.EggMachine.BuffStart == nil) then
+                EggMachine:GetInstance():GetNewState()
+            end
+
+        end
+    end
+
 
 end
 
@@ -344,6 +369,7 @@ end
 ---@field public HotelIncomTime2 number 上次在线30s触发收益时间
 ---@field public CoinDatas HotelCoinData[] 房间金币数据
 ---@field public FingerTaskIds number[]
+---@field public EggMachine EggMachine 扭蛋机数据
 function HotelData:SaveLocalData()
     ---@type HotelLocalData
     local data = {
@@ -358,7 +384,8 @@ function HotelData:SaveLocalData()
         HotelOfflineTime = self.HotelOfflineTime,
         HotelIncomTime2 = self.HotelIncomTime2,
         CoinDatas = self.CoinDatas,
-        FingerTaskIds = self.FingerTaskIds
+        FingerTaskIds = self.FingerTaskIds,
+        EggMachine = self.EggMachine
     }
     PlayerPrefsUtil.SetTable("HotelLocalData_key", data)
 
@@ -382,6 +409,7 @@ function HotelData:InitLocalData()
         self.HotelIncomTime2 = data.HotelIncomTime2
         self.CoinDatas = data.CoinDatas
         self.FingerTaskIds = data.FingerTaskIds
+        self.EggMachine = data.EggMachine
     else
         ---默认解锁休息室
         self.UnlockHotelList = { 1001 }
@@ -398,7 +426,18 @@ function HotelData:InitLocalData()
         self.HotelIncomTime2 = TimeUtil.GetSecTime()
         self.CoinDatas = {}
         self.FingerTaskIds = {}
+        self.EggMachine = {
+            PlayState = EggMachine.ePlayState.Normal,
+            RoundEggs = {},
+            ClickNum = 0,
+            BuffUse = 0
+        }
     end
+    --[[
+        self.EggMachine.PlayState = EggMachine.ePlayState.Double
+        self.EggMachine.ClickNum = 0
+        self.EggMachine.BuffUse = 0
+    ]]
 
 end
 --endregion

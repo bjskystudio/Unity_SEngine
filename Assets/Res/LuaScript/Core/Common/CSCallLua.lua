@@ -127,7 +127,25 @@ function SceneDragListener.CsCallLuaEndDrag(go_table, eventData)
     end
 end
 CS.SceneDragHandler.luaOnEndDrag = SceneDragListener.CsCallLuaEndDrag
+
+function SceneDragListener.CsCallLuaZoom(go_table, zoomDelta)
+    if go_table._onZoom ~= nil then
+        go_table._onZoom(go, zoomDelta)
+    end
+end
+CS.SceneDragHandler.luaOnZoom = SceneDragListener.CsCallLuaZoom
 --endregion
+
+--region --------------------消息通知 ----------------------
+--local LuaMessageListener = {}
+--function LuaMessageListener.CsCallLuaMessage(cmd,msg)
+--    local netMgr = require("NetManager")
+--    netMgr:GetInstance():OnCsCallLuaMessage(cmd,msg)
+--end
+--CS.Game.Network.MessageQueueHandler.luaOnRecvMessage = LuaMessageListener.CsCallLuaMessage
+
+--endregion --------------------消息通知 ----------------------
+
 
 ----region ----------循环列表-------------
 --local LoopListViewListener = {}

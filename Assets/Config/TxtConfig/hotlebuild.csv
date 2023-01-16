@@ -1,0 +1,13 @@
+﻿int,string,int,string,string,int,int[],int,int,int
+,描述（不读取）,排序,文本显示,图标显示,人气需求,消耗1.金币；2.钻石“类型#数量”,额外人气奖励,指定行为,前置条件
+id,desc,sort,text,icon,term,cost,award,param,front
+1001,修复大厅,1,Function_Build_Hotlepreserve_01,Function_Build_Hotlepreserve_01,2,1#5,,5,
+1002,建造小费罐,2,Function_Build_Hotlepreserve_02,Function_Build_Hotlepreserve_01,5,1#10,5,1,
+1003,解锁餐厅,3,Function_Build_Hotlepreserve_03,Function_Build_Hotlepreserve_01,7,1#50,,2,
+1004,修复楼梯,4,Function_Build_Hotlepreserve_04,Function_Build_Hotlepreserve_01,10,1#250,5,3,
+1005,修复二楼地板,5,Function_Build_Hotlepreserve_05,Function_Build_Hotlepreserve_01,15,1#750,10,9,1004
+1006,建造房间201,6,Function_Build_Hotlepreserve_06,Function_Build_Hotlepreserve_01,25,1#1500,,4,1004
+1007,建造告示栏,7,Function_Build_Hotlepreserve_07,Function_Build_Hotlepreserve_01,35,1#2500,10,8,1004
+1008,建造房间202,8,Function_Build_Hotlepreserve_08,Function_Build_Hotlepreserve_01,45,1#3500,,6,1004
+1009,建造二楼功能房,9,Function_Build_Hotlepreserve_09,Function_Build_Hotlepreserve_01,53,1#4500,,10,1004
+1010,修复楼顶,10,Function_Build_Hotlepreserve_10,Function_Build_Hotlepreserve_01,62,1#5500,15,7,

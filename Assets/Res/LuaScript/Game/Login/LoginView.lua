@@ -10,6 +10,12 @@ local Log = require("Log")
 local UIManager = require("UIManager")
 local UIDefine = require("UIDefine")
 local SceneInst = require("SceneManager"):GetInstance()
+local LoginNet = require("LoginNet")
+local NetManager = require("NetManager")
+local GameData = require("GameData")
+local PopManager = require("PopManager")
+local UILayerEnum = UILayerEnum
+local AppSetting = AppSetting
 
 ---@class LoginView : UIBase 窗口
 ---@field private go_table LoginView_GoTable GoTable
@@ -22,6 +28,8 @@ local LanguageUtil = LanguageUtil
 function LoginView:Awake()
 
     self:AddEvent(GameEvent.TestEvent1)
+    self:AddEvent(GameEvent.ServerConnected)
+    self:AddEvent(GameEvent.HttpResponseError)
 end
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
@@ -38,6 +46,10 @@ end
 function LoginView:EventHandle(id, args)
     if id == GameEvent.TestEvent1 then
         self:OnTestEvent(args)
+    elseif id == GameEvent.ServerConnected then
+        self:OnServerConnected(args)
+    elseif id == GameEvent.HttpResponseError then
+        self:OnHttpResponseError(args)
     end
 end
 
@@ -50,14 +62,35 @@ end
 ---@param btn UnityEngine.UI.Button 按钮
 function LoginView:OnClickBtn(btn)
     if btn == self.go_table.sbtn_login then
+        self.go_table.sbtn_login.gameObject:SetActive(false)
         self:Login()
     end
 end
 
 function LoginView:Login()
-    self:Close()
     Log.Debug("login start!!!!!")
-    SceneInst:EnterHotel(true)
+    if AppSetting.RunOffline then
+        self:Close()
+        SceneInst:EnterHotel(true)
+    else
+        local account = GameData:GetInstance().AccountData.Account
+        local password = GameData:GetInstance().AccountData.Password
+        NetManager:GetInstance():ConnectServer(account,password)
+    end
+end
+
+function LoginView:OnHttpResponseError(msg)
+    PopManager:GetInstance():ShowCommonTips(msg)
+    self.go_table.sbtn_login.gameObject:SetActive(true)
+end
+
+function LoginView:OnServerConnected()
+    Log.Info("Server Connected!!")
+    LoginNet:GetInstance():Login(function()
+        self:Close()
+        SceneInst:EnterHotel(true)
+
+    end)
 end
 
 ---数据清理

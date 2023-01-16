@@ -3,8 +3,20 @@
 --- Created by asd.
 --- DateTime: 2022/10/13 18:24
 ---
+local UIManager = require("UIManager")
+local UILayerEnum = UILayerEnum
+local UIDefine = UIDefine
 
 ---@class PopManager : Singleton @弹窗管理单例类
 local PopManager = Class("PopManager",Singleton)
 
+function PopManager:ShowCommonTips(str)
+    ---@type UISetting
+    local setting = {
+        Layer = UILayerEnum.InfoLayer,
+        ShowBgMask = false
+
+    }
+    UIManager:GetInstance():OpenUIDefine(UIDefine.DeviceCommonTip, setting, str)
+end
 return PopManager

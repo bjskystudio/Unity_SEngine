@@ -15,6 +15,7 @@ require "Core.Common.cjson.json"
 require "AppSetting"
 local Log = require "Core.Common.Logger.Log"
 
+
 local CS = _G.CS
 local string = _G.string
 local LuaPathConfig = _G.LuaPathConfig
@@ -71,7 +72,7 @@ end
 -- end
 
 local function LogError(context, description)
-    Log.Error("["..description.."]"..context)
+    Log.Error("["..(description or "").."]"..(context or ""))
     --CS.UnityEngine.Debug.LogError(debug.traceback(dump(context, description), 2))
 end
 
@@ -381,13 +382,14 @@ function OPStaticData.Type2SourceBaseType(filename, sourceBaseType, sourceValue)
         return "require", "require"
     elseif (sourceBaseType == "lua") then
         return "lua", "lua"
-    elseif sourceBaseType == "string" or sourceBaseType == "stringenum" then
+
+    elseif sourceBaseType == "string" or sourceBaseType == "stringenum" or sourceBaseType=="﻿string" then
         return "string", "string"
-    elseif sourceBaseType == "number" then
+    elseif sourceBaseType == "number" or sourceBaseType == "int" or sourceBaseType == "﻿int" then
         return "number", "number"
     elseif sourceBaseType == "enum" or sourceBaseType == "﻿long" or sourceBaseType == "long" or sourceBaseType == "byte" or
             sourceBaseType == "ushort" or sourceBaseType == "uint" or sourceBaseType == "sbyte" or sourceBaseType == "short" or
-            sourceBaseType == "int" or sourceBaseType == "ulong" or sourceBaseType == "float" or sourceBaseType == "double" then
+            sourceBaseType == "ulong" or sourceBaseType == "float" or sourceBaseType == "double" then
         return "number", "number"
     elseif sourceBaseType == "bool" then
         return "bool", "boolean"
@@ -410,7 +412,8 @@ function OPStaticData.Type2SourceBaseType(filename, sourceBaseType, sourceValue)
     elseif sourceBaseType == "worlditemcfg" then
         return "number", "number"
     else
-        LogError(string.format("%s   %s     %s 未解析正确", filename, sourceBaseType, sourceValue))
+        local errormsg = string.format("%s   %s     %s 未解析正确", filename, sourceBaseType, sourceValue)
+        LogError(errormsg)
     end
 end
 
@@ -469,7 +472,7 @@ function OPStaticData.SerializeArraySourceValue(elementType, sourceValue)
     -- 二维数组
     if string.contains(elementType, "[][]") then
         -- 一维数组
-        local ary = string.split(sourceValue, "|")
+        local ary = string.split(sourceValue, ";")
         local t = {}
 
         for i = 1, #ary do
@@ -519,7 +522,7 @@ function OPStaticData.parseVerticalTxtToLuaTableStr(filename, tag)
     end
 
     -- local title_tab = { }
-    -- title_tab.field_tab = string.split(temp_tab[2], "\t")
+    -- title_tab.field_tab = string.split(temp_tab[2], ",")
     local t = temp_tab
     table.remove(t, 1)
     table.remove(t, 1)
@@ -528,7 +531,7 @@ function OPStaticData.parseVerticalTxtToLuaTableStr(filename, tag)
     for _, v in pairs(t) do
         if string.len(v) > 0 then
             local str = ""
-            local v_data = string.split(v, "\t")
+            local v_data = string.split(v, ",")
             local ID = v_data[1]
             local filedType = v_data[2]
             local value = v_data[3]
@@ -576,9 +579,9 @@ function OPStaticData.parseTxtToLuaTableStr(filename, tag)
     end
 
     local title_tab = {}
-    title_tab.field_tab = string.split(temp_tab[3], "\t")
-    title_tab.stype_tab = string.split(temp_tab[1], "\t")
-    title_tab.cnDesc_tab = string.split(temp_tab[2], "\t")
+    title_tab.field_tab = string.split(temp_tab[3], ",")
+    title_tab.stype_tab = string.split(temp_tab[1], ",")
+    title_tab.cnDesc_tab = string.split(temp_tab[2], ",")
 
     local blackKey = {}
 
@@ -618,23 +621,22 @@ function OPStaticData.parseTxtToLuaTableStr(filename, tag)
             if string.len(v) > 0 then
                 local str = ""
                 local ID = 0
-                local v_data = string.split(v, "\t")
+                local v_data = string.split(v, ",")
 
                 for index, value in pairs(v_data) do
                     if not blackKey[index] then
                         local key = title_tab.field_tab[index]
-                        local filedType = title_tab.stype_tab[index]
+                        local stype = title_tab.stype_tab[index]
                         -- 配置表存在字段残留
-                        if string.IsNullOrEmpty(filedType) or string.IsNullOrEmpty(key) then
-                            if string.IsNullOrEmpty(filedType) then
-                                LogError(filedType, "filedType")
+                        if string.IsNullOrEmpty(stype) or string.IsNullOrEmpty(key) then
+                            if string.IsNullOrEmpty(stype) then
+                                LogError(stype, "stype")
                             end
                             if string.IsNullOrEmpty(key) then
                                 LogError(key, "key")
                             end
-
-                            LogError("配置表存在字段残留:" .. filename)
-                            LogError(v_data)
+                            LogError("配置表存在字段残留:" .. filename,filename)
+                            --LogError(v_data)
                         else
                             if index == 1 then
                                 ID = string.trim(value)
@@ -649,7 +651,7 @@ function OPStaticData.parseTxtToLuaTableStr(filename, tag)
                                 end
 
                                 value = string.trim(value)
-                                local _value, luaType = OPStaticData.ParseFieldValue(filename, value, filedType)
+                                local _value, luaType = OPStaticData.ParseFieldValue(filename, value, stype)
                                 if _value ~= "value" then
                                     str = str .. key .. " = " .. _value
                                     str = str .. ", "
@@ -816,7 +818,6 @@ function OPStaticData.Start(configPaths, watchConfigPatchs)
     if (configPaths == nil or configPaths.Length <= 0) then
         return
     end
-
     txtConfig_tab = {}
     watchConfig_tab = {}
     for i = 0, configPaths.Length - 1 do
@@ -825,10 +826,10 @@ function OPStaticData.Start(configPaths, watchConfigPatchs)
         if (string.len(path) > 0) then
             local tempData = string.split(path, "/")
             local temp = tempData[#tempData]
-            local end_pos = string.find(temp, ".txt", 1) - 1
+            local end_pos = string.find(temp, ".csv", 1) - 1
             local key = string.sub(temp, 1, end_pos)
             local luaPathStr = outConfigPath .. string.sub(path, #inputConfigPath + 1)
-            luaPathStr = string.replace(luaPathStr, ".txt", ".lua")
+            luaPathStr = string.replace(luaPathStr, ".csv", ".lua")
             local requirePath = pa_tab.basename
             txtConfig_tab[key] = {}
             txtConfig_tab[key].txtPath = path
@@ -843,7 +844,7 @@ function OPStaticData.Start(configPaths, watchConfigPatchs)
 
     for i = 0, watchConfigPatchs.Length - 1 do
         local pa_tab = io.pathinfo(watchConfigPatchs[i])
-        if (pa_tab.extname == ".txt") then
+        if (pa_tab.extname == ".csv") then
             table.insert(LuaPathConfig, { des = pa_tab.basename, path = pa_tab.basename })
             watchConfig_tab[pa_tab.basename] = pa_tab.basename
         end

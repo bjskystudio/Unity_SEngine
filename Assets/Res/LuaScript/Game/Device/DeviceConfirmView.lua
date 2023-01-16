@@ -21,7 +21,7 @@ function DeviceConfirmView:OnCreate(func, costId)
     self.go_table.stmp_unlockStr.text = LanguageUtil:GetValue("Common_Sure")
     self.go_table.stmp_LockStr = LanguageUtil:GetValue("Common_Cancel")
     if (costId ~= nil) then
-        self.go_table.stmp_Message.text = string.format(LanguageUtil:GetValue("Common_hint_usejewel") .. LanguageUtil:GetValue(ConfigManager.Items[costId].name) .. "?")
+        self.go_table.stmp_Message.text = string.format(LanguageUtil:GetValue("Common_hint_usejewel") .. LanguageUtil:GetValue(ConfigManager.items[costId].name) .. "?")
     end
 end
 

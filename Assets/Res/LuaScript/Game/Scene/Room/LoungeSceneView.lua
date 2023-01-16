@@ -19,13 +19,22 @@ local MapManager = require("MapManager")
 local ConfigManager = require("ConfigManager")
 local HotelData = require("HotelData")
 local CoinView = require("CoinView")
+local FurnitureTransView = require("FurnitureTransView")
+local ResLoadManager = require("ResLoadManager")
+local AvatarStateMachine = require("AvatarStateMachine")
 
----@class LoungeSceneView : UIBase 休息室
+---@class LoungeSceneView : SceneViewBase 休息室
 ---@field private go_table LoungeSceneView_GoTable GoTable
 ---@field private ParentCls UIBase 父窗口类
 ---@field SortInfoList LoungeSortInfo[] 排序数据
 ---@field CoinViews CoinView[] 金币掉落
 local LoungeSceneView = Class("LoungeSceneView", SceneViewBase)
+
+---@class LoungeSceneView.spiderSingle 蜘蛛动画对象
+LoungeSceneView.spiderSingle = {
+    position = nil,
+    otType = nil
+}
 
 ---@class LoungeSceneView.eSortType 排序的类型
 LoungeSceneView.eSortType = {
@@ -60,6 +69,11 @@ function LoungeSceneView:Awake()
     --触发金币
     self:AddEvent(GameEvent.TriggerCoin)
     self:AddEvent(GameEvent.CoinCollected)
+
+    --家具使用中事件
+    self:AddEvent(GameEvent.UseFurnitureEvent)
+    --家具使用完成事件
+    self:AddEvent(GameEvent.ExitFurnitureEvent)
 end
 --- 窗口显示[protected]
 ---@param ... any @窗口传参
@@ -67,23 +81,30 @@ function LoungeSceneView:OnCreate()
     self.SortInfoList = {}
     self.NodeEffectDic = {}
     self.RoomId = SceneManager:GetInstance().RoomId
+    self.FurnitureNodeSpineMap = {}   --家具spine数据
     ---大通铺大小
-    self:ResetSceneSize(Vector2.New(1181, 1181))
+    --self:ResetSceneSize(Vector2.New(1181, 1181))
+    self:ResetSceneSize(Vector2.New(1500, 1500), Vector3.New(1, 2.5, 1.6), Vector2.New(0, 150))
     ---初始化家具节点
     self:InitFurnitureNodes()
+
     ---运输中的家具
     self.TransFurnitureComps = {}
     ---@type table<number,DeviceFieldData>
     local houseDeviceData = DeviceDataInst:GetHouseData(self.RoomId)
     for i, v in pairs(houseDeviceData) do
+
         --场景家具节点
-        local furnitureNode = self:GetFurnitureNode(i)
-        if furnitureNode ~= nil then
+        --local furnitureNode = self:GetFurnitureNode(i)
+        ---@type FurnitureView
+        local nodeView = self:GetFurnitureNode(i)
+        if nodeView ~= nil then
+            local furnitureNode = nodeView.gameObject
             --家具显示
             if v.CurUseFurnitureId ~= nil then
                 self:ShowFurnitureImage(v.CurUseFurnitureId)
             else
-                furnitureNode.FurnitureImage.gameObject:SetActive(false)
+                furnitureNode:SetActive(false)
             end
             --处理运输
             if v.OnThewayFiledIds ~= nil and table.count(v.OnThewayFiledIds) > 0 then
@@ -113,65 +134,226 @@ function LoungeSceneView:OnCreate()
     self:InitCoinViews()
     ---帧刷新
     self.OrderTimer = TimerInst:GetTimerStartImme(6, self.OnOrderTimer, self, false, true);
+
+    ---初始化背景spine动画
+    self:BackgroundSpineInit()
+end
+function LoungeSceneView:BackgroundSpineInit()
+    self.go_table.obj_bgSpine.gameObject:SetActive(true)
+    self.go_table.obj_spider.gameObject:SetActive(true)
+
+    self.spiderSpine = self.go_table.obj_spider:GetComponent(typeof(CS.SEngine.UI.UISpine))
+    self.spiderSpine:PlayAnim("down", false, function()
+
+        if (self.spiderMovePosArray == nil) then
+            self.spiderMovePosArray = {}
+        end
+        if (self.spiderOtMap == nil) then
+            ---存储某个位置的图案类型
+            self.spiderOtMap = {}
+        end
+
+        local nodeCount = self.go_table.obj_spiderOtSpine.transform.childCount
+        for i = 1, nodeCount do
+            local node = self.go_table["obj_spiderPos" .. i]
+            local type = self:GetSpiderRadomType(i)
+            ---@type LoungeSceneView.spiderSingle
+            local spiderSingle = {
+                position = node.transform.localPosition,
+                otType = type
+            }
+            table.insert(self.spiderMovePosArray, spiderSingle)
+            self.spiderOtMap[i] = type
+            --print(spiderSingle.otType .. "  " .. i)
+        end
+
+        self:SpiderStartMove()
+    end)
 end
 
----@param node SceneFurnitureNode
+function LoungeSceneView:GetSpiderRadomType(index)
+    local spineNum = 3
+    local numArray = {}
+    for i = 1, spineNum do
+        table.insert(numArray, i)
+    end
+    local numType = Mathf.Floor((index - 1) / spineNum)
+    local deleteArray = {}
+    for j, v in pairs(self.spiderOtMap) do
+        if (Mathf.Floor((j - 1) / spineNum) == numType) then
+            table.insert(deleteArray, v)
+        end
+    end
+    if (table.count(deleteArray) > 0) then
+        for j = 1, table.count(deleteArray) do
+            for m = 1, table.count(numArray) do
+                if (deleteArray[j] == numArray[m]) then
+                    table.removebyvalue(numArray, deleteArray[j])
+                end
+            end
+        end
+    end
+
+    local type = numArray[Mathf.Random(1, table.count(numArray))]
+    return type
+end
+
+function LoungeSceneView:SpiderStartMove()
+    local count = table.count(self.spiderMovePosArray)
+    if (count <= 0) then
+        local x = self.spiderSpine.transform.localPosition.x
+        local y = self.spiderSpine.transform.localPosition.y
+
+        local leavePos = Vector3.New(0, 0, 0)
+        local offset = 1000
+        if (x > 0 and y > 0) then
+            leavePos = Mathf.Abs(x) > Mathf.Abs(y) and Vector3.New(x + offset, y, 0) or Vector3.New(x, y + offset, 0)
+        elseif (x > 0 and y < 0) then
+            leavePos = Mathf.Abs(x) > Mathf.Abs(y) and Vector3.New(x + offset, y, 0) or Vector3.New(x, y - offset, 0)
+        elseif (x < 0 and y > 0) then
+            leavePos = Mathf.Abs(x) > Mathf.Abs(y) and Vector3.New(x - offset, y, 0) or Vector3.New(x, y + offset, 0)
+        else
+            leavePos = Mathf.Abs(x) > Mathf.Abs(y) and Vector3.New(x - offset, y, 0) or Vector3.New(x, y - offset, 0)
+        end
+
+        self:SpiderMoveToTarget(leavePos, function()
+            self.spiderSpine.transform.gameObject:SetActive(false)
+        end)
+
+        return
+    end
+    self.spiderSpine:PlayAnim("walk", true)
+
+    local index = Mathf.Random(1, count)
+    local spiderSingle = self.spiderMovePosArray[index]
+    local endPos = spiderSingle.position
+    local type = spiderSingle.otType
+
+    self:SpiderMoveToTarget(endPos, function()
+        self.spiderSpine:PlayAnim("attack", false, function()
+            local node
+            if (type == 1) then
+                node = self.go_table.obj_spiderBat
+            elseif type == 2 then
+                node = self.go_table.obj_spiderGhost
+            elseif type == 3 then
+                node = self.go_table.obj_spiderSilk
+            end
+
+            local otClone = CS.UnityEngine.Object.Instantiate(node, self.go_table.obj_spiderOtSpine.transform)
+            otClone.gameObject:SetActive(true)
+            otClone.transform.localPosition = endPos
+            if (type == 1) then
+                otClone.transform.localRotation = Quaternion.AngleAxis(Mathf.Random(0, 1) > 0 and 30 or -30, Vector3.New(0, 0, 1))
+            elseif type == 2 then
+                otClone.transform.localRotation = Quaternion.AngleAxis(Mathf.Random(0, 1) > 0 and 0 or 180, Vector3.New(0, 1, 0))
+            end
+            table.remove(self.spiderMovePosArray, index)
+            self:SpiderStartMove()
+
+        end)
+    end)
+end
+
+function LoungeSceneView:SpiderMoveToTarget(endPos, func)
+    local speed = 200
+    local target = Vector3.New(endPos.x, endPos.y, endPos.z)
+    local vec = target:Sub(self.spiderSpine.transform.localPosition)
+    local angle = Vector3.AngleAroundAxis(Vector3.New(0, 1, 0), vec, Vector3.New(0, 0, 1)) + 180
+    self.spiderSpine.transform:DOLocalRotate(Vector3.New(0, 0, angle), 1):OnComplete(function()
+        local distance = Vector3.Distance(self.spiderSpine.transform.localPosition, target)
+        local time = Mathf.Abs(Mathf.Floor(distance / speed))
+        self.spiderSpine.transform:DOLocalMove(endPos, time, false):OnComplete(function()
+            func()
+        end)
+    end)
+end
+
+---@param node UnityEngine.GameObject
 ---@param state LoungeSceneView.FurnitureNodeState
 function LoungeSceneView:SetFurnitureNodeState(node, state, showFurnitureId)
-    local nodeGo = node.FurnitureNode
+    local fieldId = DeviceDataInst:GetFieldId(showFurnitureId)
     ---@type UnityEngine.GameObject
-    local transportGo = self:CloneTransportGo(nodeGo)
+    local transportGo = self:CloneTransportGo(node, fieldId)
     ---@type FurnitureTransView
     local transCom = self:GetOrAddComponent(transportGo, require("FurnitureTransView"), state, showFurnitureId)
     self.TransFurnitureComps[showFurnitureId] = transCom
 end
 
 ---@param targetGo  UnityEngine.GameObject
-function LoungeSceneView:CloneTransportGo(targetGo)
-    local transportGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_transport, targetGo.transform)
-    transportGo.transform.localPosition = Vector3.zero
-    transportGo.transform.gameObject:SetActive(true)
+function LoungeSceneView:CloneTransportGo(targetGo, fieldId)
+    local transportGo
+    local effectType = Config.furniture[fieldId].Effects_type
+    if effectType == FurnitureTransView.eEffectType.Floor then
+        --地板在顶层
+        transportGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_transport, self.go_table.obj_transLayer.transform)
+        transportGo.transform.localPosition = targetGo.transform.localPosition
+        transportGo.transform.gameObject:SetActive(true)
+    else
+        transportGo = CS.UnityEngine.Object.Instantiate(self.go_table.obj_transport, targetGo.transform)
+        transportGo.transform.localPosition = Vector3.zero
+        transportGo.transform.gameObject:SetActive(true)
+    end
     return transportGo
 end
 
 ---初始化家具节点
 function LoungeSceneView:InitFurnitureNodes()
-    ---@type table<number,SceneFurnitureNode>
+    ---@type table<number,FurnitureView>
     self.FurnitureNodes = {}
     local FurnitureFieldArr = Config.GetConfigByField(Config.furniture, "house_type", { self.RoomId })
     --,function(l, r)
     --    return l.sort > r.sort
     --end
+
     for i = 1, #FurnitureFieldArr do
         ---@type furniture_field_Item
         local field = FurnitureFieldArr[i]
-        ---@type SceneFurnitureNode
-        local node = {
-            FurnitureId = field.id
-        , FurnitureNode = self.go_table["obj_" .. field.id]
-        , FurnitureImage = self.go_table["simg_" .. field.id]
-        }
-        self.FurnitureNodes[field.id] = node
-        --先隐藏
-        node.FurnitureImage.gameObject:SetActive(false)
-        local tilePos = MapManager:GetInstance().FurnitureTilePosDic[field.id]
-        if tilePos ~= nil and #tilePos > 0 then
-            --添加到排序中
-            ---@type LoungeSortInfo
-            local sortInfo = {
-                Type = LoungeSceneView.eSortType.FurnitureSingle,
-                Node = node.FurnitureNode,
-                PosX = tilePos[1].x,
-                PosY = tilePos[1].y,
-                OffsetY = Mathf.Random(1,100)/1000
-            }
-            table.insert(self.SortInfoList, sortInfo)
+
+        local parts = {}
+        local tilePos = MapManager:GetInstance().FurnitureTilePosDic[field.id] ---位置数据
+        if (tilePos ~= nil and #tilePos > 1) then
+            for j = 1, #tilePos do
+                table.insert(parts, self.go_table["obj_" .. field.id .. "_" .. j])
+            end
+        else
+            table.insert(parts, self.go_table["obj_" .. field.id])
         end
+        local furnitureNode = self.go_table["obj_" .. field.id]
+        local fView = self:GetOrAddComponent(furnitureNode, require("FurnitureView"), parts, field.id)
+        self.FurnitureNodes[field.id] = fView
+
+
+
+
+        --[[        ---@type SceneFurnitureNode
+                local node = {
+                    FurnitureId = field.id
+                , FurnitureNode = self.go_table["obj_" .. field.id]
+                , FurnitureImage = self.go_table["simg_" .. field.id]
+                }
+                self.FurnitureNodes[field.id] = node
+                --先隐藏
+                node.FurnitureImage.gameObject:SetActive(false)
+                local tilePos = MapManager:GetInstance().FurnitureTilePosDic[field.id]
+                if tilePos ~= nil and #tilePos > 0 then
+                    --添加到排序中
+                    ---@type LoungeSortInfo
+                    local sortInfo = {
+                        Type = LoungeSceneView.eSortType.FurnitureSingle,
+                        Node = node.FurnitureNode,
+                        PosX = tilePos[1].x,
+                        PosY = tilePos[1].y,
+                        OffsetY = Mathf.Random(1, 100) / 1000
+                    }
+                    table.insert(self.SortInfoList, sortInfo)
+                end]]
     end
 
 end
 
 ---获取家具节点
+---@return FurnitureView
 function LoungeSceneView:GetFurnitureNode(furnitureId)
     return self.FurnitureNodes[furnitureId]
 end
@@ -205,13 +387,18 @@ function LoungeSceneView:EventHandle(id, ...)
         self:OnTriggerCoin(...)
     elseif id == GameEvent.CoinCollected then
         self:OnCoinCollected(...)
+    elseif id == GameEvent.UseFurnitureEvent then
+        self:OnOpenFurnitureSpineStatus(...)
+    elseif id == GameEvent.ExitFurnitureEvent then
+        self:OnExitFurnitureSpineStatus(...)
     end
 end
 
 ---播放属性ui
 function LoungeSceneView:ShowShuXingUi(furnitureId)
+    self.ShowShuXingFurnitureId = furnitureId
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
-    local node = self:GetFurnitureNode(fieldId)
+    local nodeView = self:GetFurnitureNode(fieldId)
 
     ---@type furniture_level_Item
     local fData = Config.furniture_level[furnitureId]
@@ -241,10 +428,7 @@ function LoungeSceneView:ShowShuXingUi(furnitureId)
         table.insert(tabStr, str)
         table.insert(tabImgStr, iconName)
     end
-
-    local y = node.FurnitureImage.transform.rect.height / 2
-    local x = node.FurnitureImage.transform.rect.width / 2
-    self.go_table.obj_shuxing.transform.localPosition = node.FurnitureNode.transform.localPosition
+    self.go_table.obj_shuxing.transform.localPosition = nodeView.transform.localPosition
     for i, v in pairs(tabStr) do
         local itemNodeClone = CS.UnityEngine.Object.Instantiate(self.go_table.obj_FurnitureFlyViewItem, self.go_table.obj_shuxing.transform)
         itemNodeClone.transform.gameObject:SetActive(true)
@@ -252,7 +436,7 @@ function LoungeSceneView:ShowShuXingUi(furnitureId)
         local item = self:GetOrAddComponent(itemNodeClone, require("FurnitureFlyViewItem"))
         local time = i - 1
         item:InitData(v, tabImgStr[i], time, function()
-            self:DestoryComponentGameObj(item.gameObject)
+            self:RemoveComponentInstance(item)
         end)
     end
 
@@ -262,11 +446,11 @@ end
 function LoungeSceneView:CreateFurnitureCom(furnitureId, state)
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
     if IsNil(self.TransFurnitureComps[furnitureId]) then
-        local node = self:GetFurnitureNode(fieldId)
-        if node ~= nil then
-            local nodeGo = node.FurnitureNode
+        local nodeView = self:GetFurnitureNode(fieldId)
+        if nodeView ~= nil then
+            local nodeGo = nodeView.gameObject
             if nodeGo ~= nil then
-                local transportGo = self:CloneTransportGo(nodeGo)
+                local transportGo = self:CloneTransportGo(nodeGo, fieldId)
                 ---@type FurnitureTransView
                 local transCom = self:GetOrAddComponent(transportGo, require("FurnitureTransView"), state, furnitureId)
                 self.TransFurnitureComps[furnitureId] = transCom
@@ -315,14 +499,11 @@ function LoungeSceneView:OnFurnitureTranslateFinish(furnitureId)
 end
 
 ---@param furnitureId number 移动到的家具id
-function LoungeSceneView:OnRoomFurnitureLookAt(furnitureId)
+function LoungeSceneView:OnRoomFurnitureLookAt(furnitureId, complete)
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
-    local node = self:GetFurnitureNode(fieldId)
-    if node ~= nil then
-        local nodeGo = node.FurnitureNode
-        if nodeGo ~= nil then
-            self:CameraMoveTo(nodeGo.transform.localPosition, 0.5)
-        end
+    local nodeView = self:GetFurnitureNode(fieldId)
+    if nodeView ~= nil then
+        self:CameraMoveTo(nodeView.transform.localPosition, 0.5, complete)
     end
 end
 
@@ -332,7 +513,7 @@ function LoungeSceneView:RemoveTransView(furnitureId)
         ---@type FurnitureTransView
         local transCom = self.TransFurnitureComps[furnitureId]
         ---清理运输节点上的组件
-        self:DestoryComponentGameObj(transCom.gameObject)
+        self:RemoveComponentInstance(transCom)
         self.TransFurnitureComps[furnitureId] = nil
 
     end
@@ -341,37 +522,125 @@ end
 function LoungeSceneView:ShowFurnitureImage(furnitureId, showShiny)
     ---显示家具node
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
-    local node = self:GetFurnitureNode(fieldId)
-    if node ~= nil then
-        node.FurnitureImage.gameObject:SetActive(true)
-        --处理显示
-        if furnitureId ~= nil then
-            local cfg = Config.furniture_level[furnitureId]
-            if cfg ~= nil then
-                node.FurnitureImage:LoadSprite(GameDefine.eResPath.AtlasRoomFurniture .. "Lounge/" .. cfg.art, true, 1)
-            end
-            if showShiny then
-                node.FurnitureImage:ShowUIShiny(1.5)
+    ---@type FurnitureView
+    local nodeView = self:GetFurnitureNode(fieldId)
+
+    if nodeView ~= nil then
+
+        local field = Config.furniture[fieldId]
+        self:FurnitureSpineAlive(fieldId, false)
+        local imageNodes = nodeView:GetImageNode()
+        nodeView:SetNodeActive(true)
+        local count = #imageNodes
+
+        for i = 1, count do
+            imageNodes[i].gameObject:SetActive(true)
+            --处理显示
+            if furnitureId ~= nil then
+                local cfg = Config.furniture_level[furnitureId]
+
+                if cfg ~= nil then
+
+                    local imageName
+                    if (count > 1 and fieldId ~= 10012) then
+                        imageName = cfg.art .. "_" .. i
+                    else
+                        --资源相同
+                        imageName = cfg.art
+                    end
+                    imageNodes[i]:LoadSprite(GameDefine.eResPath.AtlasRoomFurniture .. "Lounge/" .. imageName, true, 1)
+
+                end
+                if showShiny then
+                    imageNodes[i]:ShowUIShiny(1.5, function()
+                        if (i == count) then
+                            self:InitLoadFurnitureSpine(field)
+
+                        end
+                    end)
+                else
+
+                    if (i == count) then
+                        self:InitLoadFurnitureSpine(field)
+                    end
+                end
             end
         end
+
+
+        --[[        node.FurnitureImage.gameObject:SetActive(true)
+                --处理显示
+                if furnitureId ~= nil then
+                    local cfg = Config.furniture_level[furnitureId]
+                    if cfg ~= nil then
+                        node.FurnitureImage:LoadSprite(GameDefine.eResPath.AtlasRoomFurniture .. "Lounge/" .. cfg.art, true, 1)
+                    end
+                    if showShiny then
+                        node.FurnitureImage:ShowUIShiny(1.5)
+                    end
+                end]]
     end
+end
+
+function LoungeSceneView:InitLoadFurnitureSpine(field)
+
+    --加载动画
+    self:LoadFurnitureSpinePreFab(field)
+
+    --[[    ---初始加载家具动画时间
+        if (self.loadSpineTimeMap == nil) then
+            self.loadSpineTimeMap = {}
+        end
+        if (self.loadSpineTimeMap[fieldId] == nil) then
+            self.loadSpineTimeMap[fieldId] = 0
+        end
+        if (self.loadSpineTimeMap[fieldId] == 0) then
+            self:FurnitureSpineAlive(fieldId, true)
+
+            self:DealSpecialFurniture(fieldId)--处理需要特殊处理的家具
+
+            self.loadSpineTimeMap[fieldId] = 1
+        else
+            TimerInst:GetTimerStart(self.loadSpineTimeMap[fieldId], function()
+
+            end, self, true)
+        end]]
+end
+--处理房间里面正在使用的家具状态
+function LoungeSceneView:PlayerInRoomFurniture(id)
+    --初始数据处理
+    ---@type AvatarStateMachine[]
+    local useArray = AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.UseFurniture, id)
+    local useCount = table.count(useArray)--正在使用的人数
+    if (useCount > 0) then
+        self:OnOpenFurnitureSpineStatus(id)
+    end
+    self:FurnitureSpineAlive(id, true)
+    self:DealSpecialFurniture(id)--处理需要特殊处理的家具
 end
 
 ---家具更换
 function LoungeSceneView:OnChangeFurnitureEvent(furnitureId)
     self:ShowFurnitureImage(furnitureId, true)
+    --self:OnFurnitureImmeFinish(furnitureId)
 end
 
 --region -----------------墙和地板升级闪光-------------------
 function LoungeSceneView:StartNodeEffect(furnitureId)
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
-    local node = self:GetFurnitureNode(fieldId)
-    if node ~= nil then
-        local seq = CS.DG.Tweening.DOTween.Sequence()
-        seq:Append(node.FurnitureImage:DOFade(0.5, 1.5))
-        seq:Append(node.FurnitureImage:DOFade(1, 1.5))
-        seq:SetLoops(-1)
-        self.NodeEffectDic[furnitureId] = seq
+
+    ---@type FurnitureView
+    local nodeView = self:GetFurnitureNode(fieldId)
+    if nodeView ~= nil then
+        local imageNodes = nodeView:GetImageNode()
+        for i = 1, #imageNodes do
+            local seq = CS.DG.Tweening.DOTween.Sequence()
+            seq:Append(imageNodes[i]:DOFade(0.5, 1.5))
+            seq:Append(imageNodes[i]:DOFade(1, 1.5))
+            seq:SetLoops(-1)
+            self.NodeEffectDic[furnitureId] = seq
+        end
+
     end
 end
 function LoungeSceneView:StopNodeEffect(furnitureId)
@@ -383,9 +652,14 @@ function LoungeSceneView:StopNodeEffect(furnitureId)
     end
     --恢复透明度
     local fieldId = DeviceDataInst:GetFieldId(furnitureId)
-    local node = self:GetFurnitureNode(fieldId)
-    if node ~= nil then
-        node.FurnitureImage.Alpha = 1
+    ---@type FurnitureView
+    local nodeView = self:GetFurnitureNode(fieldId)
+    if nodeView ~= nil then
+        local imageNodes = nodeView:GetImageNode()
+        for i = 1, #imageNodes do
+            imageNodes[i].Alpha = 1
+        end
+        --nodeView.FurnitureImage.Alpha = 1
     end
 end
 
@@ -397,9 +671,9 @@ function LoungeSceneView:InitAvatars()
     local avatarMachines = AvatarManager:GetInstance():GetRoomAvatarMachines(self.RoomId)
     if avatarMachines ~= nil then
         for i = 1, #avatarMachines do
-            local avatarGo = self:CloneAvatarNode(self.go_table.obj_scene)
+            local avatarGo, shadowGo = self:CloneAvatarNode(self.go_table.obj_scene)
             ---@type AvatarView
-            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.2)
+            local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.2, false, shadowGo)
             local machine = avatarMachines[i]
             machine:SetView(avatarView)
 
@@ -424,15 +698,17 @@ function LoungeSceneView:CloneAvatarNode(pNode)
     avatarGo.transform.gameObject:SetActive(true)
     --avatarGo.transform:SetLocalScaleXYZ(1.5)
 
+    local shadowGo = CS.UnityEngine.Object.Instantiate(self.go_table.img_shadow.gameObject, self.go_table.obj_shadows.transform)
+    shadowGo.transform.gameObject:SetActive(true)
     ---spine
-    return avatarGo
+    return avatarGo, shadowGo
 end
 
 function LoungeSceneView:OnAvatarEnterRoom(roomId, avatarId)
     if roomId == self.RoomId then
-        local avatarGo = self:CloneAvatarNode(self.go_table.obj_scene)
+        local avatarGo, shadowGo = self:CloneAvatarNode(self.go_table.obj_scene)
         ---@type AvatarView
-        local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.2)
+        local avatarView = self:GetOrAddComponent(avatarGo, require("AvatarView"), 1.2, false, shadowGo)
         local machine = AvatarManager:GetInstance():GetAvatarMachineById(avatarId)
         machine:SetView(avatarView)
 
@@ -458,7 +734,7 @@ function LoungeSceneView:OnClearAvatarView(avatarId)
     local machine = AvatarManager:GetInstance():GetAvatarMachineById(avatarId)
     local view = machine.View
     if view ~= nil then
-        self:DestoryComponentGameObj(view.gameObject)
+        self:RemoveComponentInstance(view)
         machine:SetView(nil)
     else
         Log.Debug("精灵界面已经释放")
@@ -533,7 +809,7 @@ function LoungeSceneView:InitCoinViews()
             Node = coinNode,
             PosX = tilePos.x,
             PosY = tilePos.y,
-            OffsetY = Mathf.Random(1,100)/1000
+            OffsetY = Mathf.Random(1, 100) / 1000
         }
         table.insert(self.SortInfoList, sortInfo)
     end
@@ -585,7 +861,7 @@ function LoungeSceneView:OnTriggerCoin(coinData)
                 Node = coinNode,
                 PosX = tilePos.x,
                 PosY = tilePos.y,
-                OffsetY = Mathf.Random(1,100)/1000
+                OffsetY = Mathf.Random(1, 100) / 1000
             }
             table.insert(self.SortInfoList, sortInfo)
         end
@@ -607,8 +883,8 @@ function LoungeSceneView:OnCoinCollected(coinData)
                     break
                 end
             end
-            table.removebyvalue(self.CoinViews,coinView)
-            self:DestoryComponentGameObj(coinView.gameObject)
+            table.removebyvalue(self.CoinViews, coinView)
+            self:RemoveComponentInstance(coinView)
             coinView = nil
         end
     end
@@ -654,6 +930,371 @@ end
 
 function LoungeSceneView:OnTimer()
     --Log.Debug("timer update")
+end
+
+---加载家具特效
+---@param field  furniture_field_Item
+function LoungeSceneView:LoadFurnitureSpinePreFab(field)
+    if (field.id == 10001 or field.id == 10003 or field.id == 10010 or field.id == 10007) then
+        self:DealBedSpine(field) --床
+    elseif field.id == 10008 then
+        --沙发
+        self:DealSofaSpine(field)
+    elseif field.id == 10002 then
+        --入户柜子   有拆分
+        self:DealGuiZiSpine(field)
+    elseif field.id == 10011 then
+        --娱乐区  有拆分
+        self:DealGamesSpine(field)
+
+    elseif field.id == 10009 then
+        --坩埚
+        self:DealCrucibleSpine(field)
+    elseif field.id == 10005 then
+        --占卜桌
+        self:DealZhanBuDeskSpine(field)
+
+    end
+
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealZhanBuDeskSpine(field)
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        --print("已有预制，直接删除")
+        self:DestroyFurnitureSpine(field.id)
+    end
+    local level = Config.furniture_level[useFurnitureId].level
+    local path = "UI/Room/FurnitureSpine/zhanbuDesk_" .. level
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform:SetParent(self.go_table["obj_" .. field.id].transform, false)
+            go.transform.gameObject:SetActive(false)
+            go.transform:SetSiblingIndex(1)
+            go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+            --go:ResetPRS()
+            --go.transform:SetLocalScaleXYZ(0.05)
+            go.transform.localPosition = Vector3.New(0, 0, 0)
+
+            local spineNode = go.transform:Find("@_obj_spines").transform:Find("spine1")
+            ---@type SEngine.UI.UISpine
+            local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            spine:PlayAnim("idle", true)
+            self.FurnitureNodeSpineMap[field.id] = go
+            self:PlayerInRoomFurniture(field.id)
+            --print("加载完成  " .. "zhanbuDesk_" .. level)
+        else
+            --print("加载失败  " .. "zhanbuDesk_" .. level)
+        end
+    end)
+
+
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealCrucibleSpine(field)
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        self:DestroyFurnitureSpine(field.id)
+    end
+    local level = Config.furniture_level[useFurnitureId].level
+    local path = "UI/Room/FurnitureSpine/ganguo_" .. level
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform:SetParent(self.go_table["obj_" .. field.id].transform, false)
+            go.transform.gameObject:SetActive(false)
+            go.transform:SetSiblingIndex(1)
+            go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+            --go:ResetPRS()
+            --go.transform:SetLocalScaleXYZ(0.05)
+            go.transform.localPosition = Vector3.New(0, 0, 0)
+
+            local spineNode = go.transform:Find("@_obj_spines").transform:Find("spine1")
+            ---@type SEngine.UI.UISpine
+            local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            spine:PlayAnim("idle", true)
+            self.FurnitureNodeSpineMap[field.id] = go
+            self:PlayerInRoomFurniture(field.id)
+        end
+    end)
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealGamesSpine(field)
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        self:DestroyFurnitureSpine(field.id)
+    end
+    local level = Config.furniture_level[useFurnitureId].level
+    if (level == 1) then
+        --1级柜子
+        local path = "UI/Room/FurnitureSpine/game2_" .. level
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table["obj_" .. field.id .. "_2"].transform, false)
+                go.transform.gameObject:SetActive(false)
+                go.transform:SetSiblingIndex(1)
+                go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+                local spineNode = go.transform:Find("@_obj_spines").transform:Find("spine1")
+                ---@type SEngine.UI.UISpine
+                local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+                local aniName = "TV_light_yellow"
+                local rDnum = Mathf.Random(1, 3)
+                if (rDnum == 1) then
+                    aniName = "TV_light_yellow"
+                elseif rDnum == 2 then
+                    aniName = "TV_light_purple"
+                else
+                    aniName = "TV_light_blue"
+                end
+
+                spine:PlayAnim(aniName, true)
+                --go:ResetPRS()
+                --go.transform:SetLocalScaleXYZ(0.05)
+                go.transform.localPosition = Vector3.New(0, 0, 0)
+                self.FurnitureNodeSpineMap[field.id] = go
+                go.transform.gameObject:SetActive(false)
+                self:PlayerInRoomFurniture(field.id)
+            end
+        end)
+    end
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealGuiZiSpine(field)
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        self:DestroyFurnitureSpine(field.id)
+    end
+
+    local level = Config.furniture_level[useFurnitureId].level
+    if (level == 1) then
+        --1级柜子
+        local path = "UI/Room/FurnitureSpine/guizi2_" .. level
+        ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+            if go ~= nil then
+                go.transform:SetParent(self.go_table["obj_" .. field.id .. "_2"].transform, false)
+                go.transform.gameObject:SetActive(false)
+                go.transform:SetSiblingIndex(1)
+                go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+                --go:ResetPRS()
+                --go.transform:SetLocalScaleXYZ(0.05)
+                go.transform.localPosition = Vector3.New(0, 0, 0)
+                self.FurnitureNodeSpineMap[field.id] = go
+                self:PlayerInRoomFurniture(field.id)
+            else
+                self.FurnitureNodeSpineMap[field.id] = nil
+            end
+        end)
+    end
+
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealSofaSpine(field)
+
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        self:DestroyFurnitureSpine(field.id)
+    end
+
+    local level = Config.furniture_level[useFurnitureId].level
+    local path = "UI/Room/FurnitureSpine/sofa_" .. level
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform:SetParent(self.go_table["obj_" .. field.id].transform, false)
+            go.transform:SetSiblingIndex(1)
+            go.transform.gameObject:SetActive(false)
+            go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+            --go:ResetPRS()
+            --go.transform:SetLocalScaleXYZ(0.05)
+            go.transform.localPosition = Vector3.New(0, 0, 0)
+            self.FurnitureNodeSpineMap[field.id] = go
+            self:PlayerInRoomFurniture(field.id)
+        end
+    end)
+
+
+end
+
+---@param field  furniture_field_Item
+function LoungeSceneView:DealBedSpine(field)
+
+    local useFurnitureId = DeviceData:GetInstance():GetCurUseFurnitureData(field.house_type, field.id) --当前房间当前栏位正在上使用的家具id
+    if (useFurnitureId == nil) then
+        return
+    end
+    local node = self.FurnitureNodeSpineMap[field.id]
+    if (node ~= nil) then
+        self:DestroyFurnitureSpine(field.id)
+    end
+    local level = Config.furniture_level[useFurnitureId].level
+    local path = "UI/Room/FurnitureSpine/bed_" .. level
+    ResLoadManager:GetInstance():LoadObj(path, ResTypeEnum.ePrefab, true, function(go)
+        if go ~= nil then
+            go.transform.gameObject:SetActive(false)
+            go.transform:SetParent(self.go_table["obj_" .. field.id].transform, false)
+            go.transform:SetSiblingIndex(1)
+            go.transform:Find("@_simg_furniture").transform.gameObject:SetActive(false)
+            --go:ResetPRS()
+            --go.transform:SetLocalScaleXYZ(0.05)
+            go.transform.localPosition = Vector3.New(0, 0, 0)
+            self.FurnitureNodeSpineMap[field.id] = go
+            self:PlayerInRoomFurniture(field.id)
+        end
+    end)
+
+
+end
+
+---@param fieldId number 栏位id
+function LoungeSceneView:OnOpenFurnitureSpineStatus(fieldId)
+    if (fieldId == 10009) then
+        --坩埚
+        local node = self.FurnitureNodeSpineMap[fieldId]
+        local spineNode = node.transform:Find("@_obj_spines").transform:Find("spine1")
+        ---@type SEngine.UI.UISpine
+        local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+        spine:PlayAnim("walk", true)
+    elseif fieldId == 10005 then
+        if (self.zhanbuPeoPleNum == nil) then
+            self.zhanbuPeoPleNum = 0
+        end
+
+        if (self.zhanbuPeoPleNum == 0) then
+            --占卜桌
+            local node = self.FurnitureNodeSpineMap[fieldId]
+            local spineNode = node.transform:Find("@_obj_spines").transform:Find("spine1")
+            ---@type SEngine.UI.UISpine
+            local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            spine:PlayAnim("walk", true)
+        end
+        self.zhanbuPeoPleNum = self.zhanbuPeoPleNum + 1
+
+    elseif fieldId == 10011 then
+        --游戏区 电视机
+
+        if (self.TVpeopleNum == nil) then
+            self.TVpeopleNum = 0
+        end
+        if (self.TVpeopleNum == 0) then
+            local node = self.FurnitureNodeSpineMap[fieldId]
+            node.transform.gameObject:SetActive(true)
+            local spineNode = node.transform:Find("@_obj_spines").transform:Find("spine1")
+            ---@type SEngine.UI.UISpine
+            local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            local aniName = "TV_light_yellow"
+            local rDnum = Mathf.Random(1, 3)
+            if (rDnum == 1) then
+                aniName = "TV_light_yellow"
+            elseif rDnum == 2 then
+                aniName = "TV_light_purple"
+            else
+                aniName = "TV_light_blue"
+            end
+            spine:PlayAnim(aniName, true)
+        end
+        self.TVpeopleNum = self.TVpeopleNum + 1
+    end
+end
+
+---@param fieldId number 栏位id
+function LoungeSceneView:OnExitFurnitureSpineStatus(fieldId)
+    if (fieldId == 10009) then
+        --坩埚
+        local node = self.FurnitureNodeSpineMap[fieldId]
+        local spineNode = node.transform:Find("@_obj_spines").transform:Find("spine1")
+        ---@type SEngine.UI.UISpine
+        local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+        spine:PlayAnim("idle", true)
+    elseif fieldId == 10005 then
+        if (self.zhanbuPeoPleNum == 1) then
+            --占卜桌
+
+            local node = self.FurnitureNodeSpineMap[fieldId]
+            local spineNode = node.transform:Find("@_obj_spines").transform:Find("spine1")
+            ---@type SEngine.UI.UISpine
+            local spine = spineNode.transform:GetComponent(typeof(CS.SEngine.UI.UISpine))
+            spine:PlayAnim("idle", true)
+        end
+
+        self.zhanbuPeoPleNum = self.zhanbuPeoPleNum - 1
+
+    elseif fieldId == 10011 then
+        --游戏区 电视机
+
+        if (self.TVpeopleNum == nil) then
+            self.TVpeopleNum = 0
+        end
+        if (self.TVpeopleNum == 1) then
+            local node = self.FurnitureNodeSpineMap[fieldId]
+            node.transform.gameObject:SetActive(false)
+        end
+        self.TVpeopleNum = self.TVpeopleNum - 1
+    end
+end
+
+---@param id number
+---@param isAlive  boolean
+function LoungeSceneView:FurnitureSpineAlive(id, isAlive)
+    local node = self.FurnitureNodeSpineMap[id]
+    if (node == nil) then
+        return
+    end
+    node.transform.gameObject:SetActive(isAlive)
+end
+---@param id number
+function LoungeSceneView:DestroyFurnitureSpine(id)
+    self.FurnitureNodeSpineMap[id].transform.gameObject:SetActive(false)
+    self.FurnitureNodeSpineMap[id].transform:DestroyGameObj()
+    self.FurnitureNodeSpineMap[id] = nil
+end
+
+function LoungeSceneView:DealSpecialFurniture(fieldId)
+    ---@type AvatarStateMachine[]
+    local useArray = AvatarManager:GetInstance():GetFurnitureStateMachines(AvatarStateMachine.eStateName.UseFurniture, fieldId)
+    local useCount = table.count(useArray)--正在使用的人数
+
+    if (useCount <= 0 and fieldId == 10011) then
+        --电视机 要默认关闭 有人才打开
+        self:FurnitureSpineAlive(fieldId, false)
+    end
+
+    if (fieldId == 10009) then
+        --坩埚需要隐藏图片
+        ---@type FurnitureView
+        local nodeView = self:GetFurnitureNode(fieldId)
+        if nodeView ~= nil then
+            local imageNodes = nodeView:GetImageNode()
+            if (self.FurnitureNodeSpineMap[fieldId] ~= nil) then
+                imageNodes[1].gameObject:SetActive(false)
+            else
+                imageNodes[1].gameObject:SetActive(true)
+            end
+        end
+    end
 end
 
 return LoungeSceneView

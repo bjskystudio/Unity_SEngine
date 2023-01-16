@@ -24,7 +24,7 @@ function DeviceLackView:OnCreate(lackId, lackNum)
     self.lackId = lackId--缺的物品id
 
     ---@type Items_Item[]
-    self.lackWpData = ConfigManager.Items[self.lackId]
+    self.lackWpData = ConfigManager.items[self.lackId]
     if (self.lackWpData == nil) then
         return
     end
@@ -51,7 +51,7 @@ function DeviceLackView:OnCreate(lackId, lackNum)
     self.AddNum = 1000000
     self.go_table.stmp_guanggaohuoqu.text = "+" .. self.AddNum
 
-    if (lackId == 1000003 or lackId == 1000004) then
+    if (lackId == 1000003) then
         self.go_table.sbtn_lookgg.gameObject:SetActive(false)
         self.go_table.stmp_ggcishu.gameObject:SetActive(false)
     end
@@ -95,6 +95,8 @@ function DeviceLackView:OnClickBtn(btn)
             GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Gold, self.AddNum)
         elseif self.lackId == 1000002 then
             GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.Diamond, self.AddNum)
+        elseif self.lackId == 1000004 then
+            GameDataInst:ChangePlayerProp(GameDefine.ePlayerProp.SpeedTime, self.AddNum)
         end
         self:Close()
     end

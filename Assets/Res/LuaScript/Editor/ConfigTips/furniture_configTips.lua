@@ -1,27 +1,27 @@
 ---@class furniture_Item
----@field public id number @åºå·
----@field public sort number @æ’åº
----@field public house_type number @å¯¹åº”æˆ¿é—´
----@field public desc string @è¯´æ˜
----@field public name string @åç§°æ–‡æœ¬
----@field public core number @æ ¸å¿ƒå®¶å…·(æ ‡è®°ä¸º1)
----@field public profit_trigger number @æ”¶ç›Šè§¦å‘
----@field public Effects_type number @å‡çº§æ•ˆæœ
----@field public Effects_coord number[][] @ç‰¹æ•ˆä½ç½®
----@field public unlock number @æ˜¯å¦é»˜è®¤è§£é”
----@field public unlock_terms number[] @è§£é”æ¡ä»¶ï¼ˆ8ï¼šéœ€æ±‚äººæ°” 9ï¼šéœ€æ±‚å‰ç½®æˆ¿é—´ 10ï¼šéœ€æ±‚å®¶å…·ï¼‰
----@field public term_num number[] @è§£é”å‚æ•°
----@field public cost number[] @æ¶ˆè€—1.é‡‘å¸ï¼›2.é’»çŸ³â€œç±»å‹#æ•°é‡â€
----@field public furniture_used number @å®¶å…·ä½¿ç”¨æƒ…å†µï¼ˆ1å…¥æˆ·äº¤äº’ï¼Œ2å¿…é¡»äº¤äº’å®¶å…·ï¼Œ3éšæœºäº¤äº’ï¼‰
----@field public lifetime number @äº¤äº’æ—¶é—´ï¼ˆsï¼‰
----@field public animation_tags string @äº¤äº’åŠ¨ç”»
----@field public collider number[][] @é˜»æŒ¡ä¿¡æ¯
----@field public position number[][] @æ’é˜Ÿä½ç½®
----@field public usedrange number[][] @äº¤äº’ç‚¹
----@field public direction number[] @æœå‘
----@field public excursion number[][] @äº¤äº’ç‚¹åç§»
----@field public range number[][] @ç«™ç«‹ç‚¹
----@field public coinrange number[][] @é‡‘å¸æ‰è½ç‚¹
----@field public queue number[][] @æ’é˜Ÿç‚¹
+---@field public id number @ĞòºÅ
+---@field public sort number @ÅÅĞò
+---@field public house_type number @¶ÔÓ¦·¿¼ä
+---@field public desc string @ËµÃ÷
+---@field public name string @Ãû³ÆÎÄ±¾
+---@field public core number @ºËĞÄ¼Ò¾ß(±ê¼ÇÎª1)
+---@field public profit_trigger number @ÊÕÒæ´¥·¢
+---@field public Effects_type number @Éı¼¶Ğ§¹û£¨1¼Ò¾ß 2Ç½ 3µØ°å£©
+---@field public Effects_coord number[][] @ÌØĞ§Î»ÖÃ
+---@field public unlock number @ÊÇ·ñÄ¬ÈÏ½âËø
+---@field public unlock_terms number[] @½âËøÌõ¼ş£¨8£ºĞèÇóÈËÆø 9£ºĞèÇóÇ°ÖÃ·¿¼ä 10£ºĞèÇó¼Ò¾ß£©
+---@field public term_num number[] @½âËø²ÎÊı
+---@field public cost number[] @ÏûºÄ1.½ğ±Ò£»2.×êÊ¯¡°ÀàĞÍ#ÊıÁ¿¡±
+---@field public furniture_used number @¼Ò¾ßÊ¹ÓÃÇé¿ö£¨1Èë»§½»»¥£¬2±ØĞë½»»¥¼Ò¾ß£¬3Ëæ»ú½»»¥£©
+---@field public lifetime number @½»»¥Ê±¼ä£¨s£©
+---@field public animation_tags string @½»»¥¶¯»­
+---@field public collider number[][] @×èµ²ĞÅÏ¢
+---@field public position number[][] @ÅÅĞòÎ»ÖÃ
+---@field public usedrange number[][] @½»»¥µã£¨×ÏÉ«£©
+---@field public direction number[] @³¯Ïò
+---@field public excursion number[][] @½»»¥µãÆ«ÒÆ
+---@field public range number[][] @Õ¾Á¢µã£¨»ÆÉ«£©
+---@field public coinrange number[][] @½ğ±ÒµôÂäµã£¨·ÛÉ«£©
+---@field public queue number[][] @ÅÅ¶Óµã£¨À¶É«£©
 
 

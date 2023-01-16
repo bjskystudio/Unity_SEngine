@@ -40,6 +40,8 @@ namespace SEngine.Map
         private Astar pathFinding;
 
         private MapComponent mapComponent;
+
+        public bool Line = true;
         public MapService()
         {
             doorCount = new int[5];
@@ -246,6 +248,19 @@ namespace SEngine.Map
                 return Enum.EnTileMapType.PhyRoomMap;
             }
             return Enum.EnTileMapType.None;
+        }
+
+        public int GetTileMap(Enum.EnTileMapType tileMapType)
+        {
+            if (tileMapType == Enum.EnTileMapType.PhyMap)
+            {
+                return 1000;
+            }
+            else if (tileMapType == Enum.EnTileMapType.PhyRoomMap)
+            {
+                return 1001;
+            }
+            return 0;
         }
         
         /// <summary>
@@ -504,7 +519,7 @@ namespace SEngine.Map
             }
             
             var poS = Vector3Int.FloorToInt(pos);
-            DebugPhyMap.DebugPhy.SetCellCanMove(poS,canMove);
+            DebugPhyMap.DebugPhy.SetCellCanMove(poS,canMove,GetTileMap(tileMapType));
             
             //DebugPhyMap.DebugPhy?.SetCellCanMove(poS, canMove);
             
@@ -537,6 +552,48 @@ namespace SEngine.Map
             }
         }
 
+        public void SetCellCanStand(Vector3 pos, bool canMove, Enum.EnTileMapType tileMapType = Enum.EnTileMapType.PhyMap)
+        {
+            if (phyPoints[(int)tileMapType] == null)
+            {
+                return;
+            }
+            
+            var poS = Vector3Int.FloorToInt(pos);
+            DebugPhyMap.DebugPhy.SetCellCanStand(poS,canMove,GetTileMap(tileMapType));
+        }
+        
+        public void SetCellCanQueue(Vector3 pos, bool canMove, Enum.EnTileMapType tileMapType = Enum.EnTileMapType.PhyMap)
+        {
+            if (phyPoints[(int)tileMapType] == null)
+            {
+                return;
+            }
+            
+            var poS = Vector3Int.FloorToInt(pos);
+            DebugPhyMap.DebugPhy.SetCellCanQueue(poS,canMove,GetTileMap(tileMapType));
+        }
+        public void SetCellCanInteract(Vector3 pos, bool canMove, Enum.EnTileMapType tileMapType = Enum.EnTileMapType.PhyMap)
+        {
+            if (phyPoints[(int)tileMapType] == null)
+            {
+                return;
+            }
+            
+            var poS = Vector3Int.FloorToInt(pos);
+            DebugPhyMap.DebugPhy.SetCellCanInteract(poS,canMove,GetTileMap(tileMapType));
+        }
+        
+        public void SetCellCanCoinPos(Vector3 pos, bool canMove, Enum.EnTileMapType tileMapType = Enum.EnTileMapType.PhyMap)
+        {
+            if (phyPoints[(int)tileMapType] == null)
+            {
+                return;
+            }
+            
+            var poS = Vector3Int.FloorToInt(pos);
+            DebugPhyMap.DebugPhy.SetCellCanCoinPos(poS,canMove,GetTileMap(tileMapType));
+        }
         public void RestPhyPoints()
         {
             for (Enum.EnTileMapType i = Enum.EnTileMapType.PhyMap; i < Enum.EnTileMapType.Count; i++)
@@ -572,7 +629,7 @@ namespace SEngine.Map
                 return;
             }
             //TODO
-            DebugPhyMap.DebugPhy?.SetCellCanUse(pos, canUse);
+            DebugPhyMap.DebugPhy?.SetCellCanUse(pos, canUse , GetTileMap(tileMapType));
 
             var newPos = UseCellToWallCell(pos, tileMapType);
 
@@ -949,10 +1006,15 @@ namespace SEngine.Map
             InitAstar(mapId);
             var tilemap = GetTileMap(mapId);
             var path = pathFinding.GetPath(tilemap,Vector3Int.FloorToInt(startPos) , Vector3Int.FloorToInt(endPos), isIgnoreCorner);
-             List<Vector3> temppath = new  List<Vector3>();
+            List<Vector3> temppath = new  List<Vector3>();
             for (int i = 0; i < path.Count; i++)
             {
                 temppath.Add(new Vector3(path[i].x , path[i].y , path[i].z));
+            }
+            if (temppath.Count <= 0)
+            {
+                //Debug.LogError("InvalidStartPos" + startPos);
+                //Debug.LogError("InvalidEndPos" + endPos);
             }
             return temppath;
         }
@@ -973,6 +1035,71 @@ namespace SEngine.Map
             for (int i = 0; i < list.Count; i++)
             {
                 SetCellCanMove(list[i], false , TileMap);
+            }
+        }
+        /// <summary>
+        /// 设置站立点了信息
+        /// </summary>
+        /// <param name="mapid"></param>
+        /// <param name="pos"></param>
+        /// <param name="size"></param>
+        public void SetCanStand(int mapid, Vector2 pos, Vector2 size)
+        {
+            var TileMap = GetTileMap(mapid);
+            if (TileMap == Enum.EnTileMapType.None)
+            {
+                return;
+            }
+            var bounds = new BoundsInt((int)pos.x, (int)pos.y, 1, (int)size.x , (int)size.y , 1);
+            var list = GetTileCellListFromBounds(bounds, TileMap);
+            for (int i = 0; i < list.Count; i++)
+            {
+                SetCellCanStand(list[i], false , TileMap);
+            }
+        }
+        
+        public void SetCanQueue(int mapid, Vector2 pos, Vector2 size)
+        {
+            var TileMap = GetTileMap(mapid);
+            if (TileMap == Enum.EnTileMapType.None)
+            {
+                return;
+            }
+            var bounds = new BoundsInt((int)pos.x, (int)pos.y, 1, (int)size.x , (int)size.y , 1);
+            var list = GetTileCellListFromBounds(bounds, TileMap);
+            for (int i = 0; i < list.Count; i++)
+            {
+                SetCellCanQueue(list[i], false , TileMap);
+            }
+        }
+        
+        public void SetCanInteract(int mapid, Vector2 pos, Vector2 size)
+        {
+            var TileMap = GetTileMap(mapid);
+            if (TileMap == Enum.EnTileMapType.None)
+            {
+                return;
+            }
+            var bounds = new BoundsInt((int)pos.x, (int)pos.y, 1, (int)size.x , (int)size.y , 1);
+            var list = GetTileCellListFromBounds(bounds, TileMap);
+            for (int i = 0; i < list.Count; i++)
+            {
+                SetCellCanInteract(list[i], false , TileMap);
+            }
+        }
+        
+        public void SetCanCoinPos(int mapid, Vector2 pos, Vector2 size)
+        {
+            var TileMap = GetTileMap(mapid);
+            if (TileMap == Enum.EnTileMapType.None)
+            {
+                return;
+            }
+            var bounds = new BoundsInt((int)pos.x, (int)pos.y, 1, (int)size.x , (int)size.y , 1);
+            var list = GetTileCellListFromBounds(bounds, TileMap);
+            for (int i = 0; i < list.Count; i++)
+            {
+                SetCellCanCoinPos(list[i], false , TileMap);
             }
         }
         /// <summary>

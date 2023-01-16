@@ -10,5 +10,6 @@ return _G.ConstClass("hotlebuild",{
     [1007] = { id = 1007, desc = "建造告示栏", sort = 7, text = "Function_Build_Hotlepreserve_07", icon = "Function_Build_Hotlepreserve_01", term = 35, cost = { 1, 2500 }, award = 10, param = 8, front = 1004 },
     [1008] = { id = 1008, desc = "建造房间202", sort = 8, text = "Function_Build_Hotlepreserve_08", icon = "Function_Build_Hotlepreserve_01", term = 45, cost = { 1, 3500 }, award = 0, param = 6, front = 1004 },
     [1009] = { id = 1009, desc = "建造二楼功能房", sort = 9, text = "Function_Build_Hotlepreserve_09", icon = "Function_Build_Hotlepreserve_01", term = 53, cost = { 1, 4500 }, award = 0, param = 10, front = 1004 },
-    [1010] = { id = 1010, desc = "修复楼顶", sort = 10, text = "Function_Build_Hotlepreserve_10", icon = "Function_Build_Hotlepreserve_01", term = 62, cost = { 1, 5500 }, award = 15, param = 7, front = 0 }
+    [1010] = { id = 1010, desc = "修复楼顶", sort = 10, text = "Function_Build_Hotlepreserve_10", icon = "Function_Build_Hotlepreserve_01", term = 62, cost = { 1, 5500 }, award = 15, param = 7, front = 0 },
+
 })

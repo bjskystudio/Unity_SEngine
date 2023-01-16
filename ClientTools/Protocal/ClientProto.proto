@@ -1,0 +1,54 @@
+syntax = "proto3";
+package protocol;
+option go_package = "./;protocol";
+
+// 空数据
+message NullMsg {
+}
+
+// ping请求
+message PingReq {
+  uint32 Seq = 1; // 序号
+  uint32 ClientTime = 2; // 客户端本地时间
+}
+
+// ping响应
+message PingRsp {
+  uint32 Seq = 1; // 序号
+  uint32 ClientTime = 2; // 客户端本地时间
+  uint32 ServerTime = 3; // 服务器时间
+}
+
+// 登陆请求
+message LoginInfo {
+  int32   AccountType = 1;
+  string  Account = 2;
+  string  Token = 3;
+  int64   UserID = 4;
+  int32   ServerID = 6;
+  string  UserName = 7;
+}
+
+// 登录响应
+message UserInfo {
+  PlayerData PlayerData = 1; // 玩家基础数据
+}
+
+// 玩家基础数据
+message PlayerData {
+  uint32 Uid = 1; // uid
+  string NickName = 2; // 玩家昵称
+  uint32 Level = 3; // 玩家等级
+}
+
+// 玩家背包数据
+message PlayerStore {
+  uint32 StoreType = 1; // 背包类型
+  repeated Item ItemList = 2; // 道具列表
+}
+
+// 道具
+message Item {
+  uint32 ItemId = 1; // 道具id
+  int32 Count = 2; // 当前的道具数量
+}

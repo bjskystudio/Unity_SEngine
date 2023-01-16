@@ -317,19 +317,17 @@ function UIBase:RemoveComponent(bindtarget, class)
     end
 end
 
----销毁GameObject,并移除其中挂载的所有lua组件
----@param bindtarget UnityEngine.GameObject @绑定的GameObject
-function UIBase:DestoryComponentGameObj(bindtarget)
+---移除指定lua组件实例对象
+---@param componentinstance UIComBase @lua组件实例对象
+---@return boolean @移除是否成功
+function UIBase:RemoveComponentInstance(componentinstance)
     if self.UIRootCom ~= nil then
-        return self.UIRootCom:DestoryComponentGameObj(bindtarget)
+        return self.UIRootCom:RemoveComponentInstance(componentinstance)
     else
-        Log.Error("窗口名:%s根组件已经被清理,无法进行组件清理!", self.UIName)
+        Log.Error("窗口名:%s根组件已经被清理,无法进行组件实例对象清理!", self.UIName)
         return false
     end
-
 end
---endregion
-
 
 --region ------------- 全局事件监听部分 -------------
 

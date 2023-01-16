@@ -10,6 +10,20 @@ local GameEvent = {}
 ---测试事件
 GameEvent.TestEvent1 = EventID:CreateEventID()
 
+--region -------------Net-------------
+--Http回调错误
+GameEvent.HttpResponseError = EventID:CreateEventID()
+--服务器连接成功
+GameEvent.ServerConnected = EventID:CreateEventID()
+--服务器关闭
+GameEvent.ServerClosed = EventID:CreateEventID()
+--服务器连接超时
+GameEvent.ServerConnectTimeout = EventID:CreateEventID()
+--服务器连接错误
+GameEvent.ServerConnectError = EventID:CreateEventID()
+--endregion -------------Net-------------
+
+
 --region -------------GameData-------------
 ---玩家属性改变事件
 GameEvent.GoldChange = EventID:CreateEventID()
@@ -62,8 +76,6 @@ GameEvent.FinshHotelTaskEvent = EventID:CreateEventID()
 GameEvent.GoinMoveEvent = EventID:CreateEventID()
 ---精力提升漂浮消失事件
 GameEvent.EnergyMoveEvent = EventID:CreateEventID()
----旅店列表定位事件
-GameEvent.MoveToHotelTask = EventID:CreateEventID()
 ---掉落金币
 GameEvent.TriggerCoin = EventID:CreateEventID()
 ---收取取金币
@@ -75,4 +87,16 @@ GameEvent.CoinFlyEvent = EventID:CreateEventID()
 ---货币数量改变完成时间 用于刷新货币UI中货币数量
 GameEvent.CoinChangeFinsh = EventID:CreateEventID()
 
+GameEvent.TileMapScale = EventID:CreateEventID()
+
+GameEvent.TileMapPosition = EventID:CreateEventID()
+
+---某个家具正在被使用
+GameEvent.UseFurnitureEvent = EventID:CreateEventID()
+---某个家具从正在被使用状态切换到未被使用状态
+GameEvent.ExitFurnitureEvent = EventID:CreateEventID()
+
+GameEvent.EggMachineProgress = EventID:CreateEventID()
+
+GameEvent.BtnMachine = EventID:CreateEventID()
 return GameEvent
